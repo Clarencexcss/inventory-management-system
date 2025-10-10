@@ -5,22 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Yanni's Meat Shop</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Local Tabler CSS -->
+    <link href="{{ asset('assets/css/tabler.min.css') }}" rel="stylesheet"/>
 
-    <!-- Scripts -->
+    <!-- Tailwind / App CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-
 </head>
-<body class="font-sans antialiased">
+
+<body class="font-sans antialiased theme-dark">
     <div class="min-h-screen bg-gray-100">
         @include('layouts.body.navigation')
 
-        <!-- Page Heading -->
         @if (isset($header))
             <header class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -29,22 +27,12 @@
             </header>
         @endif
 
-        <!-- Page Content -->
         <main>
             @yield('content')
         </main>
     </div>
 
     @livewireScripts
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {{-- <x-livewire-alert::scripts /> --}}
-
-    <!-- Tabler CSS -->
-    <link href="https://unpkg.com/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet"/>
-</head>
-<body class="theme-dark">
-    <div class="page">
-        @yield('content')
-    </div>
+    <script src="{{ asset('assets/js/sweetalert2.all.min.js') }}"></script>
 </body>
-</html> 
+</html>

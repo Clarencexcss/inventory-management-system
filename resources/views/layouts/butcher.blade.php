@@ -7,9 +7,10 @@
     <title>{{ config('app.name') }} - Yannis Meatshop</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
 
-    <!-- CSS files -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Local CSS files -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #8B0000;
@@ -108,7 +109,6 @@
                         </a>
                     </li>
 
-
                     @if(Auth::user()->isAdmin())
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('reports.index') }}">
@@ -154,10 +154,11 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Local JS -->
+    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+
     @stack('page-scripts')
     @livewireScripts
 </body>
-</html> 
+</html>
