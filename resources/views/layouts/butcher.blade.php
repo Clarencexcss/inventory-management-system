@@ -90,7 +90,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('meat-cuts.index') }}">
-                            <i class="fas fa-meat me-1"></i> Meat Cutssss
+                            <i class="fas fa-drumstick-bite me-1"></i> Meat Cuts
                         </a>
                     </li>
                     <li class="nav-item">
@@ -118,6 +118,11 @@
                     @endif
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <!-- Notification Navbar -->
+                    <li class="nav-item">
+                        @livewire('admin-notification-navbar')
+                    </li>
+                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}

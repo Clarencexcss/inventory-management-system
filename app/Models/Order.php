@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Services\AdminNotificationService;
+use App\Models\CustomerNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,6 +50,70 @@ class Order extends Model
         'updated_at'    => 'datetime',
         'order_status'  => OrderStatus::class,
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Create notification when a new order is created
+        static::created(function ($order) {
+            if ($order->order_status === OrderStatus::PENDING) {
+                $notificationService = app(AdminNotificationService::class);
+                $notificationService->createPendingOrderNotification($order);
+            }
+        });
+
+        // Create customer notifications when order status changes
+        static::updated(function ($order) {
+            $originalStatus = $order->getOriginal('order_status');
+            $newStatus = $order->order_status;
+
+            // Helper function to normalize status values
+            $normalizeStatus = function($status) {
+                if ($status === 0 || $status === '0') return 'pending';
+                if ($status === 1 || $status === '1') return 'complete';
+                if ($status === 2 || $status === '2') return 'cancelled';
+                return $status;
+            };
+
+            $originalStatusNormalized = $normalizeStatus($originalStatus);
+            $newStatusNormalized = $normalizeStatus($newStatus);
+
+            // If status changed from pending to complete (approved)
+            if ($originalStatusNormalized === 'pending' && $newStatusNormalized === 'complete') {
+                CustomerNotification::create([
+                    'customer_id' => $order->customer_id,
+                    'type' => 'order_approved',
+                    'title' => 'Order Approved',
+                    'message' => "Your order #{$order->invoice_no} has been approved and is being processed.",
+                    'data' => [
+                        'order_id' => $order->id,
+                        'invoice_no' => $order->invoice_no,
+                        'status' => 'approved',
+                    ],
+                ]);
+            }
+
+            // If status changed to cancelled (admin cancelled)
+            if ($originalStatusNormalized !== 'cancelled' && $newStatusNormalized === 'cancelled' && !is_null($order->cancelled_at)) {
+                CustomerNotification::create([
+                    'customer_id' => $order->customer_id,
+                    'type' => 'order_cancelled',
+                    'title' => 'Order Cancelled',
+                    'message' => "Your order #{$order->invoice_no} has been cancelled by admin. Reason: {$order->cancellation_reason}",
+                    'data' => [
+                        'order_id' => $order->id,
+                        'invoice_no' => $order->invoice_no,
+                        'status' => 'cancelled',
+                        'cancellation_reason' => $order->cancellation_reason,
+                    ],
+                ]);
+            }
+        });
+    }
 
     /**
      * Get the customer that owns the order
@@ -102,7 +168,7 @@ class Order extends Model
      */
     public function isCancelled(): bool
     {
-        return !is_null($this->cancelled_at);
+        return $this->order_status === OrderStatus::CANCELLED;
     }
 
     /**
@@ -119,10 +185,15 @@ class Order extends Model
     public function cancel(string $reason, ?User $cancelledBy = null): void
     {
         $this->update([
+            'order_status' => OrderStatus::CANCELLED,
             'cancellation_reason' => $reason,
             'cancelled_at' => now(),
             'cancelled_by' => $cancelledBy?->id,
         ]);
+
+        // Create admin notification for cancelled order
+        $notificationService = app(AdminNotificationService::class);
+        $notificationService->createCancelledOrderNotification($this, $cancelledBy);
     }
 
     /**
@@ -181,6 +252,6 @@ class Order extends Model
      */
     public function scopeCancelled($query)
     {
-        return $query->whereNotNull('cancelled_at');
+        return $query->where('order_status', OrderStatus::CANCELLED);
     }
 }

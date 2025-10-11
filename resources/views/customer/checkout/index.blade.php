@@ -81,6 +81,8 @@
                     <i class="fas fa-shopping-cart me-1"></i>Cart
                     <span class="badge bg-danger ms-1">{{ \Gloudemans\Shoppingcart\Facades\Cart::instance('customer')->count() }}</span>
                 </a>
+                 <!-- Livewire Notification Bell -->
+            @livewire('customer-notification-navbar')
                 <a class="nav-link" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>

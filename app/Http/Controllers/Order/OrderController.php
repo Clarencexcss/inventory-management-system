@@ -163,9 +163,67 @@ public function updateStatus(Request $request, Order $order)
         'order_status' => 'required|in:pending,complete,cancelled',
     ]);
 
-    $order->order_status = OrderStatus::from($request->order_status);
-    $order->save();
+    $newStatus = OrderStatus::from($request->order_status);
+    
+    // If cancelling the order, use the proper cancel method to trigger notifications
+    if ($newStatus === OrderStatus::CANCELLED && $order->order_status !== OrderStatus::CANCELLED) {
+        try {
+            DB::beginTransaction();
+            
+            // Use the cancel method which triggers notifications
+            $order->cancel('Order cancelled via status update', Auth::user());
+            
+            // Restore product quantities
+            foreach ($order->details as $detail) {
+                $detail->product->increment('quantity', $detail->quantity);
+            }
+            
+            DB::commit();
+            
+            return back()->with('success', 'Order cancelled successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
+        }
+    } else {
+        // For other status updates, just update the status
+        $order->order_status = $newStatus;
+        $order->save();
+        
+        return back()->with('success', 'Order status updated successfully.');
+    }
+}
 
-    return back()->with('success', 'Order status updated successfully.');
+/**
+ * Cancel an order (Admin)
+ */
+public function cancel(Request $request, Order $order)
+{
+    $request->validate([
+        'cancellation_reason' => 'required|string|max:500',
+    ]);
+
+    if (!$order->canBeCancelled()) {
+        return back()->with('error', 'This order cannot be cancelled.');
+    }
+
+    try {
+        DB::beginTransaction();
+
+        // Cancel the order (this will trigger the notification)
+        $order->cancel($request->cancellation_reason, Auth::user());
+
+        // Restore product quantities
+        foreach ($order->details as $detail) {
+            $detail->product->increment('quantity', $detail->quantity);
+        }
+
+        DB::commit();
+
+        return back()->with('success', 'Order cancelled successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
+    }
 }
 }

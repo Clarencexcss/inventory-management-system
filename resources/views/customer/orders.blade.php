@@ -8,8 +8,8 @@
     <title>{{ config('app.name', 'Laravel') }} - My Orders</title>
 
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
-<link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
-
+    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
+    @livewireStyles
     
     <style>
         :root {
@@ -90,6 +90,10 @@
                 <a class="nav-link active" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>
+                
+                <!-- Customer Notification Navbar -->
+                @livewire('customer-notification-navbar')
+                
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
@@ -202,15 +206,37 @@
 
                                                     
                                                          @if($order->order_status === \App\Enums\OrderStatus::PENDING)
-                                                         <form action="{{ route('orders.update-status', $order->id) }}" method="POST" class="d-inline"
-                                                       onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                                          @csrf
-                                                           @method('PATCH')
-                                                         <input type="hidden" name="order_status" value="cancelled">
-                                                             <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                         <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                                 data-bs-toggle="modal" 
+                                                                 data-bs-target="#cancelOrderModal{{ $order->id }}">
                                                              <i class="fas fa-times-circle me-1"></i>Cancel
                                                          </button>
-                                                    </form>
+                                                         
+                                                         <!-- Cancel Order Modal -->
+                                                         <div class="modal fade" id="cancelOrderModal{{ $order->id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                                                             <div class="modal-dialog">
+                                                                 <div class="modal-content">
+                                                                     <div class="modal-header">
+                                                                         <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order #{{ $order->invoice_no }}</h5>
+                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                     </div>
+                                                                     <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST">
+                                                                         @csrf
+                                                                         <div class="modal-body">
+                                                                             <p>Are you sure you want to cancel this order?</p>
+                                                                             <div class="mb-3">
+                                                                                 <label for="reason{{ $order->id }}" class="form-label">Reason for cancellation:</label>
+                                                                                 <textarea class="form-control" id="reason{{ $order->id }}" name="reason" rows="3" required placeholder="Please provide a reason for cancelling this order..."></textarea>
+                                                                             </div>
+                                                                         </div>
+                                                                         <div class="modal-footer">
+                                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                             <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                                                         </div>
+                                                                     </form>
+                                                                 </div>
+                                                             </div>
+                                                         </div>
                                                 @endif
                                               </td>
                                             </tr>
@@ -235,7 +261,8 @@
     </div>
 
     <!-- Scripts -->
-    <s<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+    @livewireScripts
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -72,11 +73,17 @@
                     <i class="fas fa-shopping-cart me-1"></i>Cart
                     <span class="badge bg-danger ms-1">{{ \Gloudemans\Shoppingcart\Facades\Cart::instance('customer')->count() }}</span>
                 </a>
+
+                
+            <!-- Livewire Notification Bell -->
+            @livewire('customer-notification-navbar')
+
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
                         {{ auth()->user()->name ?? 'Customer' }}
                     </a>
+                    
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('customer.profile') }}">
                             <i class="fas fa-user-edit me-2"></i>My Profile

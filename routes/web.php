@@ -20,6 +20,7 @@ use App\Http\Controllers\Product\ProductImportController;
 use App\Http\Controllers\MeatCutController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Staff\InventoryController;
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -90,6 +91,7 @@ Route::middleware(['customer.web.auth'])->group(function () {
         return view('customer.dashboard');
     })->name('customer.dashboard');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('customer.orders');
+    Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');
     Route::get('/my-profile', [CustomerController::class, 'profile'])->name('customer.profile');
     Route::put('/customer/profile/update', [CustomerController::class, 'update'])->name('customer.update');
     Route::post('/customer/logout', [App\Http\Controllers\Customer\WebAuthController::class, 'logout'])->name('customer.logout');
@@ -138,6 +140,15 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin Notifications
+    Route::prefix('admin/notifications')->name('admin.notifications.')->group(function () {
+        Route::get('/unread-count', [AdminNotificationController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/recent', [AdminNotificationController::class, 'getRecentNotifications'])->name('recent');
+        Route::post('/{notification}/mark-read', [AdminNotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/mark-all-read', [AdminNotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::get('/stats', [AdminNotificationController::class, 'getStats'])->name('stats');
+    });
 
     // Admin and Staff Routes
     Route::middleware(['role:admin,staff'])->group(function () {
@@ -192,6 +203,7 @@ Route::middleware(['auth:web'])->group(function () {
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     //  Order Status Update
 Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // DUES
     Route::get('/due/orders/', [DueOrderController::class, 'index'])->name('due.index');

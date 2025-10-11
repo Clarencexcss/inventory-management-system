@@ -154,19 +154,25 @@ class OrderController extends Controller
     /**
      * Cancel an order
      */
-    public function cancel(Request $request, Order $order): JsonResponse
+    public function cancel(Request $request, Order $order)
     {
         $customer = $request->user();
 
         // Ensure customer can only cancel their own orders
         if ($order->customer_id !== $customer->id) {
-            return response()->json(['message' => 'Order not found'], 404);
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Order not found'], 404);
+            }
+            return back()->with('error', 'Order not found.');
         }
 
         if (!$order->canBeCancelled()) {
-            return response()->json([
-                'message' => 'This order cannot be cancelled',
-            ], 400);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'This order cannot be cancelled',
+                ], 400);
+            }
+            return back()->with('error', 'This order cannot be cancelled.');
         }
 
         $request->validate([
@@ -176,8 +182,8 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Cancel the order
-            $order->cancel($request->reason);
+            // Cancel the order (pass null for cancelledBy since it's customer-initiated)
+            $order->cancel($request->reason, null);
 
             // Restore product quantities
             foreach ($order->details as $detail) {
@@ -195,16 +201,23 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Order cancelled successfully',
-                'order' => $order->fresh(),
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Order cancelled successfully',
+                    'order' => $order->fresh(),
+                ]);
+            }
+
+            return back()->with('success', 'Order cancelled successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to cancel order: ' . $e->getMessage(),
-            ], 500);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Failed to cancel order: ' . $e->getMessage(),
+                ], 500);
+            }
+            return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
         }
     }
 
