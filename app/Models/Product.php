@@ -18,15 +18,11 @@ class Product extends Model
         'unit_id',
         'meat_cut_id',
         'quantity',
-        'weight_per_unit',
         'price_per_kg',
         'selling_price',
-        'total_weight',
         'storage_location',
         'expiration_date',
         'source',
-        'grade',
-        'processing_date',
         'notes',
         'buying_price',
         'quantity_alert'
@@ -36,20 +32,14 @@ class Product extends Model
         'name',
         'code',
         'quantity',
-        'weight_per_unit',
         'price_per_kg',
         'selling_price',
-        'total_weight',
-        'expiration_date',
-        'processing_date'
+        'expiration_date'
     ];
 
     protected $casts = [
         'expiration_date' => 'date',
-        'processing_date' => 'date',
-        'weight_per_unit' => 'decimal:2',
-        'price_per_kg' => 'decimal:2',
-        'total_weight' => 'decimal:2'
+        'price_per_kg' => 'decimal:2'
     ];
 
     public function scopeSearch($query, $value)

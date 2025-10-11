@@ -74,27 +74,9 @@
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('grade')" href="#" role="button">
-                            {{ __('Grade') }}
-                            @include('includes._sort-icon', ['field' => 'grade'])
-                        </a>
-                    </th>
-                    <th scope="col" class="align-middle text-center">
                         <a wire:click.prevent="sortBy('quantity')" href="#" role="button">
                             {{ __('Stock') }}
                             @include('includes._sort-icon', ['field' => 'quantity'])
-                        </a>
-                    </th>
-                    <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('weight_per_unit')" href="#" role="button">
-                            {{ __('Weight/Unit (kg)') }}
-                            @include('includes._sort-icon', ['field' => 'weight_per_unit'])
-                        </a>
-                    </th>
-                    <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('total_weight')" href="#" role="button">
-                            {{ __('Total Weight (kg)') }}
-                            @include('includes._sort-icon', ['field' => 'total_weight'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
@@ -133,19 +115,15 @@
                         {{ $product->meatCut ? $product->meatCut->name : 'N/A' }}
                     </td>
                     <td class="align-middle text-center">
-                        {{ $product->grade ?? 'N/A' }}
-                    </td>
-                    <td class="align-middle text-center">
                         {{ $product->quantity }}
                     </td>
                     <td class="align-middle text-center">
-                        {{ $product->weight_per_unit ? number_format($product->weight_per_unit, 2) : 'N/A' }}
-                    </td>
-                    <td class="align-middle text-center">
-                        {{ $product->total_weight ? number_format($product->total_weight, 2) : 'N/A' }}
-                    </td>
-                    <td class="align-middle text-center">
                         ₱{{ number_format($product->price_per_kg, 2) }}
+                        @if($product->unit)
+                            /{{ $product->unit->name }}
+                        @else
+                            /kg
+                        @endif
                     </td>
                     <td class="align-middle text-center">
                         {{ $product->storage_location ?? 'N/A' }}

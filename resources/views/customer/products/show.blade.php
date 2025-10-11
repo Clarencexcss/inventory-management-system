@@ -7,13 +7,12 @@
 
     <title>{{ config('app.name', 'Laravel') }} - {{ $product->name ?? 'Product' }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+<link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
+
     
     <style>
         :root {
@@ -177,8 +176,34 @@
                             <div class="col-md-6">
                                 <h2 class="mb-3">{{ $product->name ?? 'Unnamed Product' }}</h2>
                                 
-                                <div class="price mb-3">
-                                    ₱{{ number_format($product->selling_price ?? 0, 2) }}/kg
+                                <div class="price mb-2">
+                                    ₱{{ number_format($product->selling_price ?? 0, 2) }}
+                                    @if($product->unit)
+                                        /{{ $product->unit->name }}
+                                    @else
+                                        /kg
+                                    @endif
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="alert alert-info py-2 px-3 mb-0">
+                                        <small class="fw-bold">
+                                            <i class="fas fa-tag me-1"></i>
+                                            @if($product->unit && strtolower($product->unit->name) === 'kg')
+                                                Sold per kilogram
+                                            @elseif($product->unit && strtolower($product->unit->name) === 'piece')
+                                                Sold per piece
+                                            @elseif($product->unit && strtolower($product->unit->name) === 'package')
+                                                Sold per package
+                                            @elseif($product->unit && strtolower($product->unit->name) === 'box')
+                                                Sold per box
+                                            @elseif($product->unit && strtolower($product->unit->name) === 'dozen')
+                                                Sold per dozen
+                                            @else
+                                                Sold per {{ $product->unit->name ?? 'unit' }}
+                                            @endif
+                                        </small>
+                                    </div>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -258,7 +283,14 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1">{{ $relatedProduct->name ?? 'Related Product' }}</h6>
-                                        <p class="text-muted mb-1 small">₱{{ number_format($relatedProduct->selling_price ?? 0, 2) }}/kg</p>
+                                        <p class="text-muted mb-1 small">
+                                            ₱{{ number_format($relatedProduct->selling_price ?? 0, 2) }}
+                                            @if($relatedProduct->unit)
+                                                /{{ $relatedProduct->unit->name }}
+                                            @else
+                                                /kg
+                                            @endif
+                                        </p>
                                         <a href="{{ route('customer.products.show', $relatedProduct) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             View Details
@@ -276,7 +308,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+
 </body>
 </html> 

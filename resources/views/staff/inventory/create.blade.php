@@ -22,7 +22,10 @@
                             <select name="product_id" id="product_id" class="form-control @error('product_id') is-invalid @enderror" required>
                                 <option value="">Select a product</option>
                                 @foreach($products as $product)
-                                    <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                    <option value="{{ $product->id }}" 
+                                            data-meat-cut-id="{{ $product->meat_cut_id }}"
+                                            data-default-price="{{ $product->meatCut->default_price_per_kg ?? 0 }}"
+                                            {{ old('product_id') == $product->id ? 'selected' : '' }}>
                                         {{ $product->name }} (Current Stock: {{ $product->quantity }})
                                     </option>
                                 @endforeach
@@ -30,6 +33,15 @@
                             @error('product_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+
+                        <div class="form-group" id="price-info" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Default Price per KG:</strong> ₱<span id="default-price-display">0.00</span>
+                                <br>
+                                <small class="text-muted">This is the default price for this meat cut. The actual price per kg will be used when adding to inventory.</small>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -114,6 +126,9 @@
         const referenceTypeSelect = document.getElementById('reference_type');
         const referenceIdGroup = document.querySelector('.reference-id-group');
         const referenceIdInput = document.getElementById('reference_id');
+        const productSelect = document.getElementById('product_id');
+        const priceInfo = document.getElementById('price-info');
+        const defaultPriceDisplay = document.getElementById('default-price-display');
 
         function toggleReferenceId() {
             const selectedType = referenceTypeSelect.value;
@@ -127,8 +142,24 @@
             }
         }
 
+        function showPriceInfo() {
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            const defaultPrice = selectedOption.getAttribute('data-default-price');
+            const meatCutId = selectedOption.getAttribute('data-meat-cut-id');
+            
+            if (meatCutId && defaultPrice && parseFloat(defaultPrice) > 0) {
+                defaultPriceDisplay.textContent = parseFloat(defaultPrice).toFixed(2);
+                priceInfo.style.display = 'block';
+            } else {
+                priceInfo.style.display = 'none';
+            }
+        }
+
         referenceTypeSelect.addEventListener('change', toggleReferenceId);
+        productSelect.addEventListener('change', showPriceInfo);
+        
         toggleReferenceId(); // Initial state
+        showPriceInfo(); // Initial state
     });
 </script>
 @endpush

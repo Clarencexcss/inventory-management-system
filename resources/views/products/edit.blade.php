@@ -237,49 +237,90 @@
                                         </div>
                                     </div>
 
+                                    {{-- Meat Cut --}}
                                     <div class="col-sm-6 col-md-6">
                                         <div class="mb-3">
-                                            <label for="tax" class="form-label">
-                                                {{ __('Tax') }}
+                                            <label for="meat_cut_id" class="form-label">
+                                                Meat Cut <span class="text-danger">*</span>
                                             </label>
-
-                                            <input type="number"
-                                                   id="tax"
-                                                   name="tax"
-                                                   class="form-control @error('tax') is-invalid @enderror"
-                                                   min="0"
-                                                   placeholder="0"
-                                                   value="{{ old('tax', $product->tax) }}"
-                                            >
-
-                                            @error('tax')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
+                                            <select name="meat_cut_id" id="meat_cut_id"
+                                                    class="form-select @error('meat_cut_id') is-invalid @enderror">
+                                                <option selected disabled>Select a meat cut:</option>
+                                                @foreach ($meatCuts as $meatCut)
+                                                    <option value="{{ $meatCut->id }}"
+                                                        {{ old('meat_cut_id', $product->meat_cut_id) == $meatCut->id ? 'selected' : '' }}>
+                                                        {{ $meatCut->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('meat_cut_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
 
+                                    {{-- Price per KG --}}
                                     <div class="col-sm-6 col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label" for="tax_type">
-                                                {{ __('Tax Type') }}
-                                            </label>
+                                            <label for="price_per_kg" class="form-label">Price per KG</label>
+                                            <input type="number" 
+                                                   name="price_per_kg" 
+                                                   id="price_per_kg" 
+                                                   class="form-control @error('price_per_kg') is-invalid @enderror" 
+                                                   placeholder="0.00" 
+                                                   value="{{ old('price_per_kg', $product->price_per_kg) }}" 
+                                                   step="0.01" 
+                                                   readonly>
+                                            <small class="form-text text-muted">This will be automatically set based on the selected meat cut</small>
+                                            @error('price_per_kg')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
 
-                                            <select name="tax_type" id="tax_type"
-                                                    class="form-select @error('tax_type') is-invalid @enderror"
-                                            >
-                                                @foreach(\App\Enums\TaxType::cases() as $taxType)
-                                                <option value="{{ $taxType->value }}" @selected(old('tax_type', $product->tax_type) == $taxType->value)>
-                                                    {{ $taxType->label() }}
-                                                </option>
-                                                @endforeach
-                                            </select>
+                                    {{-- Source --}}
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="mb-3">
+                                            <label for="source" class="form-label">Source</label>
+                                            <input type="text" 
+                                                   name="source" 
+                                                   id="source" 
+                                                   class="form-control @error('source') is-invalid @enderror" 
+                                                   placeholder="e.g., Local Farm"
+                                                   value="{{ old('source', $product->source) }}">
+                                            @error('source')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
 
-                                            @error('tax_type')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
+                                    {{-- Storage Location --}}
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="mb-3">
+                                            <label for="storage_location" class="form-label">Storage Location</label>
+                                            <input type="text" 
+                                                   name="storage_location" 
+                                                   id="storage_location" 
+                                                   class="form-control @error('storage_location') is-invalid @enderror" 
+                                                   placeholder="e.g., Freezer 1, Shelf 2"
+                                                   value="{{ old('storage_location', $product->storage_location) }}">
+                                            @error('storage_location')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    {{-- Expiration Date --}}
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="mb-3">
+                                            <label for="expiration_date" class="form-label">Expiration Date</label>
+                                            <input type="date" 
+                                                   name="expiration_date" 
+                                                   id="expiration_date" 
+                                                   class="form-control @error('expiration_date') is-invalid @enderror" 
+                                                   value="{{ old('expiration_date', $product->expiration_date ? $product->expiration_date->format('Y-m-d') : '') }}">
+                                            @error('expiration_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -327,4 +368,38 @@
 
 @pushonce('page-scripts')
     <script src="{{ asset('assets/js/img-preview.js') }}"></script>
+    <script>
+        // Auto-populate price per kg based on meat cut selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const meatCutSelect = document.getElementById('meat_cut_id');
+            const pricePerKgInput = document.getElementById('price_per_kg');
+            
+            // Meat cuts data with their default prices
+            const meatCutsData = @json($meatCuts->pluck('default_price_per_kg', 'id'));
+            
+            console.log('Meat cuts data:', meatCutsData); // Debug log
+            
+            if (meatCutSelect && pricePerKgInput) {
+                meatCutSelect.addEventListener('change', function() {
+                    const selectedMeatCutId = this.value;
+                    console.log('Selected meat cut ID:', selectedMeatCutId); // Debug log
+                    
+                    if (selectedMeatCutId && meatCutsData[selectedMeatCutId]) {
+                        pricePerKgInput.value = parseFloat(meatCutsData[selectedMeatCutId]).toFixed(2);
+                        console.log('Set price to:', pricePerKgInput.value); // Debug log
+                    } else {
+                        pricePerKgInput.value = '';
+                    }
+                });
+                
+                // Set initial value if meat cut is pre-selected
+                if (meatCutSelect.value && meatCutsData[meatCutSelect.value]) {
+                    pricePerKgInput.value = parseFloat(meatCutsData[meatCutSelect.value]).toFixed(2);
+                    console.log('Initial price set to:', pricePerKgInput.value); // Debug log
+                }
+            } else {
+                console.error('Required elements not found');
+            }
+        });
+    </script>
 @endpushonce

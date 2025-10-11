@@ -26,7 +26,7 @@ class ProductController extends Controller
     {
         $categories = Category::all(['id', 'name']);
         $units = Unit::all(['id', 'name']);
-        $meatCuts = MeatCut::all(['id', 'name']);
+        $meatCuts = MeatCut::all(['id', 'name', 'default_price_per_kg']);
 
         if ($request->has('category')) {
             $categories = Category::whereSlug($request->get('category'))->get();
@@ -112,6 +112,7 @@ class ProductController extends Controller
         return view('products.edit', [
             'categories' => Category::all(),
             'units' => Unit::all(),
+            'meatCuts' => MeatCut::all(['id', 'name', 'default_price_per_kg']),
             'product' => $product
         ]);
     }

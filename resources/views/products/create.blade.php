@@ -162,15 +162,23 @@
 
                                     {{-- New Required Fields --}}
                                     <div class="col-sm-6 col-md-6">
-                                        <x-input type="number" label="Price per KG" name="price_per_kg"
-                                                 id="price_per_kg" placeholder="0.00"
-                                                 value="{{ old('price_per_kg') }}" step="0.01" />
+                                        <div class="mb-3">
+                                            <label for="price_per_kg" class="form-label">Price per KG</label>
+                                            <input type="number" 
+                                                   name="price_per_kg" 
+                                                   id="price_per_kg" 
+                                                   class="form-control @error('price_per_kg') is-invalid @enderror" 
+                                                   placeholder="0.00" 
+                                                   value="{{ old('price_per_kg') }}" 
+                                                   step="0.01" 
+                                                   readonly>
+                                            <small class="form-text text-muted">This will be automatically set based on the selected meat cut</small>
+                                            @error('price_per_kg')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
-                                        <x-input type="date" label="Processing Date" name="processing_date"
-                                                 id="processing_date" value="{{ old('processing_date') }}" />
-                                    </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="text" label="Source" name="source" id="source"
@@ -178,18 +186,8 @@
                                                  value="{{ old('source') }}" />
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
-                                        <x-input type="text" label="Grade" name="grade" id="grade"
-                                                 placeholder="e.g., A, B, Premium"
-                                                 value="{{ old('grade') }}" />
-                                    </div>
 
                                     {{-- Other Product Fields --}}
-                                    <div class="col-sm-6 col-md-6">
-                                        <x-input type="number" label="Weight per Unit (kg)" name="weight_per_unit"
-                                                 id="weight_per_unit" placeholder="0.00"
-                                                 value="{{ old('weight_per_unit') }}" step="0.01" />
-                                    </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number" label="Buying Price" name="buying_price"
@@ -225,25 +223,6 @@
                                                  id="expiration_date" value="{{ old('expiration_date') }}" />
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
-                                        <x-input type="number" label="Tax" name="tax" id="tax" placeholder="0"
-                                                 value="{{ old('tax') }}" />
-                                    </div>
-
-                                    <div class="col-sm-6 col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label" for="tax_type">{{ __('Tax Type') }}</label>
-                                            <select name="tax_type" id="tax_type"
-                                                    class="form-select @error('tax_type') is-invalid @enderror">
-                                                <option value="">None</option>
-                                                <option value="1" {{ old('tax_type') == 1 ? 'selected' : '' }}>Fixed</option>
-                                                <option value="2" {{ old('tax_type') == 2 ? 'selected' : '' }}>Percentage</option>
-                                            </select>
-                                            @error('tax_type')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
 
                                     <div class="col-md-12">
                                         <div class="mb-3">
@@ -288,5 +267,38 @@
             imgPreview.src = oFREvent.target.result;
         }
     }
+
+    // Auto-populate price per kg based on meat cut selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const meatCutSelect = document.getElementById('meat_cut_id');
+        const pricePerKgInput = document.getElementById('price_per_kg');
+        
+        // Meat cuts data with their default prices
+        const meatCutsData = @json($meatCuts->pluck('default_price_per_kg', 'id'));
+        
+        console.log('Meat cuts data:', meatCutsData); // Debug log
+        
+        if (meatCutSelect && pricePerKgInput) {
+            meatCutSelect.addEventListener('change', function() {
+                const selectedMeatCutId = this.value;
+                console.log('Selected meat cut ID:', selectedMeatCutId); // Debug log
+                
+                if (selectedMeatCutId && meatCutsData[selectedMeatCutId]) {
+                    pricePerKgInput.value = parseFloat(meatCutsData[selectedMeatCutId]).toFixed(2);
+                    console.log('Set price to:', pricePerKgInput.value); // Debug log
+                } else {
+                    pricePerKgInput.value = '';
+                }
+            });
+            
+            // Set initial value if meat cut is pre-selected
+            if (meatCutSelect.value && meatCutsData[meatCutSelect.value]) {
+                pricePerKgInput.value = parseFloat(meatCutsData[meatCutSelect.value]).toFixed(2);
+                console.log('Initial price set to:', pricePerKgInput.value); // Debug log
+            }
+        } else {
+            console.error('Required elements not found');
+        }
+    });
 </script>
 @endpush

@@ -7,13 +7,9 @@
 
     <title>{{ config('app.name', 'Laravel') }} - Checkout</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Fonts-Bootstrap -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
     
     <style>
         :root {
@@ -244,7 +240,7 @@
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <h6 class="mb-1">{{ $item->name ?? 'Product' }}</h6>
-                                        <small class="text-muted">{{ $item->qty }} x ₱{{ number_format($item->price, 2) }}</small>
+                                        <small class="text-muted">{{ $item->qty }} x ₱{{ number_format($item->price, 2) }} per {{ $item->options->unit ?? 'kg' }}</small>
                                     </div>
                                     <div class="text-end"><strong>₱{{ number_format($item->subtotal, 2) }}</strong></div>
                                 </div>
@@ -271,9 +267,10 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+      <!-- Local JS -->
+      <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

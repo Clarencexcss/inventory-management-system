@@ -1,4 +1,4 @@
-@extends('layouts.tabler')
+@extends('layouts.butcher')
 
 @section('content')
 <div class="page-body">
@@ -96,8 +96,8 @@
                                 <th class="text-center">Photo</th>
                                 <th>Product Name</th>
                                 <th>Code</th>
-                                <th class="text-center">Qty</th>
-                                <th class="text-end">Price</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Unit Price</th>
                                 <th class="text-end">Total</th>
                             </tr>
                         </thead>
@@ -110,9 +110,9 @@
                                 </td>
                                 <td>{{ $item->product->name }}</td>
                                 <td>{{ $item->product->code }}</td>
-                                <td class="text-center">{{ $item->quantity }}</td>
-                                <td class="text-end">{{ number_format($item->unitcost, 2) }}</td>
-                                <td class="text-end">{{ number_format($item->total, 2) }}</td>
+                                <td class="text-center">{{ $item->quantity }} {{ $item->product->unit->name ?? 'kg' }}</td>
+                                <td class="text-end">₱{{ number_format($item->unitcost, 2) }}/{{ $item->product->unit->name ?? 'kg' }}</td>
+                                <td class="text-end">₱{{ number_format($item->total, 2) }}</td>
                             </tr>
                             @endforeach
                             <tr>

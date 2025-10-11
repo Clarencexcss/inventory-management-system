@@ -22,7 +22,7 @@ class InventoryController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        $products = Product::with('meatCut')->get();
         $suppliers = Supplier::where('status', 'active')->get();
 
         return view('staff.inventory.create', compact('products', 'suppliers'));

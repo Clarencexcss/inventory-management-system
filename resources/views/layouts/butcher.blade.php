@@ -90,7 +90,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('meat-cuts.index') }}">
-                            <i class="fas fa-meat me-1"></i> Meat Cuts
+                            <i class="fas fa-meat me-1"></i> Meat Cutssss
                         </a>
                     </li>
                     <li class="nav-item">

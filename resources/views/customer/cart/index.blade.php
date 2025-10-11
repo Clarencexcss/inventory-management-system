@@ -166,7 +166,9 @@
                                     <div class="col-md-2">
                                         <div class="text-center">
                                             <div class="fw-bold">₱{{ number_format($item->price, 2) }}</div>
-                                            <small class="text-muted">per kg</small>
+                                            <small class="text-muted">
+                                                per {{ $item->options->unit ?? 'kg' }}
+                                            </small>
                                         </div>
                                     </div>
                                     

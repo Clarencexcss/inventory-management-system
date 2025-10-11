@@ -256,7 +256,30 @@
                                         
                                         
                                         <div class="price mb-2">
-                                            ₱{{ number_format($product->selling_price ?? 0, 2) }}/kg
+                                            ₱{{ number_format($product->selling_price ?? 0, 2) }}
+                                            @if($product->unit)
+                                                /{{ $product->unit->name }}
+                                            @else
+                                                /kg
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <small class="badge bg-info text-dark">
+                                                @if($product->unit && strtolower($product->unit->name) === 'kg')
+                                                    Sold per kg
+                                                @elseif($product->unit && strtolower($product->unit->name) === 'piece')
+                                                    Sold per piece
+                                                @elseif($product->unit && strtolower($product->unit->name) === 'package')
+                                                    Sold per package
+                                                @elseif($product->unit && strtolower($product->unit->name) === 'box')
+                                                    Sold per box
+                                                @elseif($product->unit && strtolower($product->unit->name) === 'dozen')
+                                                    Sold per dozen
+                                                @else
+                                                    Sold per {{ $product->unit->name ?? 'unit' }}
+                                                @endif
+                                            </small>
                                         </div>
                                         
                                         <div class="text-muted small mb-3">

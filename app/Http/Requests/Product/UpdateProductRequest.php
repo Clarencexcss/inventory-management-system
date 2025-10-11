@@ -31,12 +31,15 @@ class UpdateProductRequest extends FormRequest
             ],
             'category_id'       => 'required|integer',
             'unit_id'           => 'required|integer',
+            'meat_cut_id'       => 'required|integer|exists:meat_cuts,id',
             'quantity'          => 'required|integer',
-            'buying_price'      => 'required|integer',
-            'selling_price'     => 'required|integer',
+            'price_per_kg'      => 'required|numeric|min:0',
+            'buying_price'      => 'required|numeric|min:0',
+            'selling_price'     => 'required|numeric|min:0',
             'quantity_alert'    => 'required|integer',
-            'tax'               => 'nullable|numeric',
-            'tax_type'          => 'nullable|integer',
+            'storage_location'  => 'required|string',
+            'expiration_date'   => 'required|date|after:today',
+            'source'            => 'required|string',
             'notes'             => 'nullable|max:1000'
         ];
     }
