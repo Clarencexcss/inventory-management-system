@@ -35,29 +35,37 @@ class UpdateCustomerRequest extends FormRequest
                 'string',
                 'max:50'
             ],
+            'username' => [
+                'nullable',
+                'string',
+                'max:25',
+                Rule::unique('customers', 'username')->ignore($customerId),
+            ],
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 'max:50',
                 Rule::unique('customers', 'email')->ignore($customerId),
             ],
             'phone' => [
-                'required',
+                'nullable',
                 'string',
                 'max:25',
                 Rule::unique('customers', 'phone')->ignore($customerId),
             ],
-            'account_holder' => [
-                'max:50'
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'confirmed'
             ],
-            'account_number' => [
-                'max:25'
-            ],
-            'bank_name' => [
-                'max:25'
+            'password_confirmation' => [
+                'required_with:password',
+                'string',
+                'min:8'
             ],
             'address' => [
-                'required',
+                'nullable',
                 'string',
                 'max:100'
             ],

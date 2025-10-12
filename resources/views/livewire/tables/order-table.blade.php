@@ -171,6 +171,7 @@
                                 <th class="align-middle text-center">{{ __('Date') }}</th>
                                 <th class="align-middle text-center">{{ __('Payment') }}</th>
                                 <th class="align-middle text-center">{{ __('Total') }}</th>
+                                <th class="align-middle text-center">{{ __('Cancel Reason') }}</th>
                                 <th class="align-middle text-center">{{ __('Status') }}</th>
                                 <th class="align-middle text-center">{{ __('Action') }}</th>
                             </tr>
@@ -184,6 +185,11 @@
                                     <td class="align-middle text-center">{{ $order->order_date->format('d-m-Y') }}</td>
                                     <td class="align-middle text-center">{{ $order->payment_type }}</td>
                                     <td class="align-middle text-center">₱{{ number_format($order->total, 2) }}</td>
+                                    <td class="align-middle text-center">
+                                        <span class="text-danger">
+                                            {{ $order->cancellation_reason ?? 'No reason provided' }}
+                                        </span>
+                                    </td>
                                     <td class="align-middle text-center">
                                         <x-status dot color="red" class="text-uppercase">
                                             {{ $order->order_status->label() }}

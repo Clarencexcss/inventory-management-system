@@ -1,5 +1,3 @@
-  <!-- Customer Notification Navbar -->
-  @livewire('customer-notification-navbar')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -72,6 +70,7 @@
                 <a class="nav-link" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>
+                 @livewire('customer-notification-navbar')
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
@@ -120,12 +119,61 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-user-edit me-2"></i>
-                            My Profile
+                            <i class="fas fa-user-edit me-2"></i>My Profile
                         </h5>
                     </div>
                     <div class="card-body">
-                        @yield('content')
+                        <!-- Profile Form Start -->
+                        <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('PATCH')
+
+                            <div class="mb-3">
+                                <label for="name">Full Name</label>
+                                <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username">Username</label>
+                                <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone">Phone</label>
+                                <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email">Email <small>(optional - leave blank to keep current)</small></label>
+                                <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address">Address</label>
+                                <textarea name="address" class="form-control" rows="3">{{ old('address', auth()->user()->address) }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password">New Password <small>(optional - leave blank to keep current)</small></label>
+                                <input type="password" name="password" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password_confirmation">Confirm New Password</label>
+                                <input type="password" name="password_confirmation" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="photo">Profile Photo</label>
+                                <input type="file" name="photo" class="form-control">
+                                @if(auth()->user()->photo)
+                                    <img src="{{ asset('storage/customers/' . auth()->user()->photo) }}" width="100" class="mt-2 rounded">
+                                @endif
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                        <!-- Profile Form End -->
                     </div>
                 </div>
             </div>

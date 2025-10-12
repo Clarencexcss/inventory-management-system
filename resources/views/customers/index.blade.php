@@ -1,6 +1,4 @@
-@extends('layouts.butcher')
 
-@section('content')
 <div class="page-body">
     @if($customers->isEmpty())
         <x-empty
@@ -25,4 +23,4 @@
         </div>
     @endif
 </div>
-@endsection
+

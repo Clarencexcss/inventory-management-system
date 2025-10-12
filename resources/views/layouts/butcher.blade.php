@@ -128,8 +128,9 @@
                             <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-1"></i> Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ route('profile.settings') }}">
+                            <i class="fas fa-cog me-1"></i> Settings
+                            </a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

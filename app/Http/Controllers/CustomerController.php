@@ -61,56 +61,42 @@ class CustomerController extends Controller
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
         $customer = auth()->user(); 
-        // Update without photo first
-        $customer->update($request->except('photo'));
-
+    
+        // Gather data except photo and password
+        $data = $request->except(['photo', 'password', 'password_confirmation']);
+    
+        // Only update password if the user entered one
+        if ($request->filled('password')) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+    
+        // Only update email if provided
+        if (!$request->filled('email')) {
+            unset($data['email']);
+        }
+    
+        // Update customer with data
+        $customer->update($data);
+    
+        // Handle photo upload
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
             if ($customer->photo) {
                 $oldPhotoPath = public_path('storage/customers/') . $customer->photo;
-
-                if (file_exists($oldPhotoPath)) {
-                    unlink($oldPhotoPath);
-                } else {
-                    \Log::warning("Old customer photo not found for deletion: {$oldPhotoPath}");
-                }
+                if (file_exists($oldPhotoPath)) unlink($oldPhotoPath);
             }
-
-            // Save new photo
+    
             $file = $request->file('photo');
             $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
-
             $file->storeAs('customers', $fileName, 'public');
-
-            $customer->update([
-                'photo' => $fileName
-            ]);
+    
+            $customer->update(['photo' => $fileName]);
         }
-
+    
         return redirect()
             ->route('customer.profile')
-            ->with('success', 'Customer has been updated!');
+            ->with('success', 'Profile has been updated successfully!');
     }
-
-    public function destroy(Customer $customer)
-    {
-        if ($customer->photo) {
-            $photoPath = public_path('storage/customers/') . $customer->photo;
-
-            if (file_exists($photoPath)) {
-                unlink($photoPath);
-            } else {
-                \Log::warning("Customer photo not found for deletion: {$photoPath}");
-            }
-        }
-
-        $customer->delete();
-
-        return redirect()
-            ->back()
-            ->with('success', 'Customer has been deleted!');
-    }
-
+    
     /**
      * Show customer profile (for authenticated customers)
      */

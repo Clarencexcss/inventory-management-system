@@ -49,7 +49,7 @@
                                                 <img src="{{ Storage::url($cut->image_path) }}" 
                                                      alt="{{ $cut->name }}" 
                                                      class="img-thumbnail" 
-                                                     style="max-width: 50px;">
+                                                     style="max-width: 100px;">
                                             @else
                                                 <span class="text-muted">No image</span>
                                             @endif

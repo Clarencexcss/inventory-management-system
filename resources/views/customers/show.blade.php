@@ -1,6 +1,4 @@
-@extends('layouts.tabler')
 
-@section('content')
     <div class="page-header d-print-none">
         <div class="container-xl mb-3">
             <div class="row g-2 align-items-center mb-3">
@@ -93,4 +91,4 @@
             </div>
         </div>
     </div>
-@endsection
+

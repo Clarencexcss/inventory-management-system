@@ -92,6 +92,8 @@ Route::middleware(['customer.web.auth'])->group(function () {
     })->name('customer.dashboard');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('customer.orders');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');
+    Route::post('/customer/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel');
+
     Route::get('/my-profile', [CustomerController::class, 'profile'])->name('customer.profile');
     Route::put('/customer/profile/update', [CustomerController::class, 'update'])->name('customer.update');
     Route::post('/customer/logout', [App\Http\Controllers\Customer\WebAuthController::class, 'logout'])->name('customer.logout');
@@ -116,6 +118,13 @@ Route::middleware(['auth:web_customer'])->group(function () {
         Route::get('/products/{product}', [\App\Http\Controllers\Customer\ProductController::class, 'show'])->name('customer.products.show');
         Route::get('/categories/{category}', [\App\Http\Controllers\Customer\ProductController::class, 'category'])->name('customer.products.category');
     });
+
+    // Customer Profile
+Route::prefix('customer')->middleware(['auth'])->group(function () {
+    Route::get('profile', [CustomerController::class, 'profile'])->name('customer.profile');
+    Route::patch('profile', [CustomerController::class, 'update'])->name('customer.profile.update');
+});
+
 });
 
 // ============================================================================
