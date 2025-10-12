@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\MeatCut;
+use App\Services\AdminNotificationService;
 use App\Enums\OrderStatus;
 
 class DashboardController extends Controller
@@ -19,6 +20,7 @@ class DashboardController extends Controller
         $completedOrders = Order::where('order_status', OrderStatus::COMPLETE)
             ->count();
         $todayOrders = Order::whereDate('created_at', today())->count();
+        $pendingOrders = Order::where('order_status', OrderStatus::PENDING)->count();
 
         // Products and Categories
         $products = Product::count();
@@ -37,17 +39,25 @@ class DashboardController extends Controller
             ->get()
             ->pluck('count', 'animal_type')
             ->toArray();
+            
+        // Notification statistics
+        $notificationService = app(AdminNotificationService::class);
+        $unreadNotifications = $notificationService->getUnreadCount();
+        $notifications = $notificationService->getRecentNotifications(5);
 
         return view('dashboard', compact(
             'orders',
             'completedOrders',
             'todayOrders',
+            'pendingOrders',
             'products',
             'categories',
             'totalMeatCuts',
             'availableMeatCuts',
             'lowStockMeatCuts',
-            'meatByAnimalType'
+            'meatByAnimalType',
+            'unreadNotifications',
+            'notifications'
         ));
     }
 }

@@ -138,6 +138,79 @@
 
         <!-- Dashboard Cards -->
         <div class="row">
+            <!-- Recent Notifications -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bell me-2"></i>
+                            Recent Notifications
+                        </h5>
+                        <a href="{{ route('customer.notifications.index') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>View All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            $customer = auth()->user();
+                            $notifications = $customer ? $customer->notifications()->latest()->limit(3)->get() : collect([]);
+                        @endphp
+                        
+                        @if($notifications->count() > 0)
+                            <div class="list-group list-group-flush">
+                                @foreach($notifications as $notification)
+                                    <div class="list-group-item d-flex align-items-start {{ !$notification->is_read ? 'bg-light border-start border-primary border-3' : '' }}">
+                                        <div class="me-3 flex-shrink-0">
+                                            @if($notification->type === 'order_completed')
+                                                <span class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                    <i class="fas fa-check" style="font-size: 14px;"></i>
+                                                </span>
+                                            @elseif($notification->type === 'order_cancelled')
+                                                <span class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                                                </span>
+                                            @elseif($notification->type === 'order_placed')
+                                                <span class="bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                    <i class="fas fa-shopping-cart" style="font-size: 14px;"></i>
+                                                </span>
+                                            @else
+                                                <span class="bg-secondary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                    <i class="fas fa-bell" style="font-size: 14px;"></i>
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">{{ $notification->title }}</h6>
+                                                    <p class="mb-1 text-muted">{{ $notification->message }}</p>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </small>
+                                                </div>
+                                                @if(!$notification->is_read)
+                                                    <span class="badge bg-primary">New</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No notifications yet</h5>
+                                <p class="text-muted">We'll notify you when there are updates to your orders</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="row">
             <!-- Shop Now -->
             <div class="col-md-4 mb-4">
                 <div class="card h-100">

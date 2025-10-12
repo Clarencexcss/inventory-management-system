@@ -1,106 +1,94 @@
 <div class="nav-item dropdown">
-    <a href="#" class="nav-link d-flex lh-1 text-reset p-0" 
+    <a href="#" class="nav-link position-relative p-0" 
        data-bs-toggle="dropdown" 
-       aria-label="Open notifications menu"
-       wire:click="toggleDropdown">
-        <span class="position-relative">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="26" height="26" viewBox="0 0 23 20" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/>
-                <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
-            </svg>
-            @if($unreadCount > 0)
-                <span class="badge bg-red position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size: 0.6rem;">
-                    {{ $unreadCount > 99 ? '99+' : $unreadCount }}
-                </span>
-            @endif
-        </span>
+       aria-label="Open notifications menu">
+        <!-- Bell Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+        </svg>
+        
+        @if($unreadCount > 0)
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+            </span>
+        @endif
     </a>
     
-    <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" style="width: 350px;">
-        <div class="dropdown-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">Notifications</h6>
-                @if($unreadCount > 0)
-                    <button class="btn btn-sm btn-outline-primary" wire:click="markAllAsRead">
-                        Mark all read
-                    </button>
-                @endif
-            </div>
+    <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" style="width: 380px; max-height: 500px; overflow-y: auto;">
+        <div class="dropdown-header d-flex justify-content-between align-items-center">
+            <span><strong>Admin Notifications</strong></span>
+            @if($unreadCount > 0)
+                <button class="btn btn-sm btn-outline-primary" wire:click="markAllAsRead">
+                    <i class="fas fa-check-double me-1"></i>Mark all read
+                </button>
+            @endif
         </div>
-        
         <div class="dropdown-divider"></div>
         
         @if(count($notifications) > 0)
-            <div class="dropdown-list" style="max-height: 300px; overflow-y: auto;">
+            <div class="dropdown-list">
                 @foreach($notifications as $notification)
-                    <div class="dropdown-item d-flex align-items-start {{ !$notification['is_read'] ? 'bg-light' : '' }}" 
+                    <div class="dropdown-item d-flex align-items-start {{ !$notification['is_read'] ? 'bg-light border-start border-primary border-3' : '' }}" 
                          wire:click="goToOrder({{ $notification['order_id'] }})"
-                         style="cursor: pointer;">
-                        <div class="flex-shrink-0 me-3">
+                         style="cursor: pointer; padding: 12px 16px;">
+                        <div class="me-3 flex-shrink-0">
                             @if($notification['type'] === 'pending_order')
-                                <span class="bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M12 2l3.09 6.26l6.91 1.01l-5 4.87l1.18 6.88l-6.18 -3.25l-6.18 3.25l1.18 -6.88l-5 -4.87l6.91 -1.01z"/>
-                                    </svg>
+                                <span class="bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-clock" style="font-size: 14px;"></i>
                                 </span>
                             @elseif($notification['type'] === 'cancelled_order')
-                                <span class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M18 6l-12 12"/>
-                                        <path d="M6 6l12 12"/>
-                                    </svg>
+                                <span class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                                </span>
+                            @elseif($notification['type'] === 'order_completed')
+                                <span class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-check" style="font-size: 14px;"></i>
+                                </span>
+                            @elseif($notification['type'] === 'low_stock')
+                                <span class="bg-warning text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 14px;"></i>
                                 </span>
                             @else
-                                <span class="bg-info text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M9 12l2 2l4 -4"/>
-                                    </svg>
+                                <span class="bg-info text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="fas fa-bell" style="font-size: 14px;"></i>
                                 </span>
                             @endif
                         </div>
                         <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="fw-bold text-truncate" style="max-width: 200px;">
-                                        {{ $notification['title'] }}
-                                    </div>
-                                    <div class="text-muted small text-truncate" style="max-width: 200px;">
-                                        {{ $notification['message'] }}
-                                    </div>
+                            <div class="fw-bold text-truncate mb-1" style="max-width: 250px;">{{ $notification['title'] }}</div>
+                            <div class="text-muted small text-truncate mb-2" style="max-width: 250px; line-height: 1.3;">{{ $notification['message'] }}</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ \Carbon\Carbon::parse($notification['created_at'])->diffForHumans() }}
                                 </div>
                                 @if(!$notification['is_read'])
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 0.5rem;">New</span>
+                                    <span class="badge bg-primary" style="font-size: 0.6rem;">New</span>
                                 @endif
-                            </div>
-                            <div class="text-muted small mt-1">
-                                {{ \Carbon\Carbon::parse($notification['created_at'])->diffForHumans() }}
                             </div>
                         </div>
                     </div>
                     @if(!$loop->last)
-                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider m-0"></div>
                     @endif
                 @endforeach
             </div>
         @else
-            <div class="dropdown-item text-center text-muted py-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/>
-                    <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
-                </svg>
-                <div>No notifications</div>
+            <div class="dropdown-item text-center text-muted py-5">
+                <i class="fas fa-bell-slash fa-3x mb-3 text-muted"></i>
+                <div class="fw-bold">No notifications yet</div>
+                <small>New order and system notifications will appear here</small>
             </div>
         @endif
         
         <div class="dropdown-divider"></div>
         <div class="dropdown-item text-center">
-            <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-primary">
-                View All Orders
+            <a href="{{ route('admin.notifications.index') }}" class="btn btn-sm btn-primary me-2">
+                <i class="fas fa-bell me-1"></i>View All Notifications
+            </a>
+            <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-list me-1"></i>Orders
             </a>
         </div>
     </div>

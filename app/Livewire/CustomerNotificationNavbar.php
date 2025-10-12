@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\CustomerNotification;
+use App\Services\CustomerNotificationService;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,12 +25,9 @@ class CustomerNotificationNavbar extends Component
         $customer = Auth::guard('web_customer')->user();
         
         if ($customer) {
-            $this->unreadCount = $customer->notifications()->unread()->count();
-            $this->notifications = $customer->notifications()
-                ->latest()
-                ->limit(5)
-                ->get()
-                ->toArray();
+            $notificationService = app(CustomerNotificationService::class);
+            $this->unreadCount = $notificationService->getUnreadCount($customer);
+            $this->notifications = $notificationService->getRecentNotifications($customer, 5)->toArray();
         }
     }
 
@@ -44,7 +42,8 @@ class CustomerNotificationNavbar extends Component
         $notification = CustomerNotification::find($notificationId);
         
         if ($notification && $notification->customer_id === $customer->id && $notification->isUnread()) {
-            $notification->markAsRead();
+            $notificationService = app(CustomerNotificationService::class);
+            $notificationService->markAsRead($notification);
             $this->loadNotifications();
         }
     }
@@ -54,16 +53,25 @@ class CustomerNotificationNavbar extends Component
         $customer = Auth::guard('web_customer')->user();
         
         if ($customer) {
-            $customer->notifications()->unread()->update([
-                'is_read' => true,
-                'read_at' => now(),
-            ]);
+            $notificationService = app(CustomerNotificationService::class);
+            $notificationService->markAllAsRead($customer);
             $this->loadNotifications();
         }
     }
 
     public function goToOrder($orderId)
     {
+        // Mark the notification as read when clicked
+        $customer = Auth::guard('web_customer')->user();
+        $notification = CustomerNotification::where('customer_id', $customer->id)
+            ->whereJsonContains('data->order_id', $orderId)
+            ->first();
+            
+        if ($notification && $notification->isUnread()) {
+            $notification->markAsRead();
+            $this->loadNotifications();
+        }
+        
         return redirect()->route('customer.orders');
     }
 

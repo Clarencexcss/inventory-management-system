@@ -14,6 +14,11 @@ class AdminNotificationService
      */
     public function createPendingOrderNotification(Order $order): AdminNotification
     {
+        // Ensure customer relationship is loaded
+        if (!$order->relationLoaded('customer')) {
+            $order->load('customer');
+        }
+        
         return AdminNotification::create([
             'type' => 'pending_order',
             'title' => 'New Pending Order',
@@ -33,6 +38,11 @@ class AdminNotificationService
      */
     public function createCancelledOrderNotification(Order $order, ?User $cancelledBy = null): AdminNotification
     {
+        // Ensure customer relationship is loaded
+        if (!$order->relationLoaded('customer')) {
+            $order->load('customer');
+        }
+        
         $cancelledByName = $cancelledBy ? $cancelledBy->name : 'Customer';
         
         return AdminNotification::create([

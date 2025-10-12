@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\OrderStatus;
 use App\Services\AdminNotificationService;
+use App\Services\CustomerNotificationService;
 use App\Models\CustomerNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -61,6 +62,11 @@ class Order extends Model
         // Create notification when a new order is created
         static::created(function ($order) {
             if ($order->order_status === OrderStatus::PENDING) {
+                // Ensure customer relationship is loaded before creating notification
+                if (!$order->relationLoaded('customer')) {
+                    $order->load('customer');
+                }
+                
                 $notificationService = app(AdminNotificationService::class);
                 $notificationService->createPendingOrderNotification($order);
             }
@@ -73,6 +79,10 @@ class Order extends Model
 
             // Helper function to normalize status values
             $normalizeStatus = function($status) {
+                // Handle enum objects
+                if ($status instanceof OrderStatus) {
+                    return $status->value;
+                }
                 // Handle both string and integer values
                 if ($status === 0 || $status === '0' || $status === 'pending') return 'pending';
                 if ($status === 1 || $status === '1' || $status === 'complete') return 'complete';
@@ -83,35 +93,26 @@ class Order extends Model
             $originalStatusNormalized = $normalizeStatus($originalStatus);
             $newStatusNormalized = $normalizeStatus($newStatus);
 
+            // Skip if status hasn't actually changed
+            if ($originalStatusNormalized === $newStatusNormalized) {
+                return;
+            }
+
+            // Ensure customer relationship is loaded before creating notifications
+            if (!$order->relationLoaded('customer')) {
+                $order->load('customer');
+            }
+
+            $customerNotificationService = app(CustomerNotificationService::class);
+
             // If status changed from pending to complete (approved)
             if ($originalStatusNormalized === 'pending' && $newStatusNormalized === 'complete') {
-                CustomerNotification::create([
-                    'customer_id' => $order->customer_id,
-                    'type' => 'order_completed',
-                    'title' => 'Order Completed',
-                    'message' => "Your order #{$order->invoice_no} has been completed and is ready for pickup/delivery.",
-                    'data' => [
-                        'order_id' => $order->id,
-                        'invoice_no' => $order->invoice_no,
-                        'status' => 'completed',
-                    ],
-                ]);
+                $customerNotificationService->createOrderCompletedNotification($order);
             }
 
             // If status changed to cancelled (admin cancelled)
-            if ($originalStatusNormalized !== 'cancelled' && $newStatusNormalized === 'cancelled' && !is_null($order->cancelled_at)) {
-                CustomerNotification::create([
-                    'customer_id' => $order->customer_id,
-                    'type' => 'order_cancelled',
-                    'title' => 'Order Cancelled',
-                    'message' => "Your order #{$order->invoice_no} has been cancelled by admin. Reason: {$order->cancellation_reason}",
-                    'data' => [
-                        'order_id' => $order->id,
-                        'invoice_no' => $order->invoice_no,
-                        'status' => 'cancelled',
-                        'cancellation_reason' => $order->cancellation_reason,
-                    ],
-                ]);
+            if ($originalStatusNormalized !== 'cancelled' && $newStatusNormalized === 'cancelled') {
+                $customerNotificationService->createOrderCancelledNotification($order);
             }
         });
     }
@@ -191,6 +192,11 @@ class Order extends Model
             'cancelled_at' => now(),
             'cancelled_by' => $cancelledBy?->id,
         ]);
+
+        // Ensure customer relationship is loaded before creating notification
+        if (!$this->relationLoaded('customer')) {
+            $this->load('customer');
+        }
 
         // Create admin notification for cancelled order
         $notificationService = app(AdminNotificationService::class);

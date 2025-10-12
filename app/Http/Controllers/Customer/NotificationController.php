@@ -4,15 +4,41 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerNotification;
+use App\Services\CustomerNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(CustomerNotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
-     * Get customer's notifications
+     * Display customer's notifications page
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
+    {
+        $customer = $request->user();
+        $perPage = $request->get('per_page', 15);
+
+        $notifications = $customer->notifications()
+            ->latest()
+            ->paginate($perPage);
+            
+        $unreadCount = $this->notificationService->getUnreadCount($customer);
+
+        return view('customer.notifications', compact('notifications', 'unreadCount'));
+    }
+
+    /**
+     * Get customer's notifications (API)
+     */
+    public function apiIndex(Request $request): JsonResponse
     {
         $customer = $request->user();
         $perPage = $request->get('per_page', 15);
@@ -25,44 +51,36 @@ class NotificationController extends Controller
     }
 
     /**
-     * Get recent notifications
+     * Get recent notifications (API)
      */
     public function recent(Request $request): JsonResponse
     {
         $customer = $request->user();
         $limit = $request->get('limit', 10);
 
-        $notifications = $customer->notifications()
-            ->latest()
-            ->limit($limit)
-            ->get();
+        $notifications = $this->notificationService->getRecentNotifications($customer, $limit);
 
         return response()->json($notifications);
     }
 
     /**
-     * Get unread notifications count
+     * Get unread notifications count (API)
      */
     public function unreadCount(Request $request): JsonResponse
     {
         $customer = $request->user();
-        $count = $customer->notifications()->unread()->count();
+        $count = $this->notificationService->getUnreadCount($customer);
 
         return response()->json(['count' => $count]);
     }
 
     /**
-     * Get notification statistics
+     * Get notification statistics (API)
      */
     public function statistics(Request $request): JsonResponse
     {
         $customer = $request->user();
-        
-        $stats = [
-            'total' => $customer->notifications()->count(),
-            'unread' => $customer->notifications()->unread()->count(),
-            'read' => $customer->notifications()->read()->count(),
-        ];
+        $stats = $this->notificationService->getNotificationStatistics($customer);
 
         return response()->json($stats);
     }
@@ -70,19 +88,20 @@ class NotificationController extends Controller
     /**
      * Mark all notifications as read
      */
-    public function markAllAsRead(Request $request): JsonResponse
+    public function markAllAsRead(Request $request)
     {
         $customer = $request->user();
-        $customer->notifications()->unread()->update([
-            'is_read' => true,
-            'read_at' => now(),
-        ]);
+        $this->notificationService->markAllAsRead($customer);
 
-        return response()->json(['success' => true]);
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', 'All notifications marked as read.');
     }
 
     /**
-     * Show specific notification
+     * Show specific notification (API)
      */
     public function show(Request $request, CustomerNotification $notification): JsonResponse
     {
@@ -99,22 +118,29 @@ class NotificationController extends Controller
     /**
      * Mark notification as read
      */
-    public function markAsRead(Request $request, CustomerNotification $notification): JsonResponse
+    public function markAsRead(Request $request, CustomerNotification $notification)
     {
         $customer = $request->user();
 
         // Ensure customer can only update their own notifications
         if ($notification->customer_id !== $customer->id) {
-            return response()->json(['message' => 'Notification not found'], 404);
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Notification not found'], 404);
+            }
+            return back()->with('error', 'Notification not found.');
         }
 
-        $notification->markAsRead();
+        $this->notificationService->markAsRead($notification);
 
-        return response()->json(['success' => true]);
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', 'Notification marked as read.');
     }
 
     /**
-     * Mark notification as unread
+     * Mark notification as unread (API)
      */
     public function markAsUnread(Request $request, CustomerNotification $notification): JsonResponse
     {
@@ -131,7 +157,7 @@ class NotificationController extends Controller
     }
 
     /**
-     * Delete notification
+     * Delete notification (API)
      */
     public function destroy(Request $request, CustomerNotification $notification): JsonResponse
     {

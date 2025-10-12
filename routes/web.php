@@ -98,6 +98,12 @@ Route::middleware(['customer.web.auth'])->group(function () {
     Route::put('/customer/profile/update', [CustomerController::class, 'update'])->name('customer.update');
     Route::post('/customer/logout', [App\Http\Controllers\Customer\WebAuthController::class, 'logout'])->name('customer.logout');
   
+    // Customer Notifications
+    Route::prefix('customer/notifications')->name('customer.notifications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Customer\NotificationController::class, 'index'])->name('index');
+        Route::post('/mark-all-read', [App\Http\Controllers\Customer\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::put('/{notification}/read', [App\Http\Controllers\Customer\NotificationController::class, 'markAsRead'])->name('mark-read');
+    });
 
     // Customer Shopping Cart
     Route::get('/cart', [App\Http\Controllers\Customer\CartController::class, 'index'])->name('customer.cart');
@@ -152,6 +158,7 @@ Route::middleware(['auth:web'])->group(function () {
 
     // Admin Notifications
     Route::prefix('admin/notifications')->name('admin.notifications.')->group(function () {
+        Route::get('/', [AdminNotificationController::class, 'index'])->name('index');
         Route::get('/unread-count', [AdminNotificationController::class, 'getUnreadCount'])->name('unread-count');
         Route::get('/recent', [AdminNotificationController::class, 'getRecentNotifications'])->name('recent');
         Route::post('/{notification}/mark-read', [AdminNotificationController::class, 'markAsRead'])->name('mark-read');

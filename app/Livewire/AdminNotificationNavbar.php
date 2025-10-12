@@ -33,9 +33,10 @@ class AdminNotificationNavbar extends Component
 
     public function markAsRead($notificationId)
     {
-        $notification = AdminNotification::find($notificationId);
+        $notification = AdminNotification::with(['order.customer', 'cancelledByUser'])->find($notificationId);
         if ($notification && $notification->isUnread()) {
-            $notification->markAsRead();
+            $service = app(AdminNotificationService::class);
+            $service->markAsRead($notification);
             $this->loadNotifications();
         }
     }
@@ -49,6 +50,18 @@ class AdminNotificationNavbar extends Component
 
     public function goToOrder($orderId)
     {
+        // Mark the notification as read when clicked
+        $notification = AdminNotification::with(['order.customer', 'cancelledByUser'])
+            ->where('order_id', $orderId)
+            ->whereIn('type', ['pending_order', 'cancelled_order'])
+            ->where('is_read', false)
+            ->first();
+            
+        if ($notification) {
+            $notification->markAsRead();
+            $this->loadNotifications();
+        }
+        
         return redirect()->route('orders.show', $orderId);
     }
 
