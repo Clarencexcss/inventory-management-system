@@ -35,6 +35,41 @@
                 <x-input name="name" :value="old('name')" placeholder="Your name" required="true"/>
                 <x-input name="email" :value="old('email')" placeholder="your@email.com" required="true"/>
                 <x-input name="username" :value="old('username')" placeholder="Your username" required="true"/>
+                
+                <!-- Role Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Role <span class="text-danger">*</span></label>
+                    <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                        <label class="form-selectgroup-item flex-fill">
+                            <input type="radio" name="role" value="admin" class="form-selectgroup-input" {{ old('role') == 'admin' ? 'checked' : '' }}>
+                            <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                <div class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </div>
+                                <div>
+                                    <strong>Administrator</strong>
+                                    <div class="text-muted">Full system access, user management, and all administrative functions</div>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="form-selectgroup-item flex-fill">
+                            <input type="radio" name="role" value="staff" class="form-selectgroup-input" {{ old('role') == 'staff' ? 'checked' : '' }}>
+                            <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                <div class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </div>
+                                <div>
+                                    <strong>Staff</strong>
+                                    <div class="text-muted">Inventory management, order processing, and basic system functions</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    @error('role')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                
                 <x-input name="password" :value="old('password')" placeholder="Password" required="true"/>
                 <x-input name="password_confirmation" :value="old('password_confirmation')" placeholder="Password confirmation" required="true" label="Password Confirmation"/>
 

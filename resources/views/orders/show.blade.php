@@ -6,7 +6,10 @@
 
         {{-- Order Header --}}
         <div class="mb-4">
-            <h1 class="page-title">{{ __('Order Details') }}</h1>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="page-title">{{ __('Order Details') }}</h1>
+                <x-back-button url="{{ route('orders.index') }}" text="Back to Orders" />
+            </div>
             <p class="text-muted">Invoice: <strong>{{ $order->invoice_no }}</strong> | Customer: <strong>{{ $order->customer->name }}</strong></p>
         </div>
 

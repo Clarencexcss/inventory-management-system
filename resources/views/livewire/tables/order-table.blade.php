@@ -83,6 +83,15 @@
                                     <td class="align-middle text-center" style="width: 5%">
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
+                                        
+                                        <!-- Cancel Order Button -->
+                                        <button type="button" class="btn btn-outline-warning btn-icon" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#cancelOrderModal{{ $order->id }}"
+                                                title="Cancel Order">
+                                            <i class="ti ti-x"></i>Cancel
+                                        </button>
+                                        
                                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                         @csrf
                                      @method('DELETE')
@@ -236,4 +245,40 @@
             {{ $orders->links() }}
         </ul>
     </div>
+
+    {{-- Cancel Order Modals --}}
+    @foreach($pendingOrders as $order)
+    <div class="modal fade" id="cancelOrderModal{{ $order->id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel{{ $order->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel{{ $order->id }}">Cancel Order #{{ $order->invoice_no }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('orders.cancel', $order) }}" method="POST" id="cancelOrderForm{{ $order->id }}">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="ti ti-alert-triangle me-2"></i>
+                            Are you sure you want to cancel this order? This action cannot be undone.
+                        </div>
+                        <div class="mb-3">
+                            <label for="cancellation_reason{{ $order->id }}" class="form-label">Cancellation Reason <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="cancellation_reason{{ $order->id }}" name="cancellation_reason" rows="3" required placeholder="Please provide a reason for cancelling this order..."></textarea>
+                            <div class="form-text">Please provide a detailed reason for cancelling this order.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-1"></i>Close
+                        </button>
+                        <button type="submit" class="btn btn-danger" id="confirmCancel{{ $order->id }}">
+                            <i class="ti ti-trash me-1"></i>Cancel Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endforeach
 </div>

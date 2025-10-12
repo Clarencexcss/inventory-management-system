@@ -186,9 +186,8 @@ public function updateStatus(Request $request, Order $order)
             return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
         }
     } else {
-        // For other status updates, just update the status
-        $order->order_status = $newStatus;
-        $order->save();
+        // For other status updates, use update method to trigger model events
+        $order->update(['order_status' => $newStatus]);
         
         return back()->with('success', 'Order status updated successfully.');
     }

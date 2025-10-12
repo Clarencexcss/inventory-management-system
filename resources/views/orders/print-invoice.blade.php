@@ -106,7 +106,7 @@
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <strong>
-                                                        {{ Number::currency($order->sub_total, 'EUR') }}
+                                                        {{ Number::currency($order->sub_total, 'PESOS') }}
                                                     </strong>
                                                 </td>
                                             </tr>
@@ -116,7 +116,7 @@
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <strong>
-                                                        {{ Number::currency($order->vat, 'EUR') }}
+                                                        {{ Number::currency($order->vat, 'PESOS') }}
                                                     </strong>
                                                 </td>
                                             </tr>
@@ -126,7 +126,7 @@
                                                 </td>
                                                 <td class="align-middle text-center">
                                                     <strong>
-                                                        {{ Number::currency($order->total, 'EUR') }}
+                                                        {{ Number::currency($order->total, 'PESOS') }}
                                                     </strong>
                                                 </td>
                                             </tr>

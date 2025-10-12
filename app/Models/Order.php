@@ -73,9 +73,10 @@ class Order extends Model
 
             // Helper function to normalize status values
             $normalizeStatus = function($status) {
-                if ($status === 0 || $status === '0') return 'pending';
-                if ($status === 1 || $status === '1') return 'complete';
-                if ($status === 2 || $status === '2') return 'cancelled';
+                // Handle both string and integer values
+                if ($status === 0 || $status === '0' || $status === 'pending') return 'pending';
+                if ($status === 1 || $status === '1' || $status === 'complete') return 'complete';
+                if ($status === 2 || $status === '2' || $status === 'cancelled') return 'cancelled';
                 return $status;
             };
 
@@ -86,13 +87,13 @@ class Order extends Model
             if ($originalStatusNormalized === 'pending' && $newStatusNormalized === 'complete') {
                 CustomerNotification::create([
                     'customer_id' => $order->customer_id,
-                    'type' => 'order_approved',
-                    'title' => 'Order Approved',
-                    'message' => "Your order #{$order->invoice_no} has been approved and is being processed.",
+                    'type' => 'order_completed',
+                    'title' => 'Order Completed',
+                    'message' => "Your order #{$order->invoice_no} has been completed and is ready for pickup/delivery.",
                     'data' => [
                         'order_id' => $order->id,
                         'invoice_no' => $order->invoice_no,
-                        'status' => 'approved',
+                        'status' => 'completed',
                     ],
                 ]);
             }

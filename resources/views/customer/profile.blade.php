@@ -100,6 +100,9 @@
 
     <!-- Main Content -->
     <div class="container mt-4">
+        <div class="mb-3">
+            <x-back-button url="{{ route('customer.dashboard') }}" text="Back to Dashboard" />
+        </div>
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}

@@ -149,6 +149,11 @@
     <div class="container-fluid">
         <div class="row">
             <main class="col py-4">
+                @if(isset($showBackButton) && $showBackButton)
+                    <div class="mb-3">
+                        <x-back-button />
+                    </div>
+                @endif
                 @yield('content')
             </main>
         </div>

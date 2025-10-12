@@ -1,4 +1,4 @@
-@extends('layouts.tabler')
+@extends('layouts.butcher')
 
 @section('content')
 <div class="page-body">
@@ -53,7 +53,7 @@
                         <th scope="col" class="text-center">{{ __('Payment') }}</th>
                         <th scope="col" class="text-center">{{ __('Total') }}</th>
                         <th scope="col" class="text-center">{{ __('Status') }}</th>
-                        <th scope="col" class="text-center">{{ __('Actions') }}</th>
+                        <th scope="col" class="text-center">{{ __('Action') }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -66,7 +66,7 @@
                             <td class="text-center">{{ $order->customer->name }}</td>
                             <td class="text-center">{{ $order->order_date->format('d-m-Y') }}</td>
                             <td class="text-center">{{ $order->payment_type }}</td>
-                            <td class="text-center">{{ Number::currency($order->total, 'EUR') }}</td>
+                            <td class="text-center">{{ Number::currency($order->total, 'PESOS') }}</td>
                             <td class="text-center">
                                 <span class="badge bg-orange text-white text-uppercase">
                                     {{ \App\Enums\OrderStatus::PENDING->label() }}
