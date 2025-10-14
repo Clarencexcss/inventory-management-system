@@ -21,6 +21,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('products/', [ProductController::class, 'index'])->name('api.product.index');
 
+// Analytics API Routes (Optimized)
+Route::prefix('analytics')->group(function () {
+    Route::get('/inventory', [App\Http\Controllers\OptimizedReportController::class, 'inventoryAnalytics']);
+    Route::get('/sales', [App\Http\Controllers\OptimizedReportController::class, 'salesAnalytics']);
+    Route::get('/suppliers', [App\Http\Controllers\OptimizedReportController::class, 'supplierAnalytics']);
+    Route::get('/staff', [App\Http\Controllers\OptimizedReportController::class, 'staffPerformanceAnalytics']);
+    Route::get('/dashboard', [App\Http\Controllers\OptimizedReportController::class, 'dashboardAnalytics']);
+    Route::post('/clear-cache', [App\Http\Controllers\OptimizedReportController::class, 'clearCache']);
+});
+
+// Performance Monitoring API Routes
+Route::prefix('performance')->group(function () {
+    Route::get('/metrics', [App\Http\Controllers\PerformanceController::class, 'getMetrics']);
+    Route::get('/diagnostics', [App\Http\Controllers\PerformanceController::class, 'runDiagnostics']);
+    Route::post('/optimize', [App\Http\Controllers\PerformanceController::class, 'optimize']);
+});
+
 // Customer Authentication Routes (Public)
 Route::prefix('customer')->group(function () {
     Route::post('/register', [App\Http\Controllers\Customer\AuthController::class, 'register']);

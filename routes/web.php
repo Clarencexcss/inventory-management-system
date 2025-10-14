@@ -92,7 +92,7 @@ Route::middleware(['customer.web.auth'])->group(function () {
     })->name('customer.dashboard');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('customer.orders');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');
-    Route::post('/customer/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel');
+    Route::post('/customer/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel.admin');
 
     Route::get('/my-profile', [CustomerController::class, 'profile'])->name('customer.profile');
     Route::put('/customer/profile/update', [CustomerController::class, 'update'])->name('customer.update');
@@ -127,7 +127,7 @@ Route::middleware(['auth:web_customer'])->group(function () {
 
     // Customer Profile
 Route::prefix('customer')->middleware(['auth'])->group(function () {
-    Route::get('profile', [CustomerController::class, 'profile'])->name('customer.profile');
+    Route::get('profile', [CustomerController::class, 'profile'])->name('customer.profile.admin');
     Route::patch('profile', [CustomerController::class, 'update'])->name('customer.profile.update');
 });
 

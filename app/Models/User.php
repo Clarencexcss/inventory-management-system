@@ -83,4 +83,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Order::class);
     }
+
+    // Staff relationships
+    public function cancelledOrders()
+    {
+        return $this->hasMany(Order::class, 'cancelled_by');
+    }
 }
