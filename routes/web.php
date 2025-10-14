@@ -252,12 +252,30 @@ Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name(
     // Reports Routes
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/inventory', [ReportController::class, 'inventory'])->name('reports.inventory');
+        Route::get('/reports/inventory', [\App\Http\Controllers\InventoryReportController::class, 'index'])->name('reports.inventory');
+        Route::get('/reports/inventory/analytics', [\App\Http\Controllers\InventoryReportController::class, 'analytics'])->name('reports.inventory.analytics');
         Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
         Route::get('/reports/purchases', [ReportController::class, 'purchases'])->name('reports.purchases');
         Route::get('/reports/stock-levels', [ReportController::class, 'stockLevels'])->name('reports.stock-levels');
         Route::get('/reports/export-inventory', [ReportController::class, 'exportInventory'])->name('reports.export-inventory');
         Route::get('/reports/export-sales', [ReportController::class, 'exportSales'])->name('reports.export-sales');
+        
+        // Sales Analytics Routes
+        Route::get('/reports/sales-analytics', [\App\Http\Controllers\SalesAnalyticsController::class, 'index'])->name('reports.sales.analytics');
+        Route::get('/reports/sales-analytics/get-2025', [\App\Http\Controllers\SalesAnalyticsController::class, 'get2025Data'])->name('reports.sales.analytics.get-2025');
+        Route::post('/reports/sales-analytics/store-2025', [\App\Http\Controllers\SalesAnalyticsController::class, 'store2025'])->name('reports.sales.analytics.store-2025');
+        Route::get('/reports/sales-analytics/export-pdf', [\App\Http\Controllers\SalesAnalyticsController::class, 'exportPDF'])->name('reports.sales.analytics.export-pdf');
+        Route::get('/reports/sales-analytics/export-csv', [\App\Http\Controllers\SalesAnalyticsController::class, 'exportCSV'])->name('reports.sales.analytics.export-csv');
+        
+        // Supplier Analytics Routes
+        Route::get('/reports/supplier-analytics', [\App\Http\Controllers\SupplierAnalyticsController::class, 'index'])->name('reports.supplier.analytics');
+        Route::get('/reports/supplier-analytics/export', [\App\Http\Controllers\SupplierAnalyticsController::class, 'export'])->name('reports.supplier.analytics.export');
+        
+        // Legacy Sales Analytics Routes (redirects)
+        Route::get('/sales-analytics', [\App\Http\Controllers\SalesAnalyticsController::class, 'index'])->name('sales-analytics.index');
+        Route::post('/sales-analytics', [\App\Http\Controllers\SalesAnalyticsController::class, 'store'])->name('sales-analytics.store');
+        Route::put('/sales-analytics/{id}', [\App\Http\Controllers\SalesAnalyticsController::class, 'update'])->name('sales-analytics.update');
+        Route::get('/sales-analytics/expense-breakdown/{year}/{month}', [\App\Http\Controllers\SalesAnalyticsController::class, 'getExpenseBreakdown'])->name('sales-analytics.expense-breakdown');
         
         // Staff Performance Routes (Admin Only)
         Route::resource('staff', \App\Http\Controllers\StaffController::class);

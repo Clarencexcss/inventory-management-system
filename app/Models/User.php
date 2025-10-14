@@ -89,4 +89,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Order::class, 'cancelled_by');
     }
+
+    /**
+     * Get the staff record associated with this user (if any)
+     */
+    public function staff()
+    {
+        return $this->hasOne(Staff::class, 'user_id');
+    }
 }

@@ -133,16 +133,16 @@
                         </div>
                         <div class="col">
                             <h5 class="card-title">Sales Analytics</h5>
-                            <p class="card-text">Sales performance, trends, and top-selling products analysis.</p>
+                            <p class="card-text">Comprehensive sales performance and trends analysis (2020-2025).</p>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('reports.sales') }}" class="btn btn-success">
-                            <i class="fas fa-chart-bar"></i> View Report
+                        <a href="{{ route('reports.sales.analytics') }}" class="btn btn-success">
+                            <i class="fas fa-chart-bar"></i> View Analytics
                         </a>
-                        <button onclick="loadSalesData()" class="btn btn-outline-success">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <a href="{{ route('reports.sales') }}" class="btn btn-outline-success">
+                            <i class="fas fa-file-alt"></i> Old Report
+                        </a>
                     </div>
                 </div>
             </div>
@@ -164,12 +164,12 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('reports.purchases') }}" class="btn btn-warning">
-                            <i class="fas fa-chart-bar"></i> View Report
+                        <a href="{{ route('reports.supplier.analytics') }}" class="btn btn-warning">
+                            <i class="fas fa-chart-bar"></i> View Analytics
                         </a>
-                        <button onclick="loadSupplierData()" class="btn btn-outline-warning">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <a href="{{ route('reports.purchases') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-file-alt"></i> Old Report
+                        </a>
                     </div>
                 </div>
             </div>

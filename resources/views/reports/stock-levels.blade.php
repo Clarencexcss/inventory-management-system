@@ -11,6 +11,9 @@
                         <div class="text-muted mt-1">Staff productivity, sales performance, and team analytics</div>
                     </div>
                     <div class="col-auto ms-auto d-print-none">
+                        <a href="{{ route('reports.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Reports
+                        </a>
                         <button onclick="refreshData()" class="btn btn-primary">
                             <i class="fas fa-sync-alt"></i> Refresh Data
                         </button>

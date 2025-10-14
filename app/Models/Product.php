@@ -26,7 +26,8 @@ class Product extends Model
         'notes',
         'buying_price',
         'quantity_alert',
-        'product_image'
+        'product_image',
+        'updated_by' // Track who last updated the product
     ];
 
     public $sortable = [
@@ -95,8 +96,31 @@ class Product extends Model
 }
 
     public function meatCut()
-{
-    return $this->belongsTo(MeatCut::class);
-}
+    {
+        return $this->belongsTo(MeatCut::class);
+    }
 
+    /**
+     * Get the staff member who last updated this product
+     */
+    public function updatedByStaff()
+    {
+        return $this->belongsTo(Staff::class, 'updated_by');
+    }
+
+    /**
+     * Get all update logs for this product
+     */
+    public function updateLogs()
+    {
+        return $this->hasMany(ProductUpdateLog::class);
+    }
+
+    /**
+     * Get the latest update log
+     */
+    public function latestUpdateLog()
+    {
+        return $this->hasOne(ProductUpdateLog::class)->latestOfMany();
+    }
 } 

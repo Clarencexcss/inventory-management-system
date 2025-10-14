@@ -1,200 +1,523 @@
 @extends('layouts.butcher')
 
+@push('page-styles')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .stat-card {
+        border-left: 4px solid var(--primary-color);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .stat-card.success {
+        border-left-color: #28a745;
+    }
+    .stat-card.warning {
+        border-left-color: #ffc107;
+    }
+    .stat-card.danger {
+        border-left-color: #dc3545;
+    }
+    .stat-card.info {
+        border-left-color: #17a2b8;
+    }
+    .stat-card.purple {
+        border-left-color: #6f42c1;
+    }
+    .stat-card.orange {
+        border-left-color: #fd7e14;
+    }
+    
+    .expiring-badge {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    
+    .activity-item {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .activity-item.created { border-left-color: #28a745; }
+    .activity-item.updated { border-left-color: #17a2b8; }
+    .activity-item.deleted { border-left-color: #dc3545; }
+    
+    .real-time-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #28a745;
+        border-radius: 50%;
+        animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-header d-print-none">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title">Inventory Analytics</h2>
-                        <div class="text-muted mt-1">Real-time inventory insights and stock management</div>
+<div class="container-fluid py-4">
+    <!-- Page Header with Real-time Indicator -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-warehouse me-2"></i>Inventory Analytics
+                <span class="badge bg-success ms-2">
+                    <span class="real-time-indicator me-1"></span>Live
+                </span>
+            </h1>
+            <p class="text-muted">Real-time inventory insights, stock levels, and expiration tracking</p>
+        </div>
+        <div class="col-auto">
+            <a href="{{ route('reports.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Back to Reports
+            </a>
+            <a href="{{ route('products.index') }}" class="btn btn-secondary">
+                <i class="fas fa-box me-1"></i>
+                View Products
+            </a>
+        </div>
+    </div>
+
+    <x-alert/>
+
+    <!-- Enhanced Inventory Overview Cards - Row 1 -->
+    <div class="row mb-4">
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-primary text-white avatar me-3">
+                            <i class="fas fa-box-open"></i>
+                        </span>
+                        <div>
+                            <div class="h3 mb-0">{{ $totalProducts }}</div>
+                            <div class="text-muted small">Total Products</div>
+                        </div>
                     </div>
-                    <div class="col-auto ms-auto d-print-none">
-                        <button onclick="refreshData()" class="btn btn-primary">
-                            <i class="fas fa-sync-alt"></i> Refresh Data
-                        </button>
-                        <button onclick="exportData()" class="btn btn-success">
-                            <i class="fas fa-file-export"></i> Export
-                        </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-success text-white avatar me-3">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                        <div>
+                            <div class="h3 mb-0 text-success">{{ $inStockItems }}</div>
+                            <div class="text-muted small">In Stock</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-warning text-white avatar me-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                        <div>
+                            <div class="h3 mb-0 text-warning">{{ $lowStockItems }}</div>
+                            <div class="text-muted small">Low Stock</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card danger">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-danger text-white avatar me-3">
+                            <i class="fas fa-times-circle"></i>
+                        </span>
+                        <div>
+                            <div class="h3 mb-0 text-danger">{{ $outOfStockItems }}</div>
+                            <div class="text-muted small">Out of Stock</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card orange">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-warning text-white avatar me-3">
+                            <i class="fas fa-clock"></i>
+                        </span>
+                        <div>
+                            <div class="h3 mb-0 text-warning expiring-badge">{{ $expiringItems }}</div>
+                            <div class="text-muted small">Expiring Soon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card stat-card info">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="bg-info text-white avatar me-3">
+                            <i class="fas fa-dollar-sign"></i>
+                        </span>
+                        <div>
+                            <div class="h4 mb-0 text-info">₱{{ number_format($totalStockValue, 0) }}</div>
+                            <div class="text-muted small">Stock Value</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="row mb-4" id="summaryCards">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-primary text-white avatar">
-                                <i class="fas fa-boxes"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="font-weight-medium" id="totalItems">Loading...</div>
-                            <div class="text-muted">Total Products</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-info text-white avatar">
-                                <i class="fas fa-layer-group"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="font-weight-medium" id="totalStock">Loading...</div>
-                            <div class="text-muted">Total Stock Count</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-warning text-white avatar">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="font-weight-medium" id="lowStockItems">Loading...</div>
-                            <div class="text-muted">Low Stock Items</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-danger text-white avatar">
-                                <i class="fas fa-clock"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="font-weight-medium" id="soonToExpire">Loading...</div>
-                            <div class="text-muted">Soon to Expire</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Low Stock Alert -->
-    <div class="row mb-4" id="lowStockAlert" style="display: none;">
-        <div class="col-12">
-            <div class="alert alert-warning">
-                <h5><i class="fas fa-exclamation-triangle"></i> Low Stock Alert</h5>
-                <p>The following products are running low on stock (less than 10 units):</p>
-                <div id="lowStockList"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Expiration Alert -->
-    <div class="row mb-4" id="expirationAlert" style="display: none;">
-        <div class="col-12">
-            <div class="alert alert-danger">
-                <h5><i class="fas fa-clock"></i> Expiration Alert</h5>
-                <p>The following products will expire within 7 days:</p>
-                <div id="expirationList"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Inventory Details -->
-    <div class="row">
-        <div class="col-12">
+    <!-- Stock Trend & Expiration Alerts Row -->
+    <div class="row mb-4">
+        <!-- Stock Trend Chart -->
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Inventory Details</h3>
-                    <div class="card-actions">
-                        <span class="badge bg-success" id="lastUpdated">Last updated: Never</span>
-                    </div>
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Stock Movement Trend (Last 30 Days)
+                    </h3>
                 </div>
                 <div class="card-body">
-                    <div class="row" id="inventoryDetails">
-                        <div class="col-12 text-center">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                    <canvas id="stockTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expiring Products Alert -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        Products Expiring Soon
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @forelse($expiringProducts as $product)
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ $product->name }}</strong>
+                                        <div class="small text-muted">{{ $product->meatCut->name ?? 'N/A' }}</div>
+                                    </div>
+                                    <span class="badge bg-danger">
+                                        {{ \Carbon\Carbon::parse($product->expiration_date)->diffForHumans() }}
+                                    </span>
+                                </div>
+                                <div class="small mt-1">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Expires: {{ \Carbon\Carbon::parse($product->expiration_date)->format('M d, Y') }}
+                                </div>
                             </div>
-                            <p class="mt-2">Loading inventory data...</p>
+                        @empty
+                            <div class="list-group-item text-center text-muted py-4">
+                                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                <p class="mb-0">No products expiring soon</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('reports.inventory') }}">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label">Filter by Staff</label>
+                                <select name="staff_id" class="form-select">
+                                    <option value="">All Staff</option>
+                                    @foreach($allStaff as $staff)
+                                        <option value="{{ $staff->id }}" {{ request('staff_id') == $staff->id ? 'selected' : '' }}>
+                                            {{ $staff->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Animal Type</label>
+                                <select name="animal_type" class="form-select">
+                                    <option value="">All Types</option>
+                                    @foreach($animalTypes as $type)
+                                        <option value="{{ $type }}" {{ request('animal_type') == $type ? 'selected' : '' }}>
+                                            {{ ucfirst($type) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Stock Status</label>
+                                <select name="stock_status" class="form-select">
+                                    <option value="">All Status</option>
+                                    <option value="in_stock" {{ request('stock_status') == 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                                    <option value="low" {{ request('stock_status') == 'low' ? 'selected' : '' }}>Low Stock</option>
+                                    <option value="out" {{ request('stock_status') == 'out' ? 'selected' : '' }}>Out of Stock</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date From</label>
+                                <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date To</label>
+                                <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-filter me-1"></i>Filter
+                                </button>
+                                <a href="{{ route('reports.inventory') }}" class="btn btn-secondary">
+                                    <i class="fas fa-redo me-1"></i>Reset
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Low Stock Products Table -->
-    <div class="row mt-4">
+    <!-- Analytics Charts Row -->
+    <div class="row mb-4">
+        <!-- Product Distribution Pie Chart -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Product Distribution
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="productDistributionChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Level Distribution -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-layer-group me-2"></i>
+                        Stock Level Status
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="stockLevelChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Value by Category -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Top 5 Categories by Value
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="stockValueChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Staff Performance Row -->
+    <div class="row mb-4">
+        <!-- Recent Activity -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Stock Activity (Last 7 Days)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @forelse($recentActivity as $activity)
+                        <div class="activity-item {{ $activity->action }}">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ $activity->product->name ?? 'Unknown Product' }}</strong>
+                                    <span class="badge bg-{{ $activity->action === 'created' ? 'success' : ($activity->action === 'updated' ? 'info' : 'danger') }} ms-2">
+                                        {{ ucfirst($activity->action) }}
+                                    </span>
+                                    <div class="small text-muted">
+                                        by {{ $activity->staff->name ?? 'System' }} • {{ $activity->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Activity Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-users me-2"></i>
+                        Staff Productivity (Product Updates)
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="staffActivityChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Low Stock Products</h3>
+                    <h3 class="card-title">
+                        <i class="fas fa-list me-2"></i>
+                        Product Inventory Details
+                        <span class="badge bg-secondary ms-2">{{ $products->count() }} items</span>
+                    </h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped" id="lowStockTable">
+                        <table class="table table-hover table-vcenter card-table mb-0">
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Current Stock</th>
-                                    <th>Expiration Date</th>
+                                    <th>Code</th>
+                                    <th>Animal Type</th>
+                                    <th>Cut Type</th>
+                                    <th>Price/kg</th>
+                                    <th>Quantity</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Expiration</th>
+                                    <th>Last Updated By</th>
+                                    <th>Last Update</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="5" class="text-center">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Soon to Expire Products Table -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Soon to Expire Products</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped" id="expirationTable">
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Current Stock</th>
-                                    <th>Expiration Date</th>
-                                    <th>Days Until Expiry</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="5" class="text-center">Loading...</td>
-                                </tr>
+                                @forelse($products as $product)
+                                    <tr>
+                                        <td><strong>{{ $product->name }}</strong></td>
+                                        <td><code>{{ $product->code }}</code></td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ $product->meatCut->animal_type ?? 'N/A' }}</span>
+                                        </td>
+                                        <td>{{ $product->meatCut->name ?? 'N/A' }}</td>
+                                        <td>₱{{ number_format($product->price_per_kg, 2) }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $product->quantity > ($product->quantity_alert ?? 10) ? 'success' : ($product->quantity > 0 ? 'warning' : 'danger') }}">
+                                                {{ $product->quantity }} {{ $product->unit->name ?? 'pcs' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if($product->quantity <= 0)
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>Out of Stock
+                                                </span>
+                                            @elseif($product->quantity <= ($product->quantity_alert ?? 10))
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>Low Stock
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>In Stock
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($product->expiration_date)
+                                                @php
+                                                    $expirationDate = \Carbon\Carbon::parse($product->expiration_date);
+                                                    $daysUntilExpiry = now()->diffInDays($expirationDate, false);
+                                                @endphp
+                                                
+                                                @if($daysUntilExpiry < 0)
+                                                    <span class="badge bg-dark">
+                                                        <i class="fas fa-skull-crossbones me-1"></i>Expired
+                                                    </span>
+                                                @elseif($daysUntilExpiry <= 7)
+                                                    <span class="badge bg-danger expiring-badge">
+                                                        <i class="fas fa-clock me-1"></i>{{ ceil($daysUntilExpiry) }}d left
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-info">
+                                                        {{ $expirationDate->format('M d, Y') }}
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($product->updatedByStaff)
+                                                <div class="d-flex align-items-center">
+                                                    <span class="avatar avatar-sm me-2" style="background-color: var(--primary-color); color: white;">
+                                                        {{ strtoupper(substr($product->updatedByStaff->name, 0, 2)) }}
+                                                    </span>
+                                                    <div>
+                                                        <strong>{{ $product->updatedByStaff->name }}</strong>
+                                                        <div class="small text-muted">{{ $product->updatedByStaff->position }}</div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">System</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="small">{{ $product->updated_at->format('M d, Y') }}</span>
+                                            <div class="small text-muted">{{ $product->updated_at->format('h:i A') }}</div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="text-center py-4">
+                                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">No products found matching your criteria</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -203,235 +526,179 @@
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
+@push('page-scripts')
 <script>
-let inventoryData = {};
-
-// Load inventory data on page load
-document.addEventListener('DOMContentLoaded', function() {
-    loadInventoryData();
-    
-    // Auto-refresh every 2 minutes
-    setInterval(loadInventoryData, 120000);
-});
-
-// Load inventory analytics data
-async function loadInventoryData() {
-    try {
-        const response = await fetch('/api/analytics/inventory');
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            inventoryData = data.data;
-            updateSummaryCards();
-            updateAlerts();
-            updateInventoryDetails();
-            updateTables();
-            updateLastUpdated();
-        } else {
-            console.error('Failed to load inventory data:', data.message);
-            showError('Failed to load inventory data: ' + data.message);
+    // Stock Trend Line Chart
+    const trendCtx = document.getElementById('stockTrendChart').getContext('2d');
+    const stockTrendChart = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($stockTrend->keys()) !!},
+            datasets: [{
+                label: 'Stock Updates',
+                data: {!! json_encode($stockTrend->values()) !!},
+                borderColor: 'rgb(139, 0, 0)',
+                backgroundColor: 'rgba(139, 0, 0, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
         }
-    } catch (error) {
-        console.error('Error loading inventory data:', error);
-        showError('Error loading inventory data: ' + error.message);
-    }
-}
+    });
 
-// Update summary cards
-function updateSummaryCards() {
-    document.getElementById('totalItems').textContent = inventoryData.total_items || 0;
-    document.getElementById('totalStock').textContent = inventoryData.total_stock_count || 0;
-    document.getElementById('lowStockItems').textContent = inventoryData.low_stock_items || 0;
-    document.getElementById('soonToExpire').textContent = inventoryData.soon_to_expire_items || 0;
-}
+    // Product Distribution Pie Chart
+    const distributionCtx = document.getElementById('productDistributionChart').getContext('2d');
+    const productDistributionChart = new Chart(distributionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {!! json_encode($productDistribution->keys()) !!},
+            datasets: [{
+                data: {!! json_encode($productDistribution->values()) !!},
+                backgroundColor: [
+                    'rgba(139, 0, 0, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-// Update alerts
-function updateAlerts() {
-    // Low stock alert
-    if (inventoryData.low_stock_items > 0) {
-        const lowStockAlert = document.getElementById('lowStockAlert');
-        const lowStockList = document.getElementById('lowStockList');
-        
-        let listHtml = '<ul>';
-        inventoryData.low_stock_products.forEach(product => {
-            listHtml += `<li><strong>${product.name}</strong> - Current Stock: ${product.quantity}</li>`;
-        });
-        listHtml += '</ul>';
-        
-        lowStockList.innerHTML = listHtml;
-        lowStockAlert.style.display = 'block';
-    } else {
-        document.getElementById('lowStockAlert').style.display = 'none';
-    }
-    
-    // Expiration alert
-    if (inventoryData.soon_to_expire_items > 0) {
-        const expirationAlert = document.getElementById('expirationAlert');
-        const expirationList = document.getElementById('expirationList');
-        
-        let listHtml = '<ul>';
-        inventoryData.soon_to_expire_products.forEach(product => {
-            const daysUntilExpiry = Math.ceil((new Date(product.expiration_date) - new Date()) / (1000 * 60 * 60 * 24));
-            listHtml += `<li><strong>${product.name}</strong> - Expires: ${product.expiration_date} (${daysUntilExpiry} days)</li>`;
-        });
-        listHtml += '</ul>';
-        
-        expirationList.innerHTML = listHtml;
-        expirationAlert.style.display = 'block';
-    } else {
-        document.getElementById('expirationAlert').style.display = 'none';
-    }
-}
+    // Stock Level Distribution Chart
+    const stockLevelCtx = document.getElementById('stockLevelChart').getContext('2d');
+    const stockLevelChart = new Chart(stockLevelCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {!! json_encode(array_keys($stockLevelDistribution)) !!},
+            datasets: [{
+                data: {!! json_encode(array_values($stockLevelDistribution)) !!},
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',   // Green - In Stock
+                    'rgba(255, 193, 7, 0.8)',    // Yellow - Low Stock
+                    'rgba(220, 53, 69, 0.8)'     // Red - Out of Stock
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
 
-// Update inventory details
-function updateInventoryDetails() {
-    const container = document.getElementById('inventoryDetails');
-    
-    container.innerHTML = `
-        <div class="col-md-6">
-            <h5>Inventory Overview</h5>
-            <p><strong>Total Products:</strong> ${inventoryData.total_items || 0}</p>
-            <p><strong>Total Stock Count:</strong> ${inventoryData.total_stock_count || 0}</p>
-            <p><strong>Low Stock Items:</strong> ${inventoryData.low_stock_items || 0}</p>
-            <p><strong>Soon to Expire:</strong> ${inventoryData.soon_to_expire_items || 0}</p>
-        </div>
-        <div class="col-md-6">
-            <h5>Stock Health</h5>
-            <div class="progress mb-2">
-                <div class="progress-bar bg-success" style="width: ${getStockHealthPercentage()}%"></div>
-            </div>
-            <small class="text-muted">Stock Health: ${getStockHealthPercentage()}%</small>
-            <p class="mt-2"><strong>Status:</strong> ${getStockHealthStatus()}</p>
-        </div>
-    `;
-}
+    // Stock Value by Category Chart
+    const stockValueCtx = document.getElementById('stockValueChart').getContext('2d');
+    const stockValueChart = new Chart(stockValueCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($stockValueByCategory->keys()) !!},
+            datasets: [{
+                label: 'Stock Value (₱)',
+                data: {!! json_encode($stockValueByCategory->values()) !!},
+                backgroundColor: 'rgba(139, 0, 0, 0.8)',
+                borderColor: 'rgb(139, 0, 0)',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₱' + context.parsed.x.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
 
-// Update tables
-function updateTables() {
-    updateLowStockTable();
-    updateExpirationTable();
-}
+    // Staff Activity Bar Chart
+    const activityCtx = document.getElementById('staffActivityChart').getContext('2d');
+    const staffActivityChart = new Chart(activityCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($staffActivity->pluck('staff.name')) !!},
+            datasets: [{
+                label: 'Product Updates',
+                data: {!! json_encode($staffActivity->pluck('update_count')) !!},
+                backgroundColor: 'rgba(23, 162, 184, 0.8)',
+                borderColor: 'rgb(23, 162, 184)',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
 
-// Update low stock table
-function updateLowStockTable() {
-    const tbody = document.querySelector('#lowStockTable tbody');
-    
-    if (inventoryData.low_stock_products && inventoryData.low_stock_products.length > 0) {
-        let html = '';
-        inventoryData.low_stock_products.forEach(product => {
-            html += `
-                <tr>
-                    <td>${product.name}</td>
-                    <td><span class="badge bg-warning">${product.quantity}</span></td>
-                    <td>${product.expiration_date || 'N/A'}</td>
-                    <td><span class="badge bg-danger">Low Stock</span></td>
-                    <td>
-                        <a href="/products" class="btn btn-sm btn-primary">
-                            <i class="fas fa-edit"></i> Manage
-                        </a>
-                    </td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
-    } else {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-success">No low stock items found!</td></tr>';
-    }
-}
-
-// Update expiration table
-function updateExpirationTable() {
-    const tbody = document.querySelector('#expirationTable tbody');
-    
-    if (inventoryData.soon_to_expire_products && inventoryData.soon_to_expire_products.length > 0) {
-        let html = '';
-        inventoryData.soon_to_expire_products.forEach(product => {
-            const daysUntilExpiry = Math.ceil((new Date(product.expiration_date) - new Date()) / (1000 * 60 * 60 * 24));
-            const badgeClass = daysUntilExpiry <= 3 ? 'bg-danger' : 'bg-warning';
-            
-            html += `
-                <tr>
-                    <td>${product.name}</td>
-                    <td>${product.quantity}</td>
-                    <td>${product.expiration_date}</td>
-                    <td><span class="badge ${badgeClass}">${daysUntilExpiry} days</span></td>
-                    <td>
-                        <a href="/products" class="btn btn-sm btn-primary">
-                            <i class="fas fa-edit"></i> Manage
-                        </a>
-                    </td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
-    } else {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-success">No products expiring soon!</td></tr>';
-    }
-}
-
-// Calculate stock health percentage
-function getStockHealthPercentage() {
-    if (!inventoryData.total_items || inventoryData.total_items === 0) return 100;
-    
-    const lowStockPercentage = (inventoryData.low_stock_items / inventoryData.total_items) * 100;
-    return Math.max(0, 100 - lowStockPercentage);
-}
-
-// Get stock health status
-function getStockHealthStatus() {
-    const percentage = getStockHealthPercentage();
-    
-    if (percentage >= 90) return 'Excellent';
-    if (percentage >= 75) return 'Good';
-    if (percentage >= 50) return 'Fair';
-    return 'Needs Attention';
-}
-
-// Update last updated timestamp
-function updateLastUpdated() {
-    const now = new Date();
-    document.getElementById('lastUpdated').textContent = `Last updated: ${now.toLocaleTimeString()}`;
-}
-
-// Refresh data
-function refreshData() {
-    loadInventoryData();
-}
-
-// Export data
-function exportData() {
-    if (Object.keys(inventoryData).length === 0) {
-        alert('No data to export. Please refresh the data first.');
-        return;
-    }
-    
-    const dataStr = JSON.stringify(inventoryData, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `inventory-analytics-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-}
-
-// Show error message
-function showError(message) {
-    const container = document.getElementById('inventoryDetails');
-    container.innerHTML = `
-        <div class="col-12">
-            <div class="alert alert-danger">
-                <h5><i class="fas fa-exclamation-circle"></i> Error</h5>
-                <p>${message}</p>
-                <button onclick="loadInventoryData()" class="btn btn-danger">
-                    <i class="fas fa-retry"></i> Retry
-                </button>
-            </div>
-        </div>
-    `;
-}
+    // Auto-refresh analytics every 30 seconds
+    setInterval(function() {
+        fetch('{{ route("reports.inventory.analytics") }}')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Analytics updated:', data.last_updated);
+                // Update charts with new data if needed
+            });
+    }, 30000);
 </script>
 @endpush
+@endsection

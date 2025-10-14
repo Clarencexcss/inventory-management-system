@@ -47,4 +47,28 @@ class Staff extends Model
     {
         return $this->hasOne(StaffPerformance::class)->latestOfMany('month');
     }
+
+    /**
+     * Get products last updated by this staff member
+     */
+    public function productsUpdated()
+    {
+        return $this->hasMany(Product::class, 'updated_by');
+    }
+
+    /**
+     * Get update logs for this staff member
+     */
+    public function productUpdateLogs()
+    {
+        return $this->hasMany(ProductUpdateLog::class);
+    }
+
+    /**
+     * Get total number of product updates
+     */
+    public function getTotalUpdatesAttribute()
+    {
+        return $this->productUpdateLogs()->count();
+    }
 }

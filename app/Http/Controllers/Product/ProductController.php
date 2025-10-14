@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\MeatCut;
+use App\Models\ProductUpdateLog;
 use Illuminate\Http\Request;
 use Picqer\Barcode\BarcodeGeneratorHTML;
 
@@ -98,6 +99,10 @@ class ProductController extends Controller
         try {
             $product = Product::create($request->all());
 
+            // Set who created the product
+            $product->updated_by = auth()->id();
+            $product->save();
+
             /**
              * Handle image upload
              */
@@ -115,6 +120,9 @@ class ProductController extends Controller
                     return back()->withErrors(['product_image' => 'Invalid image file']);
                 }
             }
+
+            // Log the product creation
+            $this->logProductUpdate($product, 'created');
 
             return redirect()
                 ->back()
@@ -161,7 +169,24 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
+        // Track what changed
+        $original = $product->getOriginal();
+        $changes = [];
+        
+        foreach ($request->except('product_image', '_token', '_method') as $key => $value) {
+            if (array_key_exists($key, $original) && $original[$key] != $value) {
+                $changes[$key] = [
+                    'old' => $original[$key],
+                    'new' => $value
+                ];
+            }
+        }
+
         $product->update($request->except('product_image'));
+        
+        // Set who updated the product
+        $product->updated_by = auth()->id();
+        $product->save();
 
         if ($request->hasFile('product_image')) {
 
@@ -181,7 +206,12 @@ class ProductController extends Controller
             $product->update([
                 'product_image' => $fileName
             ]);
+            
+            $changes['product_image'] = ['old' => $product->product_image, 'new' => $fileName];
         }
+
+        // Log the product update with changes
+        $this->logProductUpdate($product, 'updated', $changes);
 
         return redirect()
             ->route('products.index')
@@ -190,6 +220,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Log the product deletion before deleting
+        $this->logProductUpdate($product, 'deleted');
+
         /**
          * Delete photo if exists.
          */
@@ -202,5 +235,25 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Product has been deleted!');
+    }
+
+    /**
+     * Log product update activity
+     */
+    private function logProductUpdate(Product $product, string $action, array $changes = [])
+    {
+        // Get staff_id if user has a staff record
+        $staffId = null;
+        if (auth()->user()->staff) {
+            $staffId = auth()->user()->staff->id;
+        }
+
+        ProductUpdateLog::create([
+            'product_id' => $product->id,
+            'staff_id' => $staffId,
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'changes' => !empty($changes) ? json_encode($changes) : null,
+        ]);
     }
 }
