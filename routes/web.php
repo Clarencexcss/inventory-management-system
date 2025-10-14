@@ -258,6 +258,11 @@ Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name(
         Route::get('/reports/stock-levels', [ReportController::class, 'stockLevels'])->name('reports.stock-levels');
         Route::get('/reports/export-inventory', [ReportController::class, 'exportInventory'])->name('reports.export-inventory');
         Route::get('/reports/export-sales', [ReportController::class, 'exportSales'])->name('reports.export-sales');
+        
+        // Staff Performance Routes (Admin Only)
+        Route::resource('staff', \App\Http\Controllers\StaffController::class);
+        Route::resource('staff-performance', \App\Http\Controllers\StaffPerformanceController::class);
+        Route::get('reports/staff-performance', [\App\Http\Controllers\StaffPerformanceController::class, 'report'])->name('staff.report');
     });
 
     // Staff Inventory Management Routes

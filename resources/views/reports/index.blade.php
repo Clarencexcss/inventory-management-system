@@ -187,16 +187,16 @@
                         </div>
                         <div class="col">
                             <h5 class="card-title">Staff Performance</h5>
-                            <p class="card-text">Staff productivity, sales performance, and team analytics.</p>
+                            <p class="card-text">Staff productivity, performance evaluations, and team analytics.</p>
                         </div>
                     </div>
                     <div class="mt-3">
-                        <a href="{{ route('reports.stock-levels') }}" class="btn btn-info">
+                        <a href="{{ route('staff.report') }}" class="btn btn-info">
                             <i class="fas fa-chart-bar"></i> View Report
                         </a>
-                        <button onclick="loadStaffData()" class="btn btn-outline-info">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
+                        <a href="{{ route('staff.index') }}" class="btn btn-outline-info">
+                            <i class="fas fa-users"></i> Manage Staff
+                        </a>
                     </div>
                 </div>
             </div>

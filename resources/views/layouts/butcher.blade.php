@@ -115,6 +115,11 @@
                             <i class="fas fa-chart-bar me-1"></i> Reports
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('staff.index') }}">
+                            <i class="fas fa-users me-1"></i> Staff
+                        </a>
+                    </li>
                     @endif
                 </ul>
                 <ul class="navbar-nav ms-auto">

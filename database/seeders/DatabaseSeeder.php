@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             StaffSeeder::class,
             CategorySeeder::class,
             UnitSeeder::class,
-            ProductSeeder::class
+            ProductSeeder::class,
+            StaffPerformanceSeeder::class, // Add Staff Performance Module
         ]);
 
         $orders = Order::factory(50)->create();
