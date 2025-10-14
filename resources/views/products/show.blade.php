@@ -89,7 +89,7 @@
                                     </tr>
 
                                     <tr>
-                                        <td>Buying Price</td>
+                                        <td>Buying Prices</td>
                                         <td>{{ $product->buying_price }}</td>
                                     </tr>
                                     <tr>
@@ -105,10 +105,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Tax Type</td>
-                                        <td>{{ $product->tax_type->label() }}</td>
-                                    </tr>
-                                    <tr>
+                                        
                                         <td>{{ __('Notes') }}</td>
                                         <td>{{ $product->notes }}</td>
                                     </tr>

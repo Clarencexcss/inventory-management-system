@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'Laravel') }} - {{ $category->name ?? 'Category' }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+      <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
     <style>
         .product-card {
             transition: transform 0.2s;
@@ -201,7 +201,7 @@
                                 <div class="card product-card">
                                     <div class="position-relative">
                                         @if($product->product_image)
-                                            <img src="{{ Storage::url($product->product_image) }}" 
+                                            <img src="{{ asset('storage/products/' . $product->product_image) }}" 
                                                  alt="{{ $product->name ?? 'Product' }}" class="product-image">
                                         @else
                                             <div class="product-image d-flex align-items-center justify-content-center bg-light">

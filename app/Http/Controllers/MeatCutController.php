@@ -8,10 +8,42 @@ use Illuminate\Support\Facades\Storage;
 
 class MeatCutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $meatCuts = MeatCut::orderBy('animal_type')->orderBy('name')->paginate(10);
-        return view('meat-cuts.index', compact('meatCuts'));
+        $query = MeatCut::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('animal_type', 'like', "%{$search}%")
+                  ->orWhere('cut_type', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by animal type
+        if ($request->filled('animal_type')) {
+            $query->where('animal_type', $request->animal_type);
+        }
+
+        // Filter by cut type
+        if ($request->filled('cut_type')) {
+            $query->where('cut_type', $request->cut_type);
+        }
+
+        // Filter by availability
+        if ($request->filled('availability')) {
+            $query->where('is_available', $request->availability);
+        }
+
+        $meatCuts = $query->orderBy('animal_type')->orderBy('name')->paginate(10);
+        
+        // Get distinct values for filters
+        $animalTypes = MeatCut::distinct()->pluck('animal_type');
+        $cutTypes = MeatCut::distinct()->pluck('cut_type');
+
+        return view('meat-cuts.index', compact('meatCuts', 'animalTypes', 'cutTypes'));
     }
 
     public function create()

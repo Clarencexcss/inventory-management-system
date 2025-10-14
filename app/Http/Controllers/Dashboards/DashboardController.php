@@ -25,8 +25,14 @@ class DashboardController extends Controller
         // Products and Categories
         $products = Product::count();
         $categories = Category::count();
+        
+        // Product-specific statistics
+        $availableProducts = Product::where('quantity', '>', 0)->count();
+        $lowStockProducts = Product::whereColumn('quantity', '<=', 'quantity_alert')
+            ->where('quantity', '>', 0)
+            ->count();
 
-        // Meat-specific statistics
+        // Meat-specific statistics (keeping for backward compatibility)
         $totalMeatCuts = MeatCut::count();
         $availableMeatCuts = MeatCut::where('is_available', true)
             ->where('quantity', '>', 0)
@@ -52,6 +58,8 @@ class DashboardController extends Controller
             'pendingOrders',
             'products',
             'categories',
+            'availableProducts',
+            'lowStockProducts',
             'totalMeatCuts',
             'availableMeatCuts',
             'lowStockMeatCuts',

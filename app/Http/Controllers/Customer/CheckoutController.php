@@ -44,7 +44,7 @@ class CheckoutController extends Controller
             'delivery_address' => 'required|string|max:500',
             'contact_phone' => 'required|string|max:20',
             'gcash_reference' => 'nullable|string|max:100',
-            'proof_of_payment' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gcash_receipt' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     
         $cartItems = Cart::instance('customer')->content();
@@ -63,10 +63,10 @@ class CheckoutController extends Controller
             $tax = Cart::instance('customer')->tax();
             $total = Cart::instance('customer')->total();
     
-            // Handle proof_of_payment upload
+            // Handle gcash_receipt upload
             $proofOfPaymentPath = null;
-            if ($request->payment_type === 'gcash' && $request->hasFile('proof_of_payment')) {
-                $proofOfPaymentPath = $request->file('proof_of_payment')->store('gcash_receipts', 'public');
+            if ($request->payment_type === 'gcash' && $request->hasFile('gcash_receipt')) {
+                $proofOfPaymentPath = $request->file('gcash_receipt')->store('gcash_receipts', 'public');
             }
     
             // Create order

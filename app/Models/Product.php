@@ -25,7 +25,8 @@ class Product extends Model
         'source',
         'notes',
         'buying_price',
-        'quantity_alert'
+        'quantity_alert',
+        'product_image'
     ];
 
     public $sortable = [

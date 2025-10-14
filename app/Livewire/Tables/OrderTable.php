@@ -14,6 +14,14 @@ class OrderTable extends Component
 
     public $search = '';
 
+    public $statusFilter = '';
+
+    public $paymentFilter = '';
+
+    public $dateFrom = '';
+
+    public $dateTo = '';
+
     public $sortField = 'invoice_no';
 
     public $sortAsc = false;
@@ -32,10 +40,30 @@ class OrderTable extends Component
 
     public function render()
     {
+        $query = Order::query()
+            ->with(['customer', 'details'])
+            ->search($this->search);
+
+        // Apply status filter
+        if ($this->statusFilter) {
+            $query->where('order_status', $this->statusFilter);
+        }
+
+        // Apply payment type filter
+        if ($this->paymentFilter) {
+            $query->where('payment_type', $this->paymentFilter);
+        }
+
+        // Apply date range filter
+        if ($this->dateFrom) {
+            $query->whereDate('order_date', '>=', $this->dateFrom);
+        }
+        if ($this->dateTo) {
+            $query->whereDate('order_date', '<=', $this->dateTo);
+        }
+
         return view('livewire.tables.order-table', [
-            'orders' => Order::query()
-                ->with(['customer', 'details'])
-                ->search($this->search)
+            'orders' => $query
                 ->orderByRaw("CASE order_status WHEN 'pending' THEN 1 WHEN 'complete' THEN 2 WHEN 'cancelled' THEN 3 ELSE 4 END")
                 ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                 ->paginate($this->perPage),

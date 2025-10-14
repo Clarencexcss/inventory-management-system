@@ -14,10 +14,52 @@ use Picqer\Barcode\BarcodeGeneratorHTML;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $meatCuts = MeatCut::orderBy('name')->get();
+        $query = Product::query()->with(['category', 'unit', 'meatCut']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhereHas('meatCut', function($mq) use ($search) {
+                      $mq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Filter by stock status
+        if ($request->filled('stock_status')) {
+            if ($request->stock_status === 'in_stock') {
+                $query->where('quantity', '>', 0);
+            } elseif ($request->stock_status === 'out_of_stock') {
+                $query->where('quantity', '<=', 0);
+            } elseif ($request->stock_status === 'low_stock') {
+                $query->whereColumn('quantity', '<=', 'quantity_alert');
+            }
+        }
+
+        // Filter by meat cut
+        if ($request->filled('meat_cut_id')) {
+            $query->where('meat_cut_id', $request->meat_cut_id);
+        }
+
+        $products = $query->orderBy('name')->paginate(12);
+        
+        // Get data for filters
+        $categories = Category::all(['id', 'name']);
+        $meatCuts = MeatCut::all(['id', 'name']);
+
         return view('products.index', [
+            'products' => $products,
+            'categories' => $categories,
             'meatCuts' => $meatCuts,
         ]);
     }

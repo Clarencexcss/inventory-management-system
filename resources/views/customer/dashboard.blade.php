@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -10,7 +9,6 @@
 
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
-   
 
     <style>
         :root {
@@ -24,9 +22,28 @@
             background-color: #f8f9fa;
         }
 
+        /* Navbar custom colors */
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+
         .navbar-brand {
             font-weight: bold;
-            color: var(--primary-color) !important;
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:focus {
+            color: #ffd1d1 !important;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .btn-primary {
@@ -58,46 +75,54 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-drumstick-bite me-2"></i>
                 Yannis Meatshop - Customer Portal
             </a>
 
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('customer.products') }}">
-                    <i class="fas fa-store me-1"></i>Products
-                </a>
-                <a class="nav-link" href="{{ route('customer.cart') }}">
-                    <i class="fas fa-shopping-cart me-1"></i>Cart
-                    <span class="badge bg-danger ms-1">{{ \Gloudemans\Shoppingcart\Facades\Cart::instance('customer')->count() }}</span>
-                </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                
-            <!-- Livewire Notification Bell -->
-            @livewire('customer-notification-navbar')
-
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user me-1"></i>
-                        {{ auth()->user()->name ?? 'Customer' }}
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="{{ route('customer.products') }}">
+                        <i class="fas fa-store me-1"></i>Products
                     </a>
-                    
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('customer.profile') }}">
-                            <i class="fas fa-user-edit me-2"></i>My Profile
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('customer.logout') }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
+
+                    <a class="nav-link" href="{{ route('customer.cart') }}">
+                        <i class="fas fa-shopping-cart me-1"></i>Cart
+                        <span class="badge bg-danger ms-1">{{ \Gloudemans\Shoppingcart\Facades\Cart::instance('customer')->count() }}</span>
+                    </a>
+
+                    <!-- Livewire Notification Bell -->
+                    @livewire('customer-notification-navbar')
+
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            {{ auth()->user()->name ?? 'Customer' }}
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('customer.profile') }}">
+                                    <i class="fas fa-user-edit me-2"></i>My Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('customer.logout') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,17 +161,15 @@
             </div>
         </div>
 
-        <!-- Dashboard Cards -->
-        <div class="row">
-            <!-- Recent Notifications -->
-            <div class="col-12 mb-4">
+        <!-- Recent Notifications -->
+        <div class="row mb-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-bell me-2"></i>
-                            Recent Notifications
+                            <i class="fas fa-bell me-2"></i>Recent Notifications
                         </h5>
-                        <a href="{{ route('customer.notifications.index') }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('customer.notifications.index') }}" class="btn btn-sm btn-outline-light">
                             <i class="fas fa-eye me-1"></i>View All
                         </a>
                     </div>
@@ -155,7 +178,7 @@
                             $customer = auth()->user();
                             $notifications = $customer ? $customer->notifications()->latest()->limit(3)->get() : collect([]);
                         @endphp
-                        
+
                         @if($notifications->count() > 0)
                             <div class="list-group list-group-flush">
                                 @foreach($notifications as $notification)
@@ -163,19 +186,19 @@
                                         <div class="me-3 flex-shrink-0">
                                             @if($notification->type === 'order_completed')
                                                 <span class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                    <i class="fas fa-check" style="font-size: 14px;"></i>
+                                                    <i class="fas fa-check"></i>
                                                 </span>
                                             @elseif($notification->type === 'order_cancelled')
                                                 <span class="bg-danger text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                    <i class="fas fa-times" style="font-size: 14px;"></i>
+                                                    <i class="fas fa-times"></i>
                                                 </span>
                                             @elseif($notification->type === 'order_placed')
                                                 <span class="bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                    <i class="fas fa-shopping-cart" style="font-size: 14px;"></i>
+                                                    <i class="fas fa-shopping-cart"></i>
                                                 </span>
                                             @else
                                                 <span class="bg-secondary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                    <i class="fas fa-bell" style="font-size: 14px;"></i>
+                                                    <i class="fas fa-bell"></i>
                                                 </span>
                                             @endif
                                         </div>
@@ -208,61 +231,52 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Dashboard Cards -->
         <div class="row">
-            <!-- Shop Now -->
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-store me-2"></i>
-                            Browse Products
+                            <i class="fas fa-store me-2"></i>Browse Products
                         </h5>
                     </div>
                     <div class="card-body d-flex flex-column justify-content-between">
                         <p class="card-text">Explore our fresh meat products and add them to your cart.</p>
                         <a href="{{ route('customer.products') }}" class="btn btn-primary btn-equal mt-auto">
-                            <i class="fas fa-shopping-bag me-1"></i>
-                            Shop Now
+                            <i class="fas fa-shopping-bag me-1"></i>Shop Now
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- View Orders -->
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-shopping-cart me-2"></i>
-                            My Orders
+                            <i class="fas fa-shopping-cart me-2"></i>My Orders
                         </h5>
                     </div>
                     <div class="card-body d-flex flex-column justify-content-between">
                         <p class="card-text">View and track your order history.</p>
                         <a href="{{ route('customer.orders') }}" class="btn btn-primary btn-equal mt-auto">
-                            <i class="fas fa-eye me-1"></i>
-                            View Orders
+                            <i class="fas fa-eye me-1"></i>View Orders
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Edit Profile -->
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-user-edit me-2"></i>
-                            My Profile
+                            <i class="fas fa-user-edit me-2"></i>My Profile
                         </h5>
                     </div>
                     <div class="card-body d-flex flex-column justify-content-between">
                         <p class="card-text">Update your personal information and preferences.</p>
                         <a href="{{ route('customer.profile') }}" class="btn btn-primary btn-equal mt-auto">
-                            <i class="fas fa-edit me-1"></i>
-                            Edit Profile
+                            <i class="fas fa-edit me-1"></i>Edit Profile
                         </a>
                     </div>
                 </div>

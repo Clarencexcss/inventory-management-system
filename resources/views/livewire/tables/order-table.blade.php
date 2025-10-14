@@ -12,23 +12,60 @@
     </div>
 
     <div class="card-body border-bottom py-3">
-        <div class="d-flex">
-            <div class="text-secondary">
-                Show
-                <div class="mx-2 d-inline-block">
-                    <select wire:model.live="perPage" class="form-select form-select-sm" aria-label="result per page">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="25">25</option>
-                    </select>
-                </div>
-                entries
-            </div>
-            <div class="ms-auto text-secondary">
-                Search:
-                <div class="ms-2 d-inline-block">
-                    <input type="text" wire:model.live="search" class="form-control form-control-sm" aria-label="Search invoice">
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="row g-2">
+                    {{-- Search Bar --}}
+                    <div class="col-md-3">
+                        <label class="form-label text-secondary">Search</label>
+                        <input type="text" wire:model.live="search" class="form-control form-control-sm" placeholder="Search invoice or customer...">
+                    </div>
+
+                    {{-- Status Filter --}}
+                    <div class="col-md-2">
+                        <label class="form-label text-secondary">Status</label>
+                        <select wire:model.live="statusFilter" class="form-select form-select-sm">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="complete">Complete</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    {{-- Payment Type Filter --}}
+                    <div class="col-md-2">
+                        <label class="form-label text-secondary">Payment Type</label>
+                        <select wire:model.live="paymentFilter" class="form-select form-select-sm">
+                            <option value="">All Payments</option>
+                            <option value="cash">Cash</option>
+                            <option value="gcash">GCash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="card">Card</option>
+                        </select>
+                    </div>
+
+                    {{-- Date From --}}
+                    <div class="col-md-2">
+                        <label class="form-label text-secondary">Date From</label>
+                        <input type="date" wire:model.live="dateFrom" class="form-control form-control-sm">
+                    </div>
+
+                    {{-- Date To --}}
+                    <div class="col-md-2">
+                        <label class="form-label text-secondary">Date To</label>
+                        <input type="date" wire:model.live="dateTo" class="form-control form-control-sm">
+                    </div>
+
+                    {{-- Per Page --}}
+                    <div class="col-md-1">
+                        <label class="form-label text-secondary">Show</label>
+                        <select wire:model.live="perPage" class="form-select form-select-sm">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="25">25</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,14 +120,6 @@
                                     <td class="align-middle text-center" style="width: 5%">
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
-                                        
-                                        <!-- Cancel Order Button -->
-                                        <button type="button" class="btn btn-sm btn-outline-warning me-1" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#cancelOrderModal{{ $order->id }}"
-                                                title="Cancel Order">
-                                            <i class="ti ti-x me-1"></i>Cancel
-                                        </button>
                                         
                                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                             @csrf
@@ -245,108 +274,4 @@
             {{ $orders->links() }}
         </ul>
     </div>
-
-    {{-- Cancel Order Modals --}}
-    @foreach($pendingOrders as $order)
-    <div class="modal fade" id="cancelOrderModal{{ $order->id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel{{ $order->id }}" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-white">
-                    <h5 class="modal-title" id="cancelOrderModalLabel{{ $order->id }}">
-                        <i class="ti ti-alert-triangle me-2"></i>
-                        Cancel Order #{{ $order->invoice_no }}
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{ route('orders.cancel', $order) }}" method="POST" id="cancelOrderForm{{ $order->id }}">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="alert alert-warning border-0 mb-4">
-                            <div class="d-flex align-items-center">
-                                <i class="ti ti-alert-triangle fs-1 me-3"></i>
-                                <div>
-                                    <h6 class="alert-heading mb-1">Important Warning</h6>
-                                    <p class="mb-0">Are you sure you want to cancel this order? This action cannot be undone and will:</p>
-                                    <ul class="mb-0 mt-2">
-                                        <li>Restore product quantities to inventory</li>
-                                        <li>Notify the customer about the cancellation</li>
-                                        <li>Update the order status permanently</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Customer:</strong> {{ $order->customer->name }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Order Date:</strong> {{ $order->order_date->format('M d, Y') }}
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <strong>Payment Type:</strong> {{ ucfirst($order->payment_type) }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Total Amount:</strong> ₱{{ number_format($order->total, 2) }}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="cancellation_reason{{ $order->id }}" class="form-label fw-bold">
-                                Cancellation Reason <span class="text-danger">*</span>
-                            </label>
-                            <textarea class="form-control" 
-                                      id="cancellation_reason{{ $order->id }}" 
-                                      name="cancellation_reason" 
-                                      rows="4" 
-                                      required 
-                                      placeholder="Please provide a detailed reason for cancelling this order. This will be sent to the customer..."></textarea>
-                            <div class="form-text">This reason will be visible to the customer in their notification.</div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            <i class="ti ti-x me-1"></i>Close
-                        </button>
-                        <button type="submit" class="btn btn-danger" id="confirmCancel{{ $order->id }}">
-                            <i class="ti ti-ban me-1"></i>Cancel Order
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endforeach
 </div>
-
-<script>
-// Prevent modal conflicts and improve UX
-document.addEventListener('DOMContentLoaded', function() {
-    // Clear form when modal is hidden
-    document.querySelectorAll('[id^="cancelOrderModal"]').forEach(function(modal) {
-        modal.addEventListener('hidden.bs.modal', function() {
-            const form = modal.querySelector('form');
-            if (form) {
-                form.reset();
-            }
-        });
-    });
-    
-    // Add confirmation before form submission
-    document.querySelectorAll('[id^="confirmCancel"]').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            const textarea = button.closest('form').querySelector('textarea[name="cancellation_reason"]');
-            if (!textarea.value.trim()) {
-                e.preventDefault();
-                textarea.focus();
-                textarea.classList.add('is-invalid');
-                return false;
-            }
-            textarea.classList.remove('is-invalid');
-        });
-    });
-});
-</script>

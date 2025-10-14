@@ -22,12 +22,25 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f8f9fa;
         }
-        
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #8B0000 !important;
+        }
+
         .navbar-brand {
             font-weight: bold;
-            color: var(--primary-color) !important;
+            color: white !important;
         }
-        
+
+        .navbar-nav .nav-link {
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #f8d7da !important;
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -52,7 +65,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-drumstick-bite me-2"></i>
@@ -126,7 +139,6 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <!-- Profile Form Start -->
                         <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
@@ -176,7 +188,6 @@
 
                             <button type="submit" class="btn btn-primary">Update Profile</button>
                         </form>
-                        <!-- Profile Form End -->
                     </div>
                 </div>
             </div>

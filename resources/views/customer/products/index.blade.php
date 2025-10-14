@@ -7,13 +7,9 @@
 
     <title>{{ config('app.name', 'Laravel') }} - Products</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Local Fonts -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
     
     <style>
         :root {
@@ -26,12 +22,25 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f8f9fa;
         }
-        
+
+        /* Navbar customization */
+        .navbar {
+            background-color: #8B0000 !important;
+        }
+
         .navbar-brand {
             font-weight: bold;
-            color: var(--primary-color) !important;
+            color: white !important;
         }
-        
+
+        .navbar-nav .nav-link {
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #f8d7da !important;
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -91,7 +100,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-drumstick-bite me-2"></i>
@@ -110,8 +119,10 @@
                 <a class="nav-link" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>
-                   <!-- Livewire Notification Bell -->
-            @livewire('customer-notification-navbar')
+
+                <!-- Livewire Notification Bell -->
+                @livewire('customer-notification-navbar')
+
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
@@ -173,21 +184,20 @@
 
                         <!-- Category Filter -->
                         <div class="mb-3">
-    <label for="category" class="form-label">Category</label>
-    <select class="form-select @error('category') is-invalid @enderror" id="category" name="category">
-        <option value="">All Categories</option>
-        <option value="beef" {{ old('category', $category ?? '') == 'beef' ? 'selected' : '' }}>Beef</option>
-        <option value="chicken" {{ old('category', $category ?? '') == 'chicken' ? 'selected' : '' }}>Chicken</option>
-        <option value="pig" {{ old('category', $category ?? '') == 'pig' ? 'selected' : '' }}>Pig</option>
-        <option value="goat" {{ old('category', $category ?? '') == 'goat' ? 'selected' : '' }}>Goat</option>
-    </select>
-    @error('category')
-        <div class="invalid-feedback">
-            {{ $message }}
-        </div>
-    @enderror
-</div>
-
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select @error('category') is-invalid @enderror" id="category" name="category">
+                                <option value="">All Categories</option>
+                                <option value="beef" {{ old('category', $category ?? '') == 'beef' ? 'selected' : '' }}>Beef</option>
+                                <option value="chicken" {{ old('category', $category ?? '') == 'chicken' ? 'selected' : '' }}>Chicken</option>
+                                <option value="pig" {{ old('category', $category ?? '') == 'pig' ? 'selected' : '' }}>Pig</option>
+                                <option value="goat" {{ old('category', $category ?? '') == 'goat' ? 'selected' : '' }}>Goat</option>
+                            </select>
+                            @error('category')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
 
                         <!-- Sort -->
                         <div class="mb-3">
@@ -237,7 +247,7 @@
                                 <div class="card product-card">
                                     <div class="position-relative">
                                         @if($product->product_image)
-                                            <img src="{{ Storage::url($product->product_image) }}" 
+                                            <img src="{{ asset('storage/products/' . $product->product_image) }}" 
                                                  alt="{{ $product->name ?? 'Product' }}" class="product-image">
                                         @else
                                             <div class="product-image d-flex align-items-center justify-content-center bg-light">
@@ -256,8 +266,6 @@
                                             {{ $product->code ?? 'N/A' }} • {{ $product->category->name ?? 'Uncategorized' }}
                                         </p>
                                         
-                                        
-                                        
                                         <div class="price mb-2">
                                             ₱{{ number_format($product->selling_price ?? 0, 2) }}
                                             @if($product->unit)
@@ -269,19 +277,7 @@
                                         
                                         <div class="mb-2">
                                             <small class="badge bg-info text-dark">
-                                                @if($product->unit && strtolower($product->unit->name) === 'kg')
-                                                    Sold per kg
-                                                @elseif($product->unit && strtolower($product->unit->name) === 'piece')
-                                                    Sold per piece
-                                                @elseif($product->unit && strtolower($product->unit->name) === 'package')
-                                                    Sold per package
-                                                @elseif($product->unit && strtolower($product->unit->name) === 'box')
-                                                    Sold per box
-                                                @elseif($product->unit && strtolower($product->unit->name) === 'dozen')
-                                                    Sold per dozen
-                                                @else
-                                                    Sold per {{ $product->unit->name ?? 'unit' }}
-                                                @endif
+                                                Sold per {{ $product->unit->name ?? 'unit' }}
                                             </small>
                                         </div>
                                         
@@ -331,7 +327,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 </body>
-</html> 
+</html>

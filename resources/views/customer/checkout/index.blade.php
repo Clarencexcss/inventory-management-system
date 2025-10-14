@@ -23,11 +23,27 @@
             background-color: #f8f9fa;
         }
 
-        .navbar-brand {
-            font-weight: bold;
-            color: var(--primary-color) !important;
+        /* Navbar Styling */
+        .navbar {
+            background-color: #8B0000 !important;
         }
 
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+
+        .navbar .nav-link,
+        .navbar .dropdown-toggle {
+            color: #ffffff !important;
+        }
+
+        .navbar .nav-link:hover,
+        .navbar .dropdown-toggle:hover {
+            color: #f1f1f1 !important;
+        }
+
+        /* Buttons and Cards */
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -66,7 +82,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-drumstick-bite me-2"></i>
@@ -81,11 +97,12 @@
                     <i class="fas fa-shopping-cart me-1"></i>Cart
                     <span class="badge bg-danger ms-1">{{ \Gloudemans\Shoppingcart\Facades\Cart::instance('customer')->count() }}</span>
                 </a>
-                 <!-- Livewire Notification Bell -->
-            @livewire('customer-notification-navbar')
+               
                 <a class="nav-link" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>
+                  <!-- Livewire Notification Bell -->
+                @livewire('customer-notification-navbar')
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
@@ -269,9 +286,8 @@
         </div>
     </div>
 
-  
-      <!-- Local JS -->
-      <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Local JS -->
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 
     <script>

@@ -35,6 +35,25 @@ class OrderController extends Controller
     }
 
     /**
+     * Show order details for customer (Web view)
+     */
+    public function showOrder(Request $request, Order $order)
+    {
+        $customer = $request->user();
+
+        // Ensure customer can only view their own orders
+        if ($order->customer_id !== $customer->id) {
+            abort(404, 'Order not found');
+        }
+
+        $order->load(['details.product.unit', 'customer']);
+
+        return view('customer.order-details', [
+            'order' => $order,
+        ]);
+    }
+
+    /**
      * Get specific order details
      */
     public function show(Request $request, Order $order): JsonResponse

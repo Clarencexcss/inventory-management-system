@@ -22,7 +22,9 @@ class AdminNotificationController extends Controller
     {
         $perPage = $request->get('per_page', 15);
         
-        $notifications = AdminNotification::with(['order.customer', 'cancelledByUser'])
+        $notifications = AdminNotification::with(['order' => function($query) {
+                $query->with('customer');
+            }, 'cancelledByUser'])
             ->latest()
             ->paginate($perPage);
             
@@ -63,7 +65,9 @@ class AdminNotificationController extends Controller
     {
         // Ensure the notification is loaded with relationships to avoid N+1 queries
         if (!$notification->relationLoaded('order')) {
-            $notification->load(['order.customer', 'cancelledByUser']);
+            $notification->load(['order' => function($query) {
+                $query->with('customer');
+            }, 'cancelledByUser']);
         }
         
         $this->notificationService->markAsRead($notification);

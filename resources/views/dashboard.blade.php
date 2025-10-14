@@ -10,13 +10,13 @@
         </div>
     </div>
 
-    <!-- Meat Inventory Section -->
+    <!-- Inventory Overview Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header bg-danger text-white">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-drumstick-bite me-2"></i>Meat Inventory Overview
+                        <i class="fas fa-box-open me-2"></i>Inventory Overview
                     </h3>
                 </div>
                 <div class="card-body">
@@ -27,12 +27,12 @@
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
                                             <span class="bg-danger text-white p-3 rounded">
-                                                <i class="fas fa-meat fa-2x"></i>
+                                                <i class="fas fa-box fa-2x"></i>
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $totalMeatCuts }}</h3>
-                                            <div class="text-muted">Total Meat Cuts</div>
+                                            <h3 class="mb-0">{{ $products }}</h3>
+                                            <div class="text-muted">Total Products</div>
                                         </div>
                                     </div>
                                 </div>
@@ -48,8 +48,8 @@
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $availableMeatCuts }}</h3>
-                                            <div class="text-muted">Available Cuts</div>
+                                            <h3 class="mb-0">{{ $availableProducts }}</h3>
+                                            <div class="text-muted">Available Products</div>
                                         </div>
                                     </div>
                                 </div>
@@ -65,8 +65,8 @@
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $lowStockMeatCuts }}</h3>
-                                            <div class="text-muted">Low Stock Items</div>
+                                            <h3 class="mb-0">{{ $lowStockProducts }}</h3>
+                                            <div class="text-muted">Low Products</div>
                                         </div>
                                     </div>
                                 </div>

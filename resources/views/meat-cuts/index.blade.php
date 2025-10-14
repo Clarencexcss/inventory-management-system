@@ -26,6 +26,71 @@
                         </div>
                     @endif
 
+                    {{-- Search and Filter Section --}}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <form method="GET" action="{{ route('meat-cuts.index') }}">
+                                <div class="row g-3">
+                                    {{-- Search Bar --}}
+                                    <div class="col-md-4">
+                                        <label class="form-label">Search</label>
+                                        <input type="text" 
+                                               name="search" 
+                                               class="form-control" 
+                                               placeholder="Search by name, animal type, or cut type..." 
+                                               value="{{ request('search') }}">
+                                    </div>
+
+                                    {{-- Animal Type Filter --}}
+                                    <div class="col-md-2">
+                                        <label class="form-label">Animal Type</label>
+                                        <select name="animal_type" class="form-select">
+                                            <option value="">All Animals</option>
+                                            @foreach($animalTypes as $type)
+                                                <option value="{{ $type }}" {{ request('animal_type') == $type ? 'selected' : '' }}>
+                                                    {{ ucfirst($type) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- Cut Type Filter --}}
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cut Type</label>
+                                        <select name="cut_type" class="form-select">
+                                            <option value="">All Cuts</option>
+                                            @foreach($cutTypes as $type)
+                                                <option value="{{ $type }}" {{ request('cut_type') == $type ? 'selected' : '' }}>
+                                                    {{ ucfirst($type) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- Availability Filter --}}
+                                    <div class="col-md-2">
+                                        <label class="form-label">Availability</label>
+                                        <select name="availability" class="form-select">
+                                            <option value="">All Status</option>
+                                            <option value="1" {{ request('availability') == '1' ? 'selected' : '' }}>Available</option>
+                                            <option value="0" {{ request('availability') == '0' ? 'selected' : '' }}>Not Available</option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Filter Buttons --}}
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary me-2">
+                                            <i class="fas fa-filter me-1"></i>Filter
+                                        </button>
+                                        <a href="{{ route('meat-cuts.index') }}" class="btn btn-secondary">
+                                            <i class="fas fa-redo me-1"></i>Reset
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>

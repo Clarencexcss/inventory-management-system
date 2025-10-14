@@ -74,7 +74,9 @@ class AdminNotificationService
      */
     public function getRecentNotifications(int $limit = 10): \Illuminate\Database\Eloquent\Collection
     {
-        return AdminNotification::with(['order.customer', 'cancelledByUser'])
+        return AdminNotification::with(['order' => function($query) {
+                $query->with('customer');
+            }, 'cancelledByUser'])
             ->latest()
             ->limit($limit)
             ->get();
@@ -85,7 +87,9 @@ class AdminNotificationService
      */
     public function getUnreadNotifications(): \Illuminate\Database\Eloquent\Collection
     {
-        return AdminNotification::with(['order.customer', 'cancelledByUser'])
+        return AdminNotification::with(['order' => function($query) {
+                $query->with('customer');
+            }, 'cancelledByUser'])
             ->unread()
             ->latest()
             ->get();

@@ -10,39 +10,65 @@
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
 
-   
     <style>
         :root {
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
         }
-        
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f8f9fa;
         }
-        
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #8B0000 !important;
+        }
+
         .navbar-brand {
             font-weight: bold;
-            color: var(--primary-color) !important;
+            color: white !important;
         }
-        
+
+        .navbar .nav-link {
+            color: white !important;
+        }
+
+        .navbar .nav-link:hover {
+            opacity: 0.85;
+        }
+
+        .dropdown-menu {
+            background-color: white;
+        }
+
+        .dropdown-item {
+            color: #333;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Buttons */
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
-        
+
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
         }
-        
+
+        /* Cards */
         .card {
             border: none;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
-        
+
         .card-header {
             background-color: var(--primary-color);
             color: white;
@@ -68,7 +94,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-drumstick-bite me-2"></i>
@@ -86,14 +112,16 @@
                 <a class="nav-link" href="{{ route('customer.orders') }}">
                     <i class="fas fa-shopping-bag me-1"></i>My Orders
                 </a>
-                   <!-- Livewire Notification Bell -->
-            @livewire('customer-notification-navbar')
+
+                <!-- Livewire Notification Bell -->
+                @livewire('customer-notification-navbar')
+
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user me-1"></i>
                         {{ auth()->user()->name ?? 'Customer' }}
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ route('customer.dashboard') }}">
                             <i class="fas fa-home me-2"></i>Dashboard
                         </a></li>
@@ -282,4 +310,4 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 </body>
-</html> 
+</html>

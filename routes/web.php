@@ -91,6 +91,7 @@ Route::middleware(['customer.web.auth'])->group(function () {
         return view('customer.dashboard');
     })->name('customer.dashboard');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('customer.orders');
+    Route::get('/my-orders/{order}', [\App\Http\Controllers\Customer\OrderController::class, 'showOrder'])->name('customer.orders.show');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');
     Route::post('/customer/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel.admin');
 

@@ -161,7 +161,7 @@
                             <div class="col-md-6 mb-4">
                                 <div class="position-relative">
                                     @if($product->product_image)
-                                        <img src="{{ Storage::url($product->product_image) }}" 
+                                        <img src="{{ asset('storage/products/' . $product->product_image) }}" 
                                              alt="{{ $product->name ?? 'Product' }}" class="product-image w-100">
                                     @else
                                         <div class="product-image d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
@@ -275,7 +275,7 @@
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                     <div class="flex-shrink-0 me-3">
                                         @if($relatedProduct->product_image)
-                                            <img src="{{ Storage::url($relatedProduct->product_image) }}" 
+                                            <img src="{{ asset('storage/products/' . $relatedProduct->product_image) }}" 
                                                  alt="{{ $relatedProduct->name ?? 'Related Product' }}" 
                                                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
                                         @else
