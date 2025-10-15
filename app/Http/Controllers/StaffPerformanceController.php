@@ -137,48 +137,74 @@ class StaffPerformanceController extends Controller
      */
     public function report()
     {
-        // Get top 3 performers
-        $topPerformers = StaffPerformance::with('staff')
-            ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
-            ->groupBy('staff_id')
-            ->orderBy('avg_performance', 'desc')
-            ->limit(3)
-            ->get();
+        try {
+            // Get top 3 performers
+            $topPerformers = StaffPerformance::with('staff')
+                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+                ->whereHas('staff') // Ensure staff exists
+                ->groupBy('staff_id')
+                ->orderBy('avg_performance', 'desc')
+                ->limit(3)
+                ->get();
 
-        // Get bottom 3 performers
-        $bottomPerformers = StaffPerformance::with('staff')
-            ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
-            ->groupBy('staff_id')
-            ->orderBy('avg_performance', 'asc')
-            ->limit(3)
-            ->get();
+            // Get bottom 3 performers
+            $bottomPerformers = StaffPerformance::with('staff')
+                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+                ->whereHas('staff') // Ensure staff exists
+                ->groupBy('staff_id')
+                ->orderBy('avg_performance', 'asc')
+                ->limit(3)
+                ->get();
 
-        // Get average performance by staff
-        $staffAverages = StaffPerformance::with('staff')
-            ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
-            ->groupBy('staff_id')
-            ->orderBy('avg_performance', 'desc')
-            ->get();
+            // Get average performance by staff
+            $staffAverages = StaffPerformance::with('staff')
+                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+                ->whereHas('staff') // Ensure staff exists
+                ->groupBy('staff_id')
+                ->orderBy('avg_performance', 'desc')
+                ->get();
 
-        // Get monthly trend data (last 6 months)
-        $monthlyTrends = StaffPerformance::select(
-                'month',
-                DB::raw('AVG(attendance_rate) as avg_attendance'),
-                DB::raw('AVG(task_completion_rate) as avg_task_completion'),
-                DB::raw('AVG(customer_feedback_score) as avg_feedback'),
-                DB::raw('AVG(overall_performance) as avg_performance')
-            )
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->limit(6)
-            ->get()
-            ->reverse();
+            // Get monthly trend data (last 6 months)
+            $monthlyTrends = StaffPerformance::select(
+                    'month',
+                    DB::raw('AVG(attendance_rate) as avg_attendance'),
+                    DB::raw('AVG(task_completion_rate) as avg_task_completion'),
+                    DB::raw('AVG(customer_feedback_score) as avg_feedback'),
+                    DB::raw('AVG(overall_performance) as avg_performance')
+                )
+                ->groupBy('month')
+                ->orderBy('month', 'desc')
+                ->limit(6)
+                ->get();
+                
+            // Process the monthly trends to ensure proper formatting
+            $processedMonthlyTrends = $monthlyTrends->map(function ($item) {
+                // Ensure month is properly formatted
+                if ($item->month) {
+                    $item->formatted_month = \Carbon\Carbon::parse($item->month)->format('M Y');
+                } else {
+                    $item->formatted_month = 'Unknown';
+                }
+                
+                // Ensure all values are properly formatted
+                $item->avg_performance = round($item->avg_performance, 2);
+                $item->avg_attendance = round($item->avg_attendance, 2);
+                $item->avg_task_completion = round($item->avg_task_completion, 2);
+                $item->avg_feedback = round($item->avg_feedback, 2);
+                
+                return $item;
+            })->reverse();
 
-        return view('admin.performance.report', compact(
-            'topPerformers',
-            'bottomPerformers',
-            'staffAverages',
-            'monthlyTrends'
-        ));
+            return view('admin.performance.report', compact(
+                'topPerformers',
+                'bottomPerformers',
+                'staffAverages',
+                'processedMonthlyTrends'
+            ));
+        } catch (\Exception $e) {
+            \Log::error('Staff Performance Report Error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            throw $e;
+        }
     }
 }

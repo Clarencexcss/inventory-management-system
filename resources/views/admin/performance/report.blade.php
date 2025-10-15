@@ -84,7 +84,7 @@
                             </span>
                         </div>
                         <div class="col">
-                            <div class="h2 mb-0">{{ $monthlyTrends->count() }}</div>
+                            <div class="h2 mb-0">{{ $processedMonthlyTrends->count() }}</div>
                             <div class="text-muted">Months Evaluated</div>
                         </div>
                     </div>
@@ -324,13 +324,11 @@
     const monthlyTrendChart = new Chart(monthlyCtx, {
         type: 'line',
         data: {
-            labels: {!! json_encode($monthlyTrends->pluck('month')->map(function($month) {
-                return \Carbon\Carbon::parse($month)->format('M Y');
-            })) !!},
+            labels: {!! json_encode($processedMonthlyTrends->pluck('formatted_month')) !!},
             datasets: [
                 {
                     label: 'Overall Performance',
-                    data: {!! json_encode($monthlyTrends->pluck('avg_performance')) !!},
+                    data: {!! json_encode($processedMonthlyTrends->pluck('avg_performance')) !!},
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.1,
@@ -338,7 +336,7 @@
                 },
                 {
                     label: 'Attendance',
-                    data: {!! json_encode($monthlyTrends->pluck('avg_attendance')) !!},
+                    data: {!! json_encode($processedMonthlyTrends->pluck('avg_attendance')) !!},
                     borderColor: 'rgb(54, 162, 235)',
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     tension: 0.1,
@@ -346,7 +344,7 @@
                 },
                 {
                     label: 'Task Completion',
-                    data: {!! json_encode($monthlyTrends->pluck('avg_task_completion')) !!},
+                    data: {!! json_encode($processedMonthlyTrends->pluck('avg_task_completion')) !!},
                     borderColor: 'rgb(255, 159, 64)',
                     backgroundColor: 'rgba(255, 159, 64, 0.2)',
                     tension: 0.1,
@@ -354,8 +352,8 @@
                 },
                 {
                     label: 'Customer Feedback',
-                    data: {!! json_encode($monthlyTrends->pluck('avg_feedback')->map(function($score) {
-                        return ($score / 5) * 100; // Convert to percentage
+                    data: {!! json_encode($processedMonthlyTrends->pluck('avg_feedback')->map(function($score) {
+                        return round(($score / 5) * 100, 2); // Convert to percentage
                     })) !!},
                     borderColor: 'rgb(153, 102, 255)',
                     backgroundColor: 'rgba(153, 102, 255, 0.2)',
