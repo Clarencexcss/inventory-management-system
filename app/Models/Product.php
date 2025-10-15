@@ -101,11 +101,11 @@ class Product extends Model
     }
 
     /**
-     * Get the staff member who last updated this product
+     * Get the user who last updated this product
      */
-    public function updatedByStaff()
+    public function updatedByUser()
     {
-        return $this->belongsTo(Staff::class, 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     /**

@@ -1,12 +1,12 @@
-@extends('layouts.tabler')
+@extends('layouts.butcher')
 
 @section('content')
 <div class="page-header d-print-none">
     <div class="container-xl mb-3">
         <div class="row g-2 align-items-center mb-3">
             <div class="col">
-                <h2 class="page-title">
-                    {{ __('Edit Product') }}
+                <h2 class="page-title text-dark">
+                    {{ __('Product Details') }}
                 </h2>
             </div>
         </div>
@@ -23,11 +23,11 @@
                 <div class="col-lg-4">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="card-title">
+                            <h3 class="card-title text-dark">
                                 {{ __('Product Image') }}
                             </h3>
 
-                            <img class="img-account-profile mb-2" src="{{ asset('assets/img/products/default.webp') }}" alt="" id="image-preview" />
+                            <img class="img-account-profile mb-2" src="{{ $product->product_image ? asset('storage/products/' . $product->product_image) : asset('assets/img/products/default.webp') }}" alt="{{ $product->name }}" id="image-preview" />
                         </div>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">
+                            <h3 class="card-title text-dark">
                                 {{ __('Product Details') }}
                             </h3>
                         </div>
@@ -43,80 +43,82 @@
                             <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
                                 <tbody>
                                     <tr>
-                                        <td>Name</td>
-                                        <td>{{ $product->name }}</td>
+                                        <td class="text-dark">Name</td>
+                                        <td class="text-dark">{{ $product->name }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Slug</td>
-                                        <td>{{ $product->slug }}</td>
+                                        <td class="text-dark">Slug</td>
+                                        <td class="text-dark">{{ $product->slug }}</td>
                                     </tr>
                                     <tr>
-                                        <td><span class="text-secondary">Code</span></td>
-                                        <td>{{ $product->code }}</td>
+                                        <td class="text-dark">Code</td>
+                                        <td class="text-dark">{{ $product->code }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Barcode</td>
-                                        <td>{!! $barcode !!}</td>
+                                        <td class="text-dark">Barcode</td>
+                                        <td class="text-dark">{!! $barcode !!}</td>
                                     </tr>
                                     <tr>
-                                        <td>Category</td>
+                                        <td class="text-dark">Category</td>
                                         <td>
-                                            <a href="{{ route('categories.show', $product->category) }}" class="badge bg-blue-lt">
+                                            @if($product->category)
+                                            <span class="badge bg-blue-lt text-dark">
                                                 {{ $product->category->name }}
-                                            </a>
+                                            </span>
+                                            @else
+                                            <span class="text-dark">N/A</span>
+                                            @endif
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Unit</td>
+                                        <td class="text-dark">Unit</td>
                                         <td>
-                                            <a href="{{ route('categories.show', $product->unit) }}" class="badge bg-blue-lt">
-                                                {{ $product->unit->short_code }}
-                                            </a>
+                                            @if($product->unit)
+                                            <span class="badge bg-blue-lt text-dark">
+                                                {{ $product->unit->name ?? $product->unit->short_code }}
+                                            </span>
+                                            @else
+                                            <span class="text-dark">N/A</span>
+                                            @endif
                                         </td>
                                     </tr>
 
                                     <tr>
-                                        <td>Quantity</td>
-                                        <td>{{ $product->quantity }}</td>
+                                        <td class="text-dark">Quantity</td>
+                                        <td class="text-dark">{{ $product->quantity }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Quantity Alert</td>
+                                        <td class="text-dark">Quantity Alert</td>
                                         <td>
-                                            <span class="badge bg-red-lt">
+                                            
+                                            <span class="badge bg-red-lt text-dark">
                                                 {{ $product->quantity_alert }}
                                             </span>
                                         </td>
                                     </tr>
 
                                     <tr>
-                                        <td>Buying Prices</td>
-                                        <td>{{ $product->buying_price }}</td>
+                                        <td class="text-dark">Buying Prices</td>
+                                        <td class="text-dark">{{ $product->buying_price }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Selling Price</td>
-                                        <td>{{ $product->selling_price }}</td>
+                                        <td class="text-dark">Selling Price</td>
+                                        <td class="text-dark">{{ $product->selling_price }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Tax</td>
-                                        <td>
-                                            <span class="badge bg-red-lt">
-                                                {{ $product->tax }} %
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        
-                                        <td>{{ __('Notes') }}</td>
-                                        <td>{{ $product->notes }}</td>
+                                        <td class="text-dark">{{ __('Notes') }}</td>
+                                        <td class="text-dark">{{ $product->notes }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <div class="card-footer text-end">
+                            @if(auth()->user()->isAdmin())
                             <x-button.edit route="{{ route('products.edit', $product) }}">
                                 {{ __('Edit') }}
                             </x-button.edit>
+                            @endif
 
                             <x-button.back route="{{ route('products.index') }}">
                                 {{ __('Cancel') }}

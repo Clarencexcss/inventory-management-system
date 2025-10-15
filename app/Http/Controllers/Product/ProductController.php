@@ -88,14 +88,6 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $existingProduct = Product::where('code', $request->get('code'))->first();
-        
-        if ($existingProduct) {
-            $newCode = $this->generateUniqueCode();
-            
-            $request->merge(['code' => $newCode]);
-        }
-
         try {
             $product = Product::create($request->all());
 
@@ -130,7 +122,9 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             // Handle any unexpected errors
-            return back()->withErrors(['error' => 'Something went wrong while creating the product']);
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Something went wrong while creating the product: ' . $e->getMessage()]);
         }
     }
 
@@ -242,15 +236,9 @@ class ProductController extends Controller
      */
     private function logProductUpdate(Product $product, string $action, array $changes = [])
     {
-        // Get staff_id if user has a staff record
-        $staffId = null;
-        if (auth()->user()->staff) {
-            $staffId = auth()->user()->staff->id;
-        }
-
         ProductUpdateLog::create([
             'product_id' => $product->id,
-            'staff_id' => $staffId,
+            'staff_id' => null, // Staff table doesn't exist, using users table instead
             'user_id' => auth()->id(),
             'action' => $action,
             'changes' => !empty($changes) ? json_encode($changes) : null,

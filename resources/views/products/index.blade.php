@@ -124,9 +124,11 @@
                         <a href="{{ route('products.show', $product) }}" class="btn btn-info btn-sm">
                             <i class="fas fa-eye me-1"></i>View
                         </a>
+                        @if(auth()->user()->isAdmin())
                         <a href="{{ route('products.edit', $product) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>

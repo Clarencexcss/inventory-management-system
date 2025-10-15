@@ -10,62 +10,68 @@ use App\Models\Purchase;
 use App\Models\MeatCut;
 use App\Services\AdminNotificationService;
 use App\Enums\OrderStatus;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Orders statistics
-        $orders = Order::count();
-        $completedOrders = Order::where('order_status', OrderStatus::COMPLETE)
-            ->count();
-        $todayOrders = Order::whereDate('created_at', today())->count();
-        $pendingOrders = Order::where('order_status', OrderStatus::PENDING)->count();
+        // Use caching for dashboard data (10 minutes)
+        $dashboardData = Cache::remember('dashboard_data', 600, function() {
+            // Orders statistics with optimized queries
+            $orders = Order::count();
+            $completedOrders = Order::where('order_status', OrderStatus::COMPLETE)->count();
+            $todayOrders = Order::whereDate('created_at', today())->count();
+            $pendingOrders = Order::where('order_status', OrderStatus::PENDING)->count();
 
-        // Products and Categories
-        $products = Product::count();
-        $categories = Category::count();
-        
-        // Product-specific statistics
-        $availableProducts = Product::where('quantity', '>', 0)->count();
-        $lowStockProducts = Product::whereColumn('quantity', '<=', 'quantity_alert')
-            ->where('quantity', '>', 0)
-            ->count();
-
-        // Meat-specific statistics (keeping for backward compatibility)
-        $totalMeatCuts = MeatCut::count();
-        $availableMeatCuts = MeatCut::where('is_available', true)
-            ->where('quantity', '>', 0)
-            ->count();
-        $lowStockMeatCuts = MeatCut::whereColumn('quantity', '<=', 'minimum_stock_level')
-            ->count();
-
-        $meatByAnimalType = MeatCut::selectRaw('animal_type, COUNT(*) as count')
-            ->groupBy('animal_type')
-            ->get()
-            ->pluck('count', 'animal_type')
-            ->toArray();
+            // Products and Categories with optimized queries
+            $products = Product::count();
+            $categories = Category::count();
             
-        // Notification statistics
+            // Product-specific statistics with optimized queries
+            $availableProducts = Product::where('quantity', '>', 0)->count();
+            $lowStockProducts = Product::whereColumn('quantity', '<=', 'quantity_alert')
+                ->where('quantity', '>', 0)
+                ->count();
+
+            // Meat-specific statistics (keeping for backward compatibility)
+            $totalMeatCuts = MeatCut::count();
+            $availableMeatCuts = MeatCut::where('is_available', true)
+                ->where('quantity', '>', 0)
+                ->count();
+            $lowStockMeatCuts = MeatCut::whereColumn('quantity', '<=', 'minimum_stock_level')
+                ->count();
+
+            $meatByAnimalType = MeatCut::selectRaw('animal_type, COUNT(*) as count')
+                ->groupBy('animal_type')
+                ->get()
+                ->pluck('count', 'animal_type')
+                ->toArray();
+                
+            return compact(
+                'orders',
+                'completedOrders',
+                'todayOrders',
+                'pendingOrders',
+                'products',
+                'categories',
+                'availableProducts',
+                'lowStockProducts',
+                'totalMeatCuts',
+                'availableMeatCuts',
+                'lowStockMeatCuts',
+                'meatByAnimalType'
+            );
+        });
+
+        // Notification statistics (don't cache these as they change frequently)
         $notificationService = app(AdminNotificationService::class);
         $unreadNotifications = $notificationService->getUnreadCount();
         $notifications = $notificationService->getRecentNotifications(5);
 
-        return view('dashboard', compact(
-            'orders',
-            'completedOrders',
-            'todayOrders',
-            'pendingOrders',
-            'products',
-            'categories',
-            'availableProducts',
-            'lowStockProducts',
-            'totalMeatCuts',
-            'availableMeatCuts',
-            'lowStockMeatCuts',
-            'meatByAnimalType',
-            'unreadNotifications',
-            'notifications'
-        ));
+        // Merge all data
+        $data = array_merge($dashboardData, compact('unreadNotifications', 'notifications'));
+
+        return view('dashboard', $data);
     }
 }

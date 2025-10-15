@@ -162,9 +162,19 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/', [AdminNotificationController::class, 'index'])->name('index');
         Route::get('/unread-count', [AdminNotificationController::class, 'getUnreadCount'])->name('unread-count');
         Route::get('/recent', [AdminNotificationController::class, 'getRecentNotifications'])->name('recent');
-        Route::post('/{notification}/mark-read', [AdminNotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/{admin_notification}/mark-read', [AdminNotificationController::class, 'markAsRead'])->name('mark-read');
         Route::post('/mark-all-read', [AdminNotificationController::class, 'markAllAsRead'])->name('mark-all-read');
         Route::get('/stats', [AdminNotificationController::class, 'getStats'])->name('stats');
+    });
+
+    // Staff Notifications
+    Route::prefix('staff/notifications')->name('staff.notifications.')->group(function () {
+        Route::get('/', [App\Http\Controllers\StaffNotificationController::class, 'index'])->name('index');
+        Route::get('/unread-count', [App\Http\Controllers\StaffNotificationController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/recent', [App\Http\Controllers\StaffNotificationController::class, 'getRecentNotifications'])->name('recent');
+        Route::post('/{staff_notification}/mark-read', [App\Http\Controllers\StaffNotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/mark-all-read', [App\Http\Controllers\StaffNotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::get('/stats', [App\Http\Controllers\StaffNotificationController::class, 'getStats'])->name('stats');
     });
 
     // Admin and Staff Routes

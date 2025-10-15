@@ -491,14 +491,14 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($product->updatedByStaff)
+                                            @if($product->updatedByUser)
                                                 <div class="d-flex align-items-center">
                                                     <span class="avatar avatar-sm me-2" style="background-color: var(--primary-color); color: white;">
-                                                        {{ strtoupper(substr($product->updatedByStaff->name, 0, 2)) }}
+                                                        {{ strtoupper(substr($product->updatedByUser->name, 0, 2)) }}
                                                     </span>
                                                     <div>
-                                                        <strong>{{ $product->updatedByStaff->name }}</strong>
-                                                        <div class="small text-muted">{{ $product->updatedByStaff->position }}</div>
+                                                        <strong>{{ $product->updatedByUser->name }}</strong>
+                                                        <div class="small text-muted">{{ ucfirst($product->updatedByUser->role) }}</div>
                                                     </div>
                                                 </div>
                                             @else

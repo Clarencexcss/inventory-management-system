@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AdminNotification;
-use App\Services\AdminNotificationService;
+use App\Models\StaffNotification;
+use App\Services\StaffNotificationService;
 use Illuminate\Http\Request;
 
-class AdminNotificationController extends Controller
+class StaffNotificationController extends Controller
 {
     protected $notificationService;
 
-    public function __construct(AdminNotificationService $notificationService)
+    public function __construct(StaffNotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
     }
 
     /**
-     * Display the admin notifications page
+     * Display the staff notifications page
      */
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 15);
         
-        $notifications = AdminNotification::with(['order' => function($query) {
+        $notifications = StaffNotification::with(['order' => function($query) {
                 $query->with('customer');
             }, 'cancelledByUser'])
             ->latest()
@@ -30,13 +30,13 @@ class AdminNotificationController extends Controller
             
         $unreadCount = $this->notificationService->getUnreadCount();
         $stats = [
-            'total' => AdminNotification::count(),
+            'total' => StaffNotification::count(),
             'unread' => $unreadCount,
             'pending_orders' => $this->notificationService->getPendingOrdersCount(),
             'recent_cancelled' => $this->notificationService->getRecentCancelledOrdersCount(),
         ];
 
-        return view('admin.notifications.index', compact('notifications', 'unreadCount', 'stats'));
+        return view('staff.notifications.index', compact('notifications', 'unreadCount', 'stats'));
     }
 
     /**
@@ -61,16 +61,16 @@ class AdminNotificationController extends Controller
     /**
      * Mark notification as read
      */
-    public function markAsRead(Request $request, AdminNotification $admin_notification)
+    public function markAsRead(Request $request, StaffNotification $staff_notification)
     {
         // Ensure the notification is loaded with relationships to avoid N+1 queries
-        if (!$admin_notification->relationLoaded('order')) {
-            $admin_notification->load(['order' => function($query) {
+        if (!$staff_notification->relationLoaded('order')) {
+            $staff_notification->load(['order' => function($query) {
                 $query->with('customer');
             }, 'cancelledByUser']);
         }
         
-        $this->notificationService->markAsRead($admin_notification);
+        $this->notificationService->markAsRead($staff_notification);
         
         if (request()->expectsJson()) {
             return response()->json(['success' => true]);

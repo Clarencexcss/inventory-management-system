@@ -28,9 +28,11 @@
                         <a href="{{ route('staff.inventory.create', ['meat_cut_id' => $cut->id]) }}" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-1"></i> Add to Inventory
                         </a>
+                        @if(auth()->user()->isAdmin())
                         <a href="{{ route('meat-cuts.edit', $cut) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-edit me-1"></i> Edit
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>

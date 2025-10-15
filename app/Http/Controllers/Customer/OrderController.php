@@ -110,8 +110,7 @@ class OrderController extends Controller
                 ];
             }
 
-            $vat = $subTotal * 0.12; // 12% VAT
-            $total = $subTotal + $vat;
+            $total = $subTotal;
 
             // Create order
             $order = Order::create([
@@ -120,7 +119,7 @@ class OrderController extends Controller
                 'order_status' => OrderStatus::PENDING,
                 'total_products' => $totalProducts,
                 'sub_total' => $subTotal,
-                'vat' => $vat,
+                'vat' => 0,
                 'total' => $total,
                 'invoice_no' => 'INV-' . strtoupper(Str::random(8)),
                 'tracking_number' => 'TRK-' . strtoupper(Str::random(10)),

@@ -364,15 +364,9 @@
                                 <td colspan="4" class="text-end">Subtotal:</td>
                                 <td class="text-end">₱{{ number_format($order->details->sum('total'), 2) }}</td>
                             </tr>
-                            @if($order->vat)
-                            <tr class="total-row">
-                                <td colspan="4" class="text-end">VAT (12%):</td>
-                                <td class="text-end">₱{{ number_format($order->vat, 2) }}</td>
-                            </tr>
-                            @endif
                             <tr class="grand-total-row">
                                 <td colspan="4" class="text-end">Grand Total:</td>
-                                <td class="text-end">₱{{ number_format($order->details->sum('total') + ($order->vat ?? 0), 2) }}</td>
+                                <td class="text-end">₱{{ number_format($order->details->sum('total'), 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>

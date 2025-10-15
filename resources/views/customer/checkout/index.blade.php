@@ -270,15 +270,11 @@
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal:</span><span>₱{{ number_format($cartSubtotal, 2) }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax (12%):</span><span>₱{{ number_format($cartTax, 2) }}</span>
-                        </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
-                            <strong>Total:</strong><strong class="text-primary">₱{{ number_format($cartTotal, 2) }}</strong>
+                            <strong>Total:</strong><strong class="text-primary">₱{{ number_format($cartSubtotal, 2) }}</strong>
                         </div>
 
-                        <div class="alert alert-info"><small><i class="fas fa-info-circle me-1"></i><strong>Estimated Delivery:</strong> 3-5 business days</small></div>
                         <div class="alert alert-warning"><small><i class="fas fa-exclamation-triangle me-1"></i><strong>Note:</strong> Orders are processed during business hours (8 AM - 6 PM)</small></div>
                     </div>
                 </div>

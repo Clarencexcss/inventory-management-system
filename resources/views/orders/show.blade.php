@@ -37,13 +37,15 @@
                             </button>
                         </form>
                         
-                        <!-- Cancel Order Button -->
+                        <!-- Cancel Order Button (Admin Only) -->
+                        @if(auth()->user()->isAdmin())
                         <button type="button" 
                                 class="btn btn-warning btn-sm" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#cancelOrderModal">
                             <i class="ti ti-x me-1"></i>Cancel Order
                         </button>
+                        @endif
                     @endif
                     <x-action.close route="{{ route('orders.index') }}"/>
                 </div>
@@ -153,10 +155,6 @@
                             <tr>
                                 <td colspan="6" class="text-end fw-bold">Due</td>
                                 <td class="text-end fw-bold">{{ number_format($order->due, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="6" class="text-end fw-bold">VAT</td>
-                                <td class="text-end fw-bold">{{ number_format($order->vat, 2) }}</td>
                             </tr>
                             <tr class="table-primary">
                                 <td colspan="6" class="text-end fw-bold">Total</td>

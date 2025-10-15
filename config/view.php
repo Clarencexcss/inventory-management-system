@@ -33,4 +33,16 @@ return [
         realpath(storage_path('framework/views'))
     ),
 
+    /*
+    |--------------------------------------------------------------------------
+    | View Caching
+    |--------------------------------------------------------------------------
+    |
+    | This option determines whether Blade views should be cached. In
+    | production, you should enable this to improve performance.
+    |
+    */
+
+    'cache' => env('VIEW_CACHE', true),
+
 ];

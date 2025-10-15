@@ -15,11 +15,9 @@ class CartController extends Controller
     public function index()
     {
         $cartItems = Cart::instance('customer')->content();
-        $cartTotal = Cart::instance('customer')->total();
         $cartSubtotal = Cart::instance('customer')->subtotal();
-        $cartTax = Cart::instance('customer')->tax();
 
-        return view('customer.cart.index', compact('cartItems', 'cartTotal', 'cartSubtotal', 'cartTax'));
+        return view('customer.cart.index', compact('cartItems', 'cartSubtotal'));
     }
 
     /**

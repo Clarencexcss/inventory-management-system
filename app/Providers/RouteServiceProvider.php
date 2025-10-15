@@ -26,9 +26,9 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Route model binding for AdminNotification with eager loading
-        Route::bind('notification', function (string $value) {
+        /* Route::bind('notification', function (string $value) {
             return AdminNotification::with(['order.customer', 'cancelledByUser'])->findOrFail($value);
-        });
+        }); */
         
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());

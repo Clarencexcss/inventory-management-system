@@ -276,25 +276,17 @@
                                 <span>Subtotal:</span>
                                 <span>₱{{ number_format($cartSubtotal, 2) }}</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Tax (12%):</span>
-                                <span>₱{{ number_format($cartTax, 2) }}</span>
-                            </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <strong>Total:</strong>
-                                <strong class="text-primary">₱{{ number_format($cartTotal, 2) }}</strong>
+                                <strong class="text-primary">₱{{ number_format($cartSubtotal, 2) }}</strong>
                             </div>
                             
                             <a href="{{ route('customer.checkout') }}" class="btn btn-primary w-100">
                                 <i class="fas fa-credit-card me-1"></i>Proceed to Checkout
                             </a>
                             
-                            <div class="text-center mt-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Free delivery for orders above ₱500
-                                </small>
+                            
                             </div>
                         @else
                             <div class="text-center py-3">

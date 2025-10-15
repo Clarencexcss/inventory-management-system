@@ -125,7 +125,11 @@
                 <ul class="navbar-nav ms-auto">
                     <!-- Notification Navbar -->
                     <li class="nav-item">
-                        @livewire('admin-notification-navbar')
+                        @if(auth()->user()->isAdmin())
+                            @livewire('admin-notification-navbar')
+                        @elseif(auth()->user()->isStaff())
+                            @livewire('staff-notification-navbar')
+                        @endif
                     </li>
                     
                     <li class="nav-item dropdown">

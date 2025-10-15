@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Models\AdminNotification;
-use App\Services\AdminNotificationService;
+use App\Models\StaffNotification;
+use App\Services\StaffNotificationService;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 
-class AdminNotificationNavbar extends Component
+class StaffNotificationNavbar extends Component
 {
     public $unreadCount = 0;
     public $notifications = [];
@@ -23,9 +23,9 @@ class AdminNotificationNavbar extends Component
     public function loadNotifications()
     {
         // Cache notification data for 30 seconds to reduce database queries
-        $cacheKey = 'admin_notifications_' . auth()->id();
+        $cacheKey = 'staff_notifications_' . auth()->id();
         $data = Cache::remember($cacheKey, 30, function() {
-            $service = app(AdminNotificationService::class);
+            $service = app(StaffNotificationService::class);
             return [
                 'unreadCount' => $service->getUnreadCount(),
                 'notifications' => $service->getRecentNotifications(5)->toArray()
@@ -43,13 +43,13 @@ class AdminNotificationNavbar extends Component
 
     public function markAsRead($notificationId)
     {
-        $notification = AdminNotification::find($notificationId);
+        $notification = StaffNotification::find($notificationId);
         if ($notification && $notification->isUnread()) {
-            $service = app(AdminNotificationService::class);
+            $service = app(StaffNotificationService::class);
             $service->markAsRead($notification);
             
             // Clear cache to force refresh
-            $cacheKey = 'admin_notifications_' . auth()->id();
+            $cacheKey = 'staff_notifications_' . auth()->id();
             Cache::forget($cacheKey);
             
             $this->loadNotifications();
@@ -58,11 +58,11 @@ class AdminNotificationNavbar extends Component
 
     public function markAllAsRead()
     {
-        $service = app(AdminNotificationService::class);
+        $service = app(StaffNotificationService::class);
         $service->markAllAsRead();
         
         // Clear cache to force refresh
-        $cacheKey = 'admin_notifications_' . auth()->id();
+        $cacheKey = 'staff_notifications_' . auth()->id();
         Cache::forget($cacheKey);
         
         $this->loadNotifications();
@@ -71,7 +71,7 @@ class AdminNotificationNavbar extends Component
     public function goToOrder($orderId)
     {
         // Mark the notification as read when clicked
-        $notification = AdminNotification::where('order_id', $orderId)
+        $notification = StaffNotification::where('order_id', $orderId)
             ->whereIn('type', ['pending_order', 'cancelled_order'])
             ->where('is_read', false)
             ->first();
@@ -80,7 +80,7 @@ class AdminNotificationNavbar extends Component
             $notification->markAsRead();
             
             // Clear cache to force refresh
-            $cacheKey = 'admin_notifications_' . auth()->id();
+            $cacheKey = 'staff_notifications_' . auth()->id();
             Cache::forget($cacheKey);
             
             $this->loadNotifications();
@@ -91,6 +91,6 @@ class AdminNotificationNavbar extends Component
 
     public function render()
     {
-        return view('livewire.admin-notification-navbar');
+        return view('livewire.staff-notification-navbar');
     }
 }

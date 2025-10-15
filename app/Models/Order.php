@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\OrderStatus;
 use App\Services\AdminNotificationService;
 use App\Services\CustomerNotificationService;
+use App\Services\StaffNotificationService;
 use App\Models\CustomerNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -67,8 +68,13 @@ class Order extends Model
                     $order->load('customer');
                 }
                 
-                $notificationService = app(AdminNotificationService::class);
-                $notificationService->createPendingOrderNotification($order);
+                // Create admin notification
+                $adminNotificationService = app(AdminNotificationService::class);
+                $adminNotificationService->createPendingOrderNotification($order);
+                
+                // Create staff notification
+                $staffNotificationService = app(StaffNotificationService::class);
+                $staffNotificationService->createPendingOrderNotification($order);
             }
         });
 
@@ -199,8 +205,12 @@ class Order extends Model
         }
 
         // Create admin notification for cancelled order
-        $notificationService = app(AdminNotificationService::class);
-        $notificationService->createCancelledOrderNotification($this, $cancelledBy);
+        $adminNotificationService = app(AdminNotificationService::class);
+        $adminNotificationService->createCancelledOrderNotification($this, $cancelledBy);
+        
+        // Create staff notification for cancelled order
+        $staffNotificationService = app(StaffNotificationService::class);
+        $staffNotificationService->createCancelledOrderNotification($this, $cancelledBy);
     }
 
     /**

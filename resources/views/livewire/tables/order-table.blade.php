@@ -121,6 +121,7 @@
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
                                         
+                                        @if(auth()->user()->isAdmin())
                                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                             @csrf
                                             @method('DELETE')
@@ -128,6 +129,7 @@
                                                 <i class="ti ti-trash me-1"></i>Delete
                                             </button>
                                         </form>
+                                        @endif
 
                                     </td>
                                 </tr>
@@ -176,6 +178,7 @@
                                     <td class="align-middle text-center" style="width: 5%">
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
+                                        @if(auth()->user()->isAdmin())
                                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                             @csrf
                                             @method('DELETE')
@@ -183,6 +186,7 @@
                                                 <i class="ti ti-trash"></i>Delete
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -236,6 +240,7 @@
                                     <td class="align-middle text-center" style="width: 5%">
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
+                                        @if(auth()->user()->isAdmin())
                                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
                                             @csrf
                                             @method('DELETE')
@@ -243,6 +248,7 @@
                                                 <i class="ti ti-trash"></i>Delete
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

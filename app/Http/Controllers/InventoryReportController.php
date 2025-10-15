@@ -30,8 +30,8 @@ class InventoryReportController extends Controller
             'category',
             'unit',
             'meatCut',
-            'updatedByStaff',
-            'latestUpdateLog.staff'
+            'updatedByUser',
+            'latestUpdateLog.user'
         ])
         ->when($staffFilter, function($query) use ($staffFilter) {
             $query->where('updated_by', $staffFilter);

@@ -133,7 +133,9 @@
                     </td>
                     <td class="align-middle text-center" style="width: 10%">
                         <x-button.show class="btn-icon" route="{{ route('products.show', $product) }}"/>
+                        @if(auth()->user()->isAdmin())
                         <x-button.edit class="btn-icon" route="{{ route('products.edit', $product) }}"/>
+                        @endif
                         <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}"/>
                     </td>
                 </tr>

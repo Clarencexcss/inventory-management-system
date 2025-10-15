@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'product_image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'name'              => 'required|string',
             'slug'              => 'required|unique:products',
+            'code'              => 'nullable|string|unique:products',
             'category_id'       => 'required|integer',
             'unit_id'           => 'required|integer',
             'meat_cut_id'       => 'required|integer|exists:meat_cuts,id',
@@ -44,8 +45,17 @@ class StoreProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $code = $this->code;
+        if (!$code) {
+            // Generate unique code if not provided
+            do {
+                $code = 'PC' . strtoupper(uniqid());
+            } while (\App\Models\Product::where('code', $code)->exists());
+        }
+        
         $this->merge([
             'slug' => Str::slug($this->name, '-'),
+            'code' => $code,
         ]);
     }
 

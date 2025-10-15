@@ -30,18 +30,19 @@ class ProductUpdateLog extends Model
     }
 
     /**
-     * Get the staff member who made the update
-     */
-    public function staff()
-    {
-        return $this->belongsTo(Staff::class);
-    }
-
-    /**
      * Get the user who made the update
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Legacy: Get staff relationship (for backward compatibility)
+     * Note: Staff table doesn't exist, this returns null
+     */
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

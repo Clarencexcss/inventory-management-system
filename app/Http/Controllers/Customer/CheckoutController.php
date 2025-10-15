@@ -25,12 +25,10 @@ class CheckoutController extends Controller
             return redirect()->route('customer.cart')->with('error', 'Your cart is empty!');
         }
 
-        $cartTotal = Cart::instance('customer')->total();
         $cartSubtotal = Cart::instance('customer')->subtotal();
-        $cartTax = Cart::instance('customer')->tax();
         $customer = auth()->user();
 
-        return view('customer.checkout.index', compact('cartItems', 'cartTotal', 'cartSubtotal', 'cartTax', 'customer'));
+        return view('customer.checkout.index', compact('cartItems', 'cartSubtotal', 'customer'));
     }
 
     /**
@@ -60,8 +58,7 @@ class CheckoutController extends Controller
     
             $totalProducts = $cartItems->sum('qty');
             $subTotal = Cart::instance('customer')->subtotal();
-            $tax = Cart::instance('customer')->tax();
-            $total = Cart::instance('customer')->total();
+            $total = $subTotal;
     
             // Handle gcash_receipt upload
             $proofOfPaymentPath = null;
@@ -76,7 +73,7 @@ class CheckoutController extends Controller
                 'order_status' => OrderStatus::PENDING,
                 'total_products' => $totalProducts,
                 'sub_total' => $subTotal,
-                'vat' => $tax,
+                'vat' => 0,
                 'total' => $total,
                 'invoice_no' => 'INV-' . strtoupper(Str::random(8)),
                 'tracking_number' => 'TRK-' . strtoupper(Str::random(10)),

@@ -169,11 +169,13 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\CustomerAuthServiceProvider::class,
+        App\Providers\PerformanceServiceProvider::class,
 
         /*
         * Third Party Service Providers...
         */
-        Kyslik\ColumnSortable\ColumnSortableServiceProvider::class,Gloudemans\Shoppingcart\ShoppingcartServiceProvider::class
+        Kyslik\ColumnSortable\ColumnSortableServiceProvider::class,
+        Gloudemans\Shoppingcart\ShoppingcartServiceProvider::class
     ])->toArray(),
 
     /*

@@ -132,6 +132,7 @@
                                         <td>{{ $cut->minimum_stock_level }}</td>
                                         <td>
                                             <div class="btn-group">
+                                                @if(auth()->user()->isAdmin())
                                                 <a href="{{ route('meat-cuts.edit', $cut) }}" 
                                                    class="btn btn-sm btn-info me-2">
                                                     <i class="fas fa-edit"></i>
@@ -147,6 +148,9 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                @else
+                                                    <span class="text-muted small">View Only</span>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

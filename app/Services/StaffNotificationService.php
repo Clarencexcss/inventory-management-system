@@ -2,25 +2,25 @@
 
 namespace App\Services;
 
-use App\Models\AdminNotification;
+use App\Models\StaffNotification;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
-class AdminNotificationService
+class StaffNotificationService
 {
     /**
      * Create a pending order notification
      */
-    public function createPendingOrderNotification(Order $order): AdminNotification
+    public function createPendingOrderNotification(Order $order): StaffNotification
     {
         // Ensure customer relationship is loaded
         if (!$order->relationLoaded('customer')) {
             $order->load('customer');
         }
         
-        $notification = AdminNotification::create([
+        $notification = StaffNotification::create([
             'type' => 'pending_order',
             'title' => 'New Pending Order',
             'message' => "New order #{$order->invoice_no} from {$order->customer->name} is pending approval.",
@@ -42,7 +42,7 @@ class AdminNotificationService
     /**
      * Create a cancelled order notification
      */
-    public function createCancelledOrderNotification(Order $order, ?User $cancelledBy = null): AdminNotification
+    public function createCancelledOrderNotification(Order $order, ?User $cancelledBy = null): StaffNotification
     {
         // Ensure customer relationship is loaded
         if (!$order->relationLoaded('customer')) {
@@ -51,7 +51,7 @@ class AdminNotificationService
         
         $cancelledByName = $cancelledBy ? $cancelledBy->name : 'Customer';
         
-        $notification = AdminNotification::create([
+        $notification = StaffNotification::create([
             'type' => 'cancelled_order',
             'title' => 'Order Cancelled',
             'message' => "Order #{$order->invoice_no} from {$order->customer->name} has been cancelled by {$cancelledByName}.",
@@ -73,13 +73,37 @@ class AdminNotificationService
     }
 
     /**
+     * Create a low stock notification
+     */
+    public function createLowStockNotification($product): StaffNotification
+    {
+        $notification = StaffNotification::create([
+            'type' => 'low_stock',
+            'title' => 'Low Stock Alert',
+            'message' => "Product {$product->name} (Code: {$product->product_code}) is running low. Current stock: {$product->quantity} {$product->unit->name}.",
+            'data' => [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_code' => $product->product_code,
+                'current_stock' => $product->quantity,
+                'unit' => $product->unit->name,
+            ],
+        ]);
+        
+        // Clear notification cache
+        $this->clearNotificationCache();
+        
+        return $notification;
+    }
+
+    /**
      * Get unread notifications count with caching
      */
     public function getUnreadCount(): int
     {
-        $cacheKey = 'unread_notifications_count_' . auth()->id();
+        $cacheKey = 'staff_unread_notifications_count_' . auth()->id();
         return Cache::remember($cacheKey, 30, function() {
-            return AdminNotification::unread()->count();
+            return StaffNotification::unread()->count();
         });
     }
 
@@ -88,9 +112,9 @@ class AdminNotificationService
      */
     public function getRecentNotifications(int $limit = 10): \Illuminate\Database\Eloquent\Collection
     {
-        $cacheKey = 'recent_notifications_' . auth()->id() . '_' . $limit;
+        $cacheKey = 'staff_recent_notifications_' . auth()->id() . '_' . $limit;
         return Cache::remember($cacheKey, 30, function() use ($limit) {
-            return AdminNotification::with(['order' => function($query) {
+            return StaffNotification::with(['order' => function($query) {
                     $query->with('customer');
                 }, 'cancelledByUser'])
                 ->latest()
@@ -104,9 +128,9 @@ class AdminNotificationService
      */
     public function getUnreadNotifications(): \Illuminate\Database\Eloquent\Collection
     {
-        $cacheKey = 'unread_notifications_' . auth()->id();
+        $cacheKey = 'staff_unread_notifications_' . auth()->id();
         return Cache::remember($cacheKey, 30, function() {
-            return AdminNotification::with(['order' => function($query) {
+            return StaffNotification::with(['order' => function($query) {
                     $query->with('customer');
                 }, 'cancelledByUser'])
                 ->unread()
@@ -118,7 +142,7 @@ class AdminNotificationService
     /**
      * Mark notification as read
      */
-    public function markAsRead(AdminNotification $notification): void
+    public function markAsRead(StaffNotification $notification): void
     {
         $notification->markAsRead();
         $this->clearNotificationCache();
@@ -129,7 +153,7 @@ class AdminNotificationService
      */
     public function markAllAsRead(): void
     {
-        AdminNotification::unread()->update([
+        StaffNotification::unread()->update([
             'is_read' => true,
             'read_at' => now(),
         ]);
@@ -142,10 +166,10 @@ class AdminNotificationService
     private function clearNotificationCache(): void
     {
         $userId = auth()->id();
-        Cache::forget('unread_notifications_count_' . $userId);
-        Cache::forget('recent_notifications_' . $userId . '_5');
-        Cache::forget('recent_notifications_' . $userId . '_10');
-        Cache::forget('unread_notifications_' . $userId);
+        Cache::forget('staff_unread_notifications_count_' . $userId);
+        Cache::forget('staff_recent_notifications_' . $userId . '_5');
+        Cache::forget('staff_recent_notifications_' . $userId . '_10');
+        Cache::forget('staff_unread_notifications_' . $userId);
     }
 
     /**
