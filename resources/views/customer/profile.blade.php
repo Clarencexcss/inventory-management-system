@@ -10,6 +10,8 @@
     <!-- Local CSS -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet">
+    
+    @include('customer.profile.styles')
 
     <style>
         :root {
@@ -139,56 +141,66 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('customer.profile.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PATCH')
-
-                            <div class="mb-3">
-                                <label for="name">Full Name</label>
-                                <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="username">Username</label>
-                                <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="phone">Phone</label>
-                                <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="email">Email <small>(optional - leave blank to keep current)</small></label>
-                                <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="address">Address</label>
-                                <textarea name="address" class="form-control" rows="3">{{ old('address', auth()->user()->address) }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password">New Password <small>(optional - leave blank to keep current)</small></label>
-                                <input type="password" name="password" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password_confirmation">Confirm New Password</label>
-                                <input type="password" name="password_confirmation" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="photo">Profile Photo</label>
-                                <input type="file" name="photo" class="form-control">
-                                @if(auth()->user()->photo)
-                                    <img src="{{ asset('storage/customers/' . auth()->user()->photo) }}" width="100" class="mt-2 rounded">
-                                @endif
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Update Profile</button>
-                        </form>
+                        @include('customer.profile.view-mode')
+                        @include('customer.profile.edit-mode')
+                        
+                        <!-- Account Deactivation Section -->
+                        <div class="mt-5 pt-4 border-top">
+                            <h5 class="text-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Account Deactivation
+                            </h5>
+                            <p class="text-muted">
+                                Deactivating your account will:
+                            </p>
+                            <ul class="text-muted">
+                                <li>Permanently disable your account access</li>
+                                <li>Hide your profile from public view</li>
+                                <li>Cancel any pending orders</li>
+                                <li>Retain your order history for record purposes</li>
+                            </ul>
+                            <p class="text-danger fw-bold">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                This action cannot be undone. Please be certain.
+                            </p>
+                            
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
+                                <i class="fas fa-user-slash me-2"></i>Deactivate Account
+                            </button>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Deactivate Account Modal -->
+    <div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-labelledby="deactivateAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deactivateAccountModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Account Deactivation
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to deactivate your account?</p>
+                    <p class="text-danger fw-bold">
+                        This action is permanent and cannot be undone.
+                    </p>
+                    <div class="mb-3">
+                        <label for="deactivationPassword" class="form-label">Enter your password to confirm</label>
+                        <input type="password" class="form-control" id="deactivationPassword" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ route('customer.profile.deactivate') }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="password" id="passwordHidden">
+                        <button type="submit" class="btn btn-danger">Deactivate Account</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -197,5 +209,6 @@
     <!-- Local JS -->
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+    @include('customer.profile.scripts')
 </body>
 </html>

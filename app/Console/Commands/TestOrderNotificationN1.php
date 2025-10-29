@@ -58,7 +58,7 @@ class TestOrderNotificationN1 extends Command
         // Create a new pending order
         $order = Order::create([
             'customer_id' => $customer->id,
-            'order_date' => now(),
+            'order_date' => now()->timezone('Asia/Manila')->format('Y-m-d'),
             'order_status' => OrderStatus::PENDING,
             'total_products' => 1,
             'sub_total' => 100.00,

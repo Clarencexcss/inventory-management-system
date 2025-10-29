@@ -120,11 +120,12 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        // Use soft delete instead of hard delete
         $order->delete();
         
         return redirect()
             ->route('orders.index')
-            ->with('success', 'Order has been deleted successfully!');
+            ->with('success', 'Order has been removed successfully!');
     }
 
     public function downloadInvoice($order)

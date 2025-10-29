@@ -62,21 +62,36 @@
                             <td class="text-center">{{ $loop->iteration  }}</td>
                             <td class="text-center">{{ $order->invoice_no }}</td>
                             <td class="text-center">{{ $order->customer->name }}</td>
-                            <td class="text-center">{{ $order->order_date->format('d-m-Y') }}</td>
+                            <td class="text-center">{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}</td>
                             <td class="text-center">{{ $order->payment_type }}</td>
                             <td class="text-center">{{ Number::currency($order->total, 'PHP') }}</td>
                             <td class="text-center">
-                                <span class="badge bg-green text-white text-uppercase">
+                                <span class="badge bg-success text-white text-uppercase">
                                     {{ \App\Enums\OrderStatus::COMPLETE->label() }}
                                 </span>
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('orders.show', $order) }}" class="btn btn-icon btn-outline-success">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                                <a href="{{ route('orders.show', $order) }}" class="btn btn-icon" style="background-color: #8B0000; border-color: #8B0000;" onmouseover="this.style.backgroundColor='#A52A2A'; this.style.borderColor='#A52A2A';" onmouseout="this.style.backgroundColor='#8B0000'; this.style.borderColor='#8B0000';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
                                 </a>
-                                <a href="{{ route('order.downloadInvoice', $order) }}" class="btn btn-icon btn-outline-warning">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
+                                <a href="{{ route('order.downloadInvoice', $order) }}" class="btn btn-icon btn-primary" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-printer" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
                                 </a>
+                                <!-- Remove button instead of delete -->
+                                <form action="{{ route('orders.destroy', $order) }}" method="POST" style="display: inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-icon btn-outline-danger" onclick="return confirm('Are you sure you want to remove this order?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 7l16 0" />
+                                            <path d="M10 11l0 6" />
+                                            <path d="M14 11l0 6" />
+                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

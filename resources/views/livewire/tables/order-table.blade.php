@@ -109,7 +109,7 @@
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">{{ $order->invoice_no }}</td>
                                     <td class="align-middle">{{ $order->customer->name }}</td>
-                                    <td class="align-middle text-center">{{ $order->order_date->format('d-m-Y') }}</td>
+                                    <td class="align-middle text-center">{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}</td>
                                     <td class="align-middle text-center">{{ $order->payment_type }}</td>
                                     <td class="align-middle text-center">₱{{ number_format($order->total, 2) }}</td>
                                     <td class="align-middle text-center">
@@ -122,11 +122,11 @@
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
                                         
                                         @if(auth()->user()->isAdmin())
-                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
+                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this order?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                <i class="ti ti-trash me-1"></i>Delete
+                                            <button type="submit" class="btn btn-icon btn-outline-danger" title="Remove">
+                                                <i class="ti ti-trash"></i>remove
                                             </button>
                                         </form>
                                         @endif
@@ -167,7 +167,7 @@
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">{{ $order->invoice_no }}</td>
                                     <td class="align-middle">{{ $order->customer->name }}</td>
-                                    <td class="align-middle text-center">{{ $order->order_date->format('d-m-Y') }}</td>
+                                    <td class="align-middle text-center">{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}</td>
                                     <td class="align-middle text-center">{{ $order->payment_type }}</td>
                                     <td class="align-middle text-center">₱{{ number_format($order->total, 2) }}</td>
                                     <td class="align-middle text-center">
@@ -179,11 +179,11 @@
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
                                         @if(auth()->user()->isAdmin())
-                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
+                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this order?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-icon btn-outline-danger" title="Delete">
-                                                <i class="ti ti-trash"></i>Delete
+                                            <button type="submit" class="btn btn-icon btn-outline-danger" title="Remove">
+                                                <i class="ti ti-trash"></i>remove
                                             </button>
                                         </form>
                                         @endif
@@ -224,7 +224,7 @@
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">{{ $order->invoice_no }}</td>
                                     <td class="align-middle">{{ $order->customer->name }}</td>
-                                    <td class="align-middle text-center">{{ $order->order_date->format('d-m-Y') }}</td>
+                                    <td class="align-middle text-center">{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}</td>
                                     <td class="align-middle text-center">{{ $order->payment_type }}</td>
                                     <td class="align-middle text-center">₱{{ number_format($order->total, 2) }}</td>
                                     <td class="align-middle text-center">
@@ -241,11 +241,11 @@
                                         <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}"/>
                                         <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}"/>
                                         @if(auth()->user()->isAdmin())
-                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this order?');">
+                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this order?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-icon btn-outline-danger" title="Delete">
-                                                <i class="ti ti-trash"></i>Delete
+                                            <button type="submit" class="btn btn-icon btn-outline-danger" title="Remove">
+                                                <i class="ti ti-trash"></i>remove
                                             </button>
                                         </form>
                                         @endif

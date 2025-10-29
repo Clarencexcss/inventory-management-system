@@ -23,14 +23,27 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'photo' => 'image|file|max:1024',
-            'name' => 'required|string|max:50',
-      
+            'name' => 'required|string|max:50|regex:/^[a-zA-Z\s.\-\']+$/',
             'email' => 'required|email|max:50|unique:customers,email',
-            'phone' => 'required|string|max:25|unique:customers,phone',
+            'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers,phone',
             'account_holder' => 'max:50',
             'account_number' => 'max:25',
             'bank_name' => 'max:25',
             'address' => 'required|string|max:100',
+        ];
+    }
+    
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.regex' => 'The name may only contain letters, spaces, periods, hyphens, and apostrophes.',
+            'phone.regex' => 'The phone number must start with +63 and be exactly 11 digits.',
+            'phone.unique' => 'This phone number is already registered.',
         ];
     }
 }

@@ -115,7 +115,7 @@ class OrderController extends Controller
             // Create order
             $order = Order::create([
                 'customer_id' => $customer->id,
-                'order_date' => now(),
+                'order_date' => now()->timezone('Asia/Manila')->format('Y-m-d'),
                 'order_status' => OrderStatus::PENDING,
                 'total_products' => $totalProducts,
                 'sub_total' => $subTotal,
@@ -301,5 +301,24 @@ class OrderController extends Controller
         ];
 
         return response()->json($stats);
+    }
+
+    /**
+     * Download invoice for customer order
+     */
+    public function downloadInvoice(Request $request, Order $order)
+    {
+        $customer = $request->user();
+
+        // Ensure customer can only download invoices for their own orders
+        if ($order->customer_id !== $customer->id) {
+            abort(404, 'Order not found');
+        }
+
+        $order->load(['customer', 'details.product.unit']);
+
+        return view('orders.print-invoice', [
+            'order' => $order,
+        ]);
     }
 } 

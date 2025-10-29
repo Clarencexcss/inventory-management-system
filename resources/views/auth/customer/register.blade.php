@@ -22,14 +22,16 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        <form action="{{ route('customer.register') }}" method="POST" autocomplete="off">
+        <form action="{{ route('customer.register') }}" method="POST" autocomplete="off" id="registrationForm">
             @csrf
-            <x-input name="name" :value="old('name')" placeholder="Full Name" required="true"/>
+            <x-input name="name" :value="old('name')" placeholder="Full Name" required="true" id="nameInput"/>
+            <small class="form-text text-muted" id="nameHelp">Name may only contain letters, spaces, periods, hyphens, and apostrophes.</small>
             <x-input name="email" :value="old('email')" placeholder="your@email.com" required="true"/>
             <x-input name="username" :value="old('username')" placeholder="Username" required="true"/>
             <x-input type="password" name="password" placeholder="Password" required="true"/>
             <x-input type="password" name="password_confirmation" placeholder="Confirm Password" required="true"/>
-            <x-input name="phone" :value="old('phone')" placeholder="Phone Number" required="true"/>
+            <x-input name="phone" :value="old('phone')" placeholder="e.g., 09123456789 or +63123456789" required="true" id="phoneInput"/>
+            <small class="form-text text-muted">Phone number must start with +63 and be exactly 11 digits. If you type "09", it will be automatically converted to "+63".</small>
             <div class="mb-3">
                 <label class="form-label">Address</label>
                 <textarea name="address" class="form-control" rows="3" placeholder="Your address" required>{{ old('address') }}</textarea>
@@ -49,4 +51,80 @@
         </a>
     </p>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Name validation
+    const nameInput = document.getElementById('nameInput');
+    if (nameInput) {
+        nameInput.addEventListener('input', function() {
+            const nameValue = this.value;
+            const nameErrorId = 'name-error';
+            let errorElement = document.getElementById(nameErrorId);
+            
+            // Remove existing error message
+            if (errorElement) {
+                errorElement.remove();
+            }
+            
+            // Check for invalid characters
+            const validNamePattern = /^[a-zA-Z\s.\-']*$/;
+            if (nameValue && !validNamePattern.test(nameValue)) {
+                // Create error message element
+                errorElement = document.createElement('div');
+                errorElement.id = nameErrorId;
+                errorElement.className = 'text-danger mt-1';
+                errorElement.textContent = 'Name may only contain letters, spaces, periods, hyphens, and apostrophes.';
+                
+                // Insert after the name input
+                this.parentNode.insertBefore(errorElement, this.nextSibling);
+            }
+        });
+    }
+    
+    // Phone validation
+    const phoneInput = document.getElementById('phoneInput');
+    if (phoneInput) {
+        phoneInput.addEventListener('blur', function() {
+            let phoneNumber = this.value.trim();
+            
+            // If the phone number starts with "09" and is 11 digits, convert to +63 format
+            if (phoneNumber.startsWith('09') && phoneNumber.length === 11) {
+                this.value = '+63' + phoneNumber.substring(1);
+            }
+            
+            // Check for invalid length and add visual feedback
+            const phoneErrorId = 'phone-error';
+            let errorElement = document.getElementById(phoneErrorId);
+            
+            // Remove existing error message
+            if (errorElement) {
+                errorElement.remove();
+            }
+            
+            // Add error message if phone number is too long
+            if ((phoneNumber.length > 11 && !phoneNumber.startsWith('+63')) || 
+                (phoneNumber.startsWith('+63') && phoneNumber.length > 13)) {
+                // Create error message element
+                errorElement = document.createElement('div');
+                errorElement.id = phoneErrorId;
+                errorElement.className = 'text-danger mt-1';
+                errorElement.textContent = 'The phone number must not exceed 11 digits.';
+                
+                // Insert after the phone input
+                this.parentNode.insertBefore(errorElement, this.nextSibling);
+            }
+        });
+        
+        // Clear phone error when user starts typing
+        phoneInput.addEventListener('input', function() {
+            const phoneErrorId = 'phone-error';
+            const errorElement = document.getElementById(phoneErrorId);
+            if (errorElement) {
+                errorElement.remove();
+            }
+        });
+    }
+});
+</script>
 @endsection 

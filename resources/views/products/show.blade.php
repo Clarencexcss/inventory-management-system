@@ -55,10 +55,6 @@
                                         <td class="text-dark">{{ $product->code }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-dark">Barcode</td>
-                                        <td class="text-dark">{!! $barcode !!}</td>
-                                    </tr>
-                                    <tr>
                                         <td class="text-dark">Category</td>
                                         <td>
                                             @if($product->category)
@@ -96,6 +92,10 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="text-dark">Storage Location</td>
+                                        <td class="text-dark">{{ $product->storage_location ?? 'N/A' }}</td>
+                                    </tr>
 
                                     <tr>
                                         <td class="text-dark">Buying Prices</td>
@@ -106,6 +106,10 @@
                                         <td class="text-dark">{{ $product->selling_price }}</td>
                                     </tr>
                                     <tr>
+                                        <td class="text-dark">Expiration Date</td>
+                                        <td class="text-dark">{{ $product->expiration_date ? $product->expiration_date->format('M d, Y') : 'N/A' }}</td>
+                                    </tr>
+                                    <tr>
                                         <td class="text-dark">{{ __('Notes') }}</td>
                                         <td class="text-dark">{{ $product->notes }}</td>
                                     </tr>
@@ -113,13 +117,13 @@
                             </table>
                         </div>
 
-                        <div class="card-footer text-end">
-                            @if(auth()->user()->isAdmin())
-                            <x-button.edit route="{{ route('products.edit', $product) }}">
-                                {{ __('Edit') }}
-                            </x-button.edit>
+                      <div class="card-footer text-end" style="color: white;">
+                      @if(auth()->user()->isAdmin())
+                  <x-button.edit route="{{ route('products.edit', $product) }}" style="color: white;">
+                            {{ __('Edit') }}
+                          </x-button.edit>
                             @endif
-
+                            
                             <x-button.back route="{{ route('products.index') }}">
                                 {{ __('Cancel') }}
                             </x-button.back>

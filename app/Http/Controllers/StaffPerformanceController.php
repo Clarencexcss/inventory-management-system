@@ -138,31 +138,49 @@ class StaffPerformanceController extends Controller
     public function report()
     {
         try {
-            // Get top 3 performers
-            $topPerformers = StaffPerformance::with('staff')
-                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+            // Get top 3 performers with properly loaded staff relationship
+            $topPerformers = StaffPerformance::select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
                 ->whereHas('staff') // Ensure staff exists
                 ->groupBy('staff_id')
                 ->orderBy('avg_performance', 'desc')
                 ->limit(3)
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    $item->staff = Staff::find($item->staff_id);
+                    return $item;
+                })
+                ->filter(function ($item) {
+                    return $item->staff !== null;
+                });
 
-            // Get bottom 3 performers
-            $bottomPerformers = StaffPerformance::with('staff')
-                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+            // Get bottom 3 performers with properly loaded staff relationship
+            $bottomPerformers = StaffPerformance::select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
                 ->whereHas('staff') // Ensure staff exists
                 ->groupBy('staff_id')
                 ->orderBy('avg_performance', 'asc')
                 ->limit(3)
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    $item->staff = Staff::find($item->staff_id);
+                    return $item;
+                })
+                ->filter(function ($item) {
+                    return $item->staff !== null;
+                });
 
             // Get average performance by staff
-            $staffAverages = StaffPerformance::with('staff')
-                ->select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
+            $staffAverages = StaffPerformance::select('staff_id', DB::raw('AVG(overall_performance) as avg_performance'))
                 ->whereHas('staff') // Ensure staff exists
                 ->groupBy('staff_id')
                 ->orderBy('avg_performance', 'desc')
-                ->get();
+                ->get()
+                ->map(function ($item) {
+                    $item->staff = Staff::find($item->staff_id);
+                    return $item;
+                })
+                ->filter(function ($item) {
+                    return $item->staff !== null;
+                });
 
             // Get monthly trend data (last 6 months)
             $monthlyTrends = StaffPerformance::select(

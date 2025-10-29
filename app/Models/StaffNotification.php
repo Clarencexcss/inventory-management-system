@@ -19,6 +19,7 @@ class StaffNotification extends Model
         'read_at',
         'order_id',
         'cancelled_by_user_id',
+        'user_id',
     ];
 
     protected $casts = [
@@ -43,6 +44,14 @@ class StaffNotification extends Model
     public function cancelledByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cancelled_by_user_id');
+    }
+
+    /**
+     * Get the user this notification is for
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -103,6 +112,14 @@ class StaffNotification extends Model
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
+    }
+
+    /**
+     * Scope for notifications for a specific user
+     */
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
     }
 
     /**

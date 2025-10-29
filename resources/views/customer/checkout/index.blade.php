@@ -78,6 +78,15 @@
             position: sticky;
             top: 20px;
         }
+        
+        /* Static field styling */
+        .static-field {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: 0.375rem;
+            background-color: #f8f9fa;
+            min-height: calc(1.5em + 0.75rem + 2px);
+        }
     </style>
 </head>
 <body>
@@ -162,15 +171,27 @@
                             <!-- Customer Info -->
                             <div class="row mb-4">
                                 <div class="col-12">
-                                    <h6 class="mb-3"><i class="fas fa-user me-2"></i>Customer Information</h6>
+                                    <h6 class="mb-3"><i class="fas fa-user me-2"></i>Customer Information for this Order</h6>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" value="{{ $customer->name ?? '' }}" readonly>
+                                    <label class="form-label">Customer Account</label>
+                                    <div class="static-field">
+                                        {{ $customer->name }}
+                                    </div>
+                                    <input type="hidden" name="full_name" value="{{ $customer->name }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Receiver Name (Optional)</label>
+                                    <input type="text" class="form-control @error('receiver_name') is-invalid @enderror" name="receiver_name" value="{{ old('receiver_name') }}" placeholder="Leave blank to use your name">
+                                    @error('receiver_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    <small class="form-text text-muted">Specify a different name if sending to another person</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" value="{{ $customer->email }}" readonly>
+                                    <div class="static-field">
+                                        {{ $customer->email }}
+                                    </div>
+                                    <input type="hidden" name="email" value="{{ $customer->email }}">
                                 </div>
                             </div>
 
@@ -179,11 +200,61 @@
                                 <div class="col-12">
                                     <h6 class="mb-3"><i class="fas fa-truck me-2"></i>Delivery Information</h6>
                                 </div>
-                                <div class="col-12 mb-3">
+                                
+                                <!-- Location Fields -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City *</label>
+                                    <div class="static-field @error('city') is-invalid @enderror">
+                                        {{ old('city', 'Cabuyao') }}
+                                    </div>
+                                    <input type="hidden" name="city" value="{{ old('city', 'Cabuyao') }}">
+                                    @error('city')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Postal Code *</label>
+                                    <div class="static-field @error('postal_code') is-invalid @enderror">
+                                        {{ old('postal_code', '4025') }}
+                                    </div>
+                                    <input type="hidden" name="postal_code" value="{{ old('postal_code', '4025') }}">
+                                    @error('postal_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Barangay *</label>
+                                    <select class="form-control @error('barangay') is-invalid @enderror" name="barangay">
+                                        <option value="">Select Barangay</option>
+                                        @foreach($barangays as $barangay)
+                                            <option value="{{ $barangay }}" {{ old('barangay') == $barangay ? 'selected' : '' }}>{{ $barangay }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('barangay')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Street Name *</label>
+                                    <input type="text" class="form-control @error('street_name') is-invalid @enderror" name="street_name" value="{{ old('street_name') }}" placeholder="Enter street name">
+                                    @error('street_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Building (Optional)</label>
+                                    <input type="text" class="form-control @error('building') is-invalid @enderror" name="building" value="{{ old('building') }}" placeholder="Enter building name">
+                                    @error('building')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">House No. (Optional)</label>
+                                    <input type="text" class="form-control @error('house_no') is-invalid @enderror" name="house_no" value="{{ old('house_no') }}" placeholder="Enter house number">
+                                    @error('house_no')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                
+                                <div class="col-12 mb-3 d-none">
                                     <label class="form-label">Delivery Address *</label>
                                     <textarea class="form-control @error('delivery_address') is-invalid @enderror" name="delivery_address" rows="3" placeholder="Enter your complete delivery address">{{ old('delivery_address', $customer->address) }}</textarea>
                                     @error('delivery_address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
+                                
                                 <div class="col-md-6">
                                     <label class="form-label">Contact Phone *</label>
                                     <input type="text" class="form-control @error('contact_phone') is-invalid @enderror" name="contact_phone" value="{{ old('contact_phone', $customer->phone) }}" placeholder="Enter your contact number">
@@ -275,7 +346,24 @@
                             <strong>Total:</strong><strong class="text-primary">₱{{ number_format($cartSubtotal, 2) }}</strong>
                         </div>
 
-                        <div class="alert alert-warning"><small><i class="fas fa-exclamation-triangle me-1"></i><strong>Note:</strong> Orders are processed during business hours (8 AM - 6 PM)</small></div>
+                        <!-- Shop Information -->
+                        <div class="border-top pt-3 mt-3">
+                            <h6 class="mb-2"><i class="fas fa-store me-2"></i>From Yannis Meat Shop</h6>
+                            <small class="text-muted d-block mb-1">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Katapatn Rd, 17, Cabuyao City, 4025 Laguna
+                            </small>
+                            <small class="text-muted d-block mb-1">
+                                <i class="fas fa-phone me-2"></i>
+                                +63 09082413347
+                            </small>
+                            <small class="text-muted d-block">
+                                <i class="fas fa-envelope me-2"></i>
+                                yannismeatshop@gmail.com
+                            </small>
+                        </div>
+
+                        <div class="alert alert-warning mt-3"><small><i class="fas fa-exclamation-triangle me-1"></i><strong>Note:</strong> Orders are processed during business hours (8 AM - 6 PM)</small></div>
                     </div>
                 </div>
             </div>
@@ -305,6 +393,49 @@
             document.querySelectorAll("input[name='payment_type']").forEach(input => {
                 input.addEventListener("change", toggleGCashSection);
             });
+            
+            // Phone validation for checkout form
+            const contactPhoneInput = document.querySelector("input[name='contact_phone']");
+            if (contactPhoneInput) {
+                contactPhoneInput.addEventListener('blur', function() {
+                    let phoneNumber = this.value.trim();
+                    
+                    // If the phone number starts with "09" and is 11 digits, convert to +63 format
+                    if (phoneNumber.startsWith('09') && phoneNumber.length === 11) {
+                        this.value = '+63' + phoneNumber.substring(1);
+                    }
+                    
+                    // Check for invalid length and add visual feedback
+                    const phoneErrorId = 'phone-error-checkout';
+                    let errorElement = document.getElementById(phoneErrorId);
+                    
+                    // Remove existing error message
+                    if (errorElement) {
+                        errorElement.remove();
+                    }
+                    
+                    // Add error message if phone number is invalid
+                    if (phoneNumber !== '' && !phoneNumber.match(/^(\+63\d{10}|09\d{9})$/)) {
+                        // Create error message element
+                        errorElement = document.createElement('div');
+                        errorElement.id = phoneErrorId;
+                        errorElement.className = 'text-danger mt-1';
+                        errorElement.textContent = 'The contact phone must be a valid Philippine phone number (either 09xxxxxxxxx or +63xxxxxxxxxx format).';
+                        
+                        // Insert after the phone input
+                        this.parentNode.insertBefore(errorElement, this.nextSibling);
+                    }
+                });
+                
+                // Clear phone error when user starts typing
+                contactPhoneInput.addEventListener('input', function() {
+                    const phoneErrorId = 'phone-error-checkout';
+                    const errorElement = document.getElementById(phoneErrorId);
+                    if (errorElement) {
+                        errorElement.remove();
+                    }
+                });
+            }
         });
     </script>
 </body>

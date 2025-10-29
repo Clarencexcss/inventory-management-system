@@ -8,13 +8,14 @@ use App\Services\CustomerNotificationService;
 use App\Services\StaffNotificationService;
 use App\Models\CustomerNotification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [
         'id',
@@ -22,6 +23,9 @@ class Order extends Model
 
     protected $fillable = [
         'customer_id',
+        'customer_name',
+        'receiver_name',
+        'customer_email',
         'order_date',
         'order_status',
         'total_products',
@@ -41,7 +45,13 @@ class Order extends Model
         'delivery_address',
         'contact_phone',
         'gcash_reference',        
-        'proof_of_payment',  
+        'proof_of_payment',
+        'city',
+        'postal_code',
+        'barangay',
+        'street_name',
+        'building',
+        'house_no',
     ];
 
     protected $casts = [
@@ -59,6 +69,13 @@ class Order extends Model
     protected static function boot()
     {
         parent::boot();
+
+        // Set order_date with correct timezone when creating
+        static::creating(function ($order) {
+            if (empty($order->order_date)) {
+                $order->order_date = now()->timezone('Asia/Manila')->format('Y-m-d');
+            }
+        });
 
         // Create notification when a new order is created
         static::created(function ($order) {

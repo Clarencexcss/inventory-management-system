@@ -26,7 +26,7 @@
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="logo">
-                                        <h1>Name Store</h1>
+                                        <h1>Yannis Meat Shop</h1>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-6">
@@ -42,7 +42,7 @@
                                     <div class="invoice-number">
                                         <h4 class="inv-title-1">Invoice date:</h4>
                                         <p class="invo-addr-1">
-                                            {{ Carbon\Carbon::now()->format('M d, Y') }}
+                                            {{ Carbon\Carbon::now()->timezone('Asia/Manila')->format('M d, Y g:i A') }}
                                         </p>
                                     </div>
                                 </div>
@@ -57,10 +57,10 @@
                                 </div>
                                 <div class="col-sm-6 text-end mb-50">
                                     <h4 class="inv-title-1">Store</h4>
-                                    <p class="inv-from-1">Name Store</p>
-                                    <p class="inv-from-1">(+62) 123 123 123</p>
+                                    <p class="inv-from-1">Yannis Meat Shop</p>
+                                    <p class="inv-from-1">+63 09082413347</p>
                                     <p class="inv-from-1">email@example.com</p>
-                                    <p class="inv-from-2">Cirebon, Jawa Barat, Indonesia</p>
+                                    <p class="inv-from-2">Katapatn Rd, 17, Cabuyao City, 4025 Laguna</p>
                                 </div>
                             </div>
                         </div>
@@ -79,27 +79,21 @@
                                         @foreach ($carts as $item)
                                         <tr>
                                             <td class="text-center">{{ $item->name }}</td>
-                                            <td class="text-center">{{ $item->price }}</td>
+                                            <td class="text-center">₱{{ number_format($item->price, 2) }}</td>
                                             <td class="text-center">{{ $item->qty }}</td>
-                                            <td class="text-center">{{ $item->subtotal }}</td>
+                                            <td class="text-center">₱{{ number_format($item->subtotal, 2) }}</td>
                                         </tr>
                                         @endforeach
                                         <tr>
                                             <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
                                             <td class="text-center">
-                                                <strong>{{ Cart::subtotal() }}</strong>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="3" class="text-end"><strong>Tax</strong></td>
-                                            <td class="text-center">
-                                                <strong>{{ Cart::tax() }}</strong>
+                                                <strong>₱{{ number_format(Cart::subtotal(), 2) }}</strong>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="3" class="text-end"><strong>Total</strong></td>
                                             <td class="text-center">
-                                                <strong>{{ Cart::total() }}</strong>
+                                                <strong>₱{{ number_format(Cart::total(), 2) }}</strong>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -135,7 +129,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title text-center mx-auto" id="modalCenterTitle">Invoice of {{ $customer->name }}<br/>Total Amount ${{ Cart::total() }}</h3>
+                    <h3 class="modal-title text-center mx-auto" id="modalCenterTitle">Invoice of {{ $customer->name }}<br/>Total Amount ₱{{ number_format(Cart::total(), 2) }}</h3>
                 </div>
 
                 <form action="{{ route('orders.store') }}" method="POST">

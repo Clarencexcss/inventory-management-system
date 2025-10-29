@@ -22,7 +22,7 @@ class OrderFactory extends Factory
         return [
             'customer_id' => Customer::factory(),
 //            'order_date' => fake()->dateTimeBetween('2022-01-01 00:00:00', now()->addDays(15)),
-            'order_date' => fake()->dateTime(),
+            'order_date' => now()->timezone('Asia/Manila')->format('Y-m-d'),
             'order_status' => fake()->randomElement(OrderStatus::cases()),
             'total_products' => fake()->randomElement([1,5,10,15]),
             'sub_total' => fake()->randomNumber(5, true),

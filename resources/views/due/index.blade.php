@@ -49,7 +49,7 @@
                                 {{ $order->customer->name }}
                             </td>
                             <td class="text-center">
-                                {{ $order->order_date->format('d-m-Y') }}
+                                {{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}
                             </td>
                             <td class="text-center">
                                 {{ $order->payment_type }}

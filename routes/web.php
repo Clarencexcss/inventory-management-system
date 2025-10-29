@@ -45,6 +45,10 @@ Route::get('test-customer-login', function () {
     return 'Customer login route is working!';
 })->name('test.customer.login');
 
+Route::get('test-deactivate', function () {
+    return view('customer.profile');
+})->name('test.deactivate');
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -94,9 +98,11 @@ Route::middleware(['customer.web.auth'])->group(function () {
     Route::get('/my-orders/{order}', [\App\Http\Controllers\Customer\OrderController::class, 'showOrder'])->name('customer.orders.show');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');
     Route::post('/customer/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel.admin');
+    Route::get('/customer/orders/{order}/download-invoice', [\App\Http\Controllers\Customer\OrderController::class, 'downloadInvoice'])->name('customer.orders.download-invoice');
 
     Route::get('/my-profile', [CustomerController::class, 'profile'])->name('customer.profile');
-    Route::put('/customer/profile/update', [CustomerController::class, 'update'])->name('customer.update');
+    Route::patch('/customer/profile', [CustomerController::class, 'update'])->name('customer.profile.update');
+    Route::delete('/customer/profile/deactivate', [CustomerController::class, 'deactivate'])->name('customer.profile.deactivate');
     Route::post('/customer/logout', [App\Http\Controllers\Customer\WebAuthController::class, 'logout'])->name('customer.logout');
   
     // Customer Notifications
@@ -127,10 +133,6 @@ Route::middleware(['auth:web_customer'])->group(function () {
     });
 
     // Customer Profile
-Route::prefix('customer')->middleware(['auth'])->group(function () {
-    Route::get('profile', [CustomerController::class, 'profile'])->name('customer.profile.admin');
-    Route::patch('profile', [CustomerController::class, 'update'])->name('customer.profile.update');
-});
 
 });
 

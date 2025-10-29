@@ -33,7 +33,8 @@ class UpdateCustomerRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:50'
+                'max:50',
+                'regex:/^[a-zA-Z\s.\-\']+$/'
             ],
             'username' => [
                 'nullable',
@@ -48,9 +49,10 @@ class UpdateCustomerRequest extends FormRequest
                 Rule::unique('customers', 'email')->ignore($customerId),
             ],
             'phone' => [
-                'nullable',
+                'required',
                 'string',
-                'max:25',
+                'regex:/^\+63\d{10}$/',
+                'max:13',
                 Rule::unique('customers', 'phone')->ignore($customerId),
             ],
             'password' => [
@@ -60,15 +62,30 @@ class UpdateCustomerRequest extends FormRequest
                 'confirmed'
             ],
             'password_confirmation' => [
-                'required_with:password',
+                'nullable',
                 'string',
-                'min:8'
+                'min:8',
+                'required_with:password'
             ],
             'address' => [
                 'nullable',
                 'string',
                 'max:100'
             ],
+        ];
+    }
+    
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.regex' => 'The name may only contain letters, spaces, periods, hyphens, and apostrophes.',
+            'phone.regex' => 'The phone number must start with +63 and be exactly 11 digits.',
+            'phone.unique' => 'This phone number is already registered.',
         ];
     }
 }

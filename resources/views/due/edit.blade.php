@@ -49,7 +49,7 @@
                                 <input type="text"
                                        id="order_date"
                                        class="form-control"
-                                       value="{{ $order->order_date->format('d-m-Y') }}"
+                                       value="{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}"
                                        disabled
                                 >
                             </div>
@@ -66,10 +66,9 @@
                                 >
                             </div>
 
-                            {{---
                             <div class="col">
                                 <label for="customer" class="form-label required">
-                                    {{ __('Customer') }}
+                                    {{ __('Customer Account') }}
                                 </label>
                                 <input type="text"
                                        id="customer"
@@ -78,7 +77,6 @@
                                        disabled
                                 >
                             </div>
-                            ---}}
 
                             <x-tom-select
                                 label="Customers"

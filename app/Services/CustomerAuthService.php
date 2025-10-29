@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Customer;
 use App\Models\CustomerAuthLog;
+use App\Models\LoginAttempt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -91,6 +92,20 @@ class CustomerAuthService
     public function loginCustomer(string $emailOrUsername, string $password): array
     {
         try {
+            // Check if the account is locked due to too many failed attempts
+            if ($this->isAccountLocked($emailOrUsername, 'customer')) {
+                // Calculate seconds remaining for lockout
+                $secondsRemaining = $this->getLockoutSecondsRemaining($emailOrUsername, 'customer');
+                $message = 'Account temporarily locked due to multiple failed login attempts. Please try again in ' . $secondsRemaining . ' seconds.';
+                
+                return [
+                    'success' => false,
+                    'message' => $message,
+                    'type' => 'locked',
+                    'lockout_seconds' => $secondsRemaining
+                ];
+            }
+
             DB::beginTransaction();
 
             // Find customer by email or username
@@ -100,29 +115,63 @@ class CustomerAuthService
 
             if (!$customer) {
                 $this->logFailedLogin($emailOrUsername, 'Customer not found');
+                $this->logFailedAttempt($emailOrUsername, 'customer');
                 return [
                     'success' => false,
-                    'message' => 'Invalid credentials',
+                    'message' => 'Invalid email or username. Please check your credentials and try again.',
+                    'type' => 'invalid_credentials'
                 ];
             }
 
             // Check password
             if (!Hash::check($password, $customer->password)) {
+                // Log the current failed attempt FIRST
                 $this->logFailedLogin($emailOrUsername, 'Invalid password', $customer->id);
-                return [
-                    'success' => false,
-                    'message' => 'Invalid credentials',
-                ];
+                $this->logFailedAttempt($emailOrUsername, 'customer');
+                
+                // NOW check if this attempt caused a lockout
+                // Get current failed attempts count (AFTER this attempt is logged)
+                $failedAttempts = $this->getFailedAttemptsCount($emailOrUsername, 'customer');
+                
+                // Check if account should now be locked (3 or more failed attempts)
+                if ($failedAttempts >= 3) {
+                    // Account is now locked
+                    $message = 'Invalid password. This was your third failed attempt. Your account is now locked for 5 minutes.';
+                    return [
+                        'success' => false,
+                        'message' => $message,
+                        'type' => 'locked_after_third_attempt',
+                        'lockout_seconds' => 300 // 5 minutes in seconds
+                    ];
+                } else {
+                    // Still have attempts remaining
+                    // Calculate remaining attempts: 3 total - current failed attempts
+                    $remainingAttempts = 3 - $failedAttempts;
+                    $message = 'Invalid password. Please check your password and try again.';
+                    $message .= ' You have ' . $remainingAttempts . ' attempt(s) remaining before your account is locked for 5 minutes.';
+                    
+                    return [
+                        'success' => false,
+                        'message' => $message,
+                        'type' => 'invalid_password',
+                        'remaining_attempts' => $remainingAttempts
+                    ];
+                }
             }
 
             // Check if account is active
             if (!$customer->isActive()) {
                 $this->logFailedLogin($emailOrUsername, 'Account suspended', $customer->id);
+                $this->logFailedAttempt($emailOrUsername, 'customer');
                 return [
                     'success' => false,
                     'message' => 'Your account has been suspended. Please contact support.',
+                    'type' => 'suspended'
                 ];
             }
+
+            // Log successful attempt
+            $this->logSuccessfulAttempt($emailOrUsername, 'customer');
 
             // Create token
             $token = $customer->createToken('customer-token')->plainTextToken;
@@ -156,7 +205,7 @@ class CustomerAuthService
 
             return [
                 'success' => true,
-                'message' => 'Login successful',
+                'message' => 'Login successful. Welcome back!',
                 'customer' => $customer,
                 'token' => $token,
             ];
@@ -166,12 +215,13 @@ class CustomerAuthService
             
             Log::error('Failed to login customer', [
                 'error' => $e->getMessage(),
-                'email_or_username' => $emailOrUsername,
+                'email_orUsername' => $emailOrUsername,
             ]);
 
             return [
                 'success' => false,
                 'message' => 'Login failed: ' . $e->getMessage(),
+                'type' => 'error'
             ];
         }
     }
@@ -273,6 +323,137 @@ class CustomerAuthService
     }
 
     /**
+     * Log failed login attempt
+     * 
+     * @param string $emailOrUsername
+     * @param string $userType
+     * @return void
+     */
+    private function logFailedAttempt(string $emailOrUsername, string $userType): void
+    {
+        try {
+            LoginAttempt::create([
+                'email' => $emailOrUsername,
+                'ip_address' => request()->ip() ?? 'unknown',
+                'user_type' => $userType,
+                'attempted_at' => now(),
+                'successful' => false,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to log login attempt', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Log successful login attempt
+     * 
+     * @param string $emailOrUsername
+     * @param string $userType
+     * @return void
+     */
+    private function logSuccessfulAttempt(string $emailOrUsername, string $userType): void
+    {
+        try {
+            LoginAttempt::create([
+                'email' => $emailOrUsername,
+                'ip_address' => request()->ip() ?? 'unknown',
+                'user_type' => $userType,
+                'attempted_at' => now(),
+                'successful' => true,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to log login attempt', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Check if account is locked due to too many failed attempts
+     * 
+     * @param string $emailOrUsername
+     * @param string $userType
+     * @return bool
+     */
+    private function isAccountLocked(string $emailOrUsername, string $userType): bool
+    {
+        try {
+            $failedAttempts = LoginAttempt::where('email', $emailOrUsername)
+                ->where('user_type', $userType)
+                ->where('successful', false)
+                ->where('attempted_at', '>=', now()->subMinutes(5))
+                ->count();
+
+            return $failedAttempts >= 3;
+        } catch (\Exception $e) {
+            Log::error('Failed to check account lock status', [
+                'error' => $e->getMessage(),
+            ]);
+            return false; // Don't lock accounts if there's an error
+        }
+    }
+
+    /**
+     * Get count of failed attempts
+     * 
+     * @param string $emailOrUsername
+     * @param string $userType
+     * @return int
+     */
+    private function getFailedAttemptsCount(string $emailOrUsername, string $userType): int
+    {
+        try {
+            return LoginAttempt::where('email', $emailOrUsername)
+                ->where('user_type', $userType)
+                ->where('successful', false)
+                ->where('attempted_at', '>=', now()->subMinutes(5))
+                ->count();
+        } catch (\Exception $e) {
+            Log::error('Failed to get failed attempts count', [
+                'error' => $e->getMessage(),
+            ]);
+            return 0;
+        }
+    }
+
+    /**
+     * Get seconds remaining for lockout
+     * 
+     * @param string $emailOrUsername
+     * @param string $userType
+     * @return int
+     */
+    private function getLockoutSecondsRemaining(string $emailOrUsername, string $userType): int
+    {
+        try {
+            // Get the earliest failed attempt within the last 5 minutes
+            $earliestAttempt = LoginAttempt::where('email', $emailOrUsername)
+                ->where('user_type', $userType)
+                ->where('successful', false)
+                ->where('attempted_at', '>=', now()->subMinutes(5))
+                ->orderBy('attempted_at', 'asc')
+                ->first();
+
+            if (!$earliestAttempt) {
+                return 0;
+            }
+
+            // Calculate seconds remaining (5 minutes from the first failed attempt)
+            $lockoutEnd = $earliestAttempt->attempted_at->addMinutes(5);
+            $secondsRemaining = max(0, $lockoutEnd->diffInSeconds(now()));
+
+            return $secondsRemaining;
+        } catch (\Exception $e) {
+            Log::error('Failed to get lockout seconds remaining', [
+                'error' => $e->getMessage(),
+            ]);
+            return 0;
+        }
+    }
+
+    /**
      * Get customer authentication history
      * 
      * @param Customer $customer
@@ -301,4 +482,4 @@ class CustomerAuthService
             ->where('created_at', '>=', now()->subMinutes($minutes))
             ->count();
     }
-} 
+}

@@ -72,6 +72,12 @@
                                                  value="{{ old('name') }}" />
                                     </div>
 
+                                    <div class="col-md-12">
+                                        <x-input name="code" id="code" label="Product Code" placeholder="Auto-generated"
+                                                 value="{{ old('code') }}" readonly />
+                                        <small class="form-text text-muted">This will be automatically generated based on animal type and cut</small>
+                                    </div>
+
                                     {{-- Meat Cut --}}
                                     <div class="col-sm-6 col-md-6">
                                         <div class="mb-3">
@@ -212,10 +218,28 @@
                                                  value="{{ old('quantity_alert') }}" />
                                     </div>
 
+                                    {{-- Storage Location --}}
                                     <div class="col-sm-6 col-md-6">
-                                        <x-input type="text" label="Storage Location" name="storage_location"
-                                                 id="storage_location" placeholder="e.g., Freezer 1, Shelf 2"
-                                                 value="{{ old('storage_location') }}" />
+                                        <div class="mb-3">
+                                            <label for="storage_location" class="form-label">Storage Location</label>
+                                            <select name="storage_location" id="storage_location"
+                                                    class="form-select @error('storage_location') is-invalid @enderror">
+                                                <option selected disabled>Select a storage location:</option>
+                                                <option value="Freezer 1" {{ old('storage_location') == 'Freezer 1' ? 'selected' : '' }}>Freezer 1</option>
+                                                <option value="Freezer 2" {{ old('storage_location') == 'Freezer 2' ? 'selected' : '' }}>Freezer 2</option>
+                                                <option value="Freezer 3" {{ old('storage_location') == 'Freezer 3' ? 'selected' : '' }}>Freezer 3</option>
+                                                <option value="Freezer 4" {{ old('storage_location') == 'Freezer 4' ? 'selected' : '' }}>Freezer 4</option>
+                                                <option value="Freezer 5" {{ old('storage_location') == 'Freezer 5' ? 'selected' : '' }}>Freezer 5</option>
+                                                <option value="Shelf 1" {{ old('storage_location') == 'Shelf 1' ? 'selected' : '' }}>Shelf 1</option>
+                                                <option value="Shelf 2" {{ old('storage_location') == 'Shelf 2' ? 'selected' : '' }}>Shelf 2</option>
+                                                <option value="Shelf 3" {{ old('storage_location') == 'Shelf 3' ? 'selected' : '' }}>Shelf 3</option>
+                                                <option value="Shelf 4" {{ old('storage_location') == 'Shelf 4' ? 'selected' : '' }}>Shelf 4</option>
+                                                <option value="Shelf 5" {{ old('storage_location') == 'Shelf 5' ? 'selected' : '' }}>Shelf 5</option>
+                                            </select>
+                                            @error('storage_location')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
 
                                     <div class="col-sm-6 col-md-6">
@@ -272,9 +296,10 @@
     document.addEventListener('DOMContentLoaded', function() {
         const meatCutSelect = document.getElementById('meat_cut_id');
         const pricePerKgInput = document.getElementById('price_per_kg');
+        const codeInput = document.getElementById('code');
         
-        // Meat cuts data with their default prices
-        const meatCutsData = @json($meatCuts->pluck('default_price_per_kg', 'id'));
+        // Meat cuts data with their default prices and animal types
+        const meatCutsData = @json($meatCuts);
         
         console.log('Meat cuts data:', meatCutsData); // Debug log
         
@@ -283,22 +308,108 @@
                 const selectedMeatCutId = this.value;
                 console.log('Selected meat cut ID:', selectedMeatCutId); // Debug log
                 
-                if (selectedMeatCutId && meatCutsData[selectedMeatCutId]) {
-                    pricePerKgInput.value = parseFloat(meatCutsData[selectedMeatCutId]).toFixed(2);
+                // Find the selected meat cut data
+                const selectedMeatCut = meatCutsData.find(cut => cut.id == selectedMeatCutId);
+                
+                if (selectedMeatCut) {
+                    // Update price per kg
+                    pricePerKgInput.value = parseFloat(selectedMeatCut.default_price_per_kg).toFixed(2);
                     console.log('Set price to:', pricePerKgInput.value); // Debug log
+                    
+                    // Generate and update product code preview
+                    if (codeInput) {
+                        const productCode = generateProductCode(selectedMeatCut);
+                        codeInput.value = productCode;
+                        console.log('Set code to:', productCode); // Debug log
+                    }
                 } else {
                     pricePerKgInput.value = '';
+                    if (codeInput) {
+                        codeInput.value = '';
+                    }
                 }
             });
             
             // Set initial value if meat cut is pre-selected
-            if (meatCutSelect.value && meatCutsData[meatCutSelect.value]) {
-                pricePerKgInput.value = parseFloat(meatCutsData[meatCutSelect.value]).toFixed(2);
-                console.log('Initial price set to:', pricePerKgInput.value); // Debug log
+            if (meatCutSelect.value) {
+                const selectedMeatCut = meatCutsData.find(cut => cut.id == meatCutSelect.value);
+                if (selectedMeatCut) {
+                    pricePerKgInput.value = parseFloat(selectedMeatCut.default_price_per_kg).toFixed(2);
+                    console.log('Initial price set to:', pricePerKgInput.value); // Debug log
+                    
+                    // Generate and update product code preview
+                    if (codeInput) {
+                        const productCode = generateProductCode(selectedMeatCut);
+                        codeInput.value = productCode;
+                        console.log('Initial code set to:', productCode); // Debug log
+                    }
+                }
             }
         } else {
             console.error('Required elements not found');
         }
     });
+    
+    /**
+     * Generate a product code in the format: ANIMAL-CUT-XXX
+     * Example: CK-WNG-001 (Chicken Wings 001)
+     */
+    function generateProductCode(meatCut) {
+        // Animal type abbreviations
+        const animalAbbreviations = {
+            'beef': 'BF',
+            'pork': 'PK',
+            'chicken': 'CK',
+            'lamb': 'LB',
+            'goat': 'GT'
+        };
+        
+        // Get animal abbreviation or use first 2 letters capitalized
+        const animalType = meatCut.animal_type.toLowerCase();
+        const animalCode = animalAbbreviations[animalType] || animalType.substring(0, 2).toUpperCase();
+        
+        // Generate cut abbreviation from cut name
+        const cutCode = generateCutAbbreviation(meatCut.name);
+        
+        // For preview, we'll show -XXX as the sequence will be determined on server side
+        return `${animalCode}-${cutCode}-XXX`;
+    }
+    
+    /**
+     * Generate a cut abbreviation from the cut name
+     * Examples: "Chicken Wings" -> "WNG", "Ribeye" -> "RIB"
+     */
+    function generateCutAbbreviation(cutName) {
+        // Common cut abbreviations
+        const cutAbbreviations = {
+            'breast': 'BRS',
+            'thigh': 'THI',
+            'wings': 'WNG',
+            'ribeye': 'RIB',
+            'sirloin': 'SIR',
+            'tenderloin': 'TEN',
+            't-bone': 'TBN',
+            'brisket': 'BRS',
+            'chop': 'CHP',
+            'belly': 'BEL',
+            'ribs': 'RIB',
+            'shank': 'SHK'
+        };
+        
+        // Convert to lowercase for matching
+        const lowerCutName = cutName.toLowerCase();
+        
+        // Check if we have a predefined abbreviation
+        for (const [cut, abbrev] of Object.entries(cutAbbreviations)) {
+            if (lowerCutName.includes(cut)) {
+                return abbrev;
+            }
+        }
+        
+        // Fallback: take first 3 letters of the last word
+        const words = cutName.split(' ');
+        const lastWord = words[words.length - 1].toLowerCase();
+        return lastWord.substring(0, 3).toUpperCase();
+    }
 </script>
 @endpush

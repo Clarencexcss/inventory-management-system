@@ -4,9 +4,9 @@ namespace App\Http\Requests\Order;
 
 use App\Enums\OrderStatus;
 use Gloudemans\Shoppingcart\Facades\Cart;
-use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class OrderStoreRequest extends FormRequest
 {
@@ -30,19 +30,37 @@ class OrderStoreRequest extends FormRequest
     public function prepareForValidation(): void
     {
         $this->merge([
-            'order_date' => Carbon::now()->format('Y-m-d'),
+            'order_date' => Carbon::now()->timezone('Asia/Manila')->format('Y-m-d'),
             'order_status' => OrderStatus::PENDING->value,
             'total_products' => Cart::instance('order')->count(),
             'sub_total' => Cart::instance('order')->subtotal(),
             'vat' => Cart::instance('order')->tax(),
             'total' => Cart::instance('order')->total(),
-            'invoice_no' => IdGenerator::generate([
-                'table' => 'orders',
-                'field' => 'invoice_no',
-                'length' => 10,
-                'prefix' => 'INV-',
-            ]),
+            'invoice_no' => $this->generateInvoiceNumber(),
             'due' => (Cart::instance('order')->total() - $this->pay),
         ]);
+    }
+
+    private function generateInvoiceNumber(): string
+    {
+        $date = now()->timezone('Asia/Manila')->format('Ymd');
+        $prefix = "INV-ORD-{$date}-";
+        
+        // Get the latest invoice number for today
+        $latestOrder = DB::table('orders')
+            ->where('invoice_no', 'like', "{$prefix}%")
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        if ($latestOrder) {
+            // Extract the sequence number and increment it
+            $lastSequence = intval(substr($latestOrder->invoice_no, -4));
+            $nextSequence = str_pad($lastSequence + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            // First order of the day
+            $nextSequence = '0001';
+        }
+        
+        return $prefix . $nextSequence;
     }
 }

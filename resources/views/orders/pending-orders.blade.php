@@ -64,9 +64,9 @@
                             </td>
                             <td class="text-center">{{ $order->invoice_no }}</td>
                             <td class="text-center">{{ $order->customer->name }}</td>
-                            <td class="text-center">{{ $order->order_date->format('d-m-Y') }}</td>
+                            <td class="text-center">{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}</td>
                             <td class="text-center">{{ $order->payment_type }}</td>
-                            <td class="text-center">{{ Number::currency($order->total, 'PESOS') }}</td>
+                            <td class="text-center">{{ Number::currency($order->total, 'PHP') }}</td>
                             <td class="text-center">
                                 <span class="badge bg-orange text-white text-uppercase">
                                     {{ \App\Enums\OrderStatus::PENDING->label() }}

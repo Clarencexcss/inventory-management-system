@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Services\AdminAuthService;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,13 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    //protected $inputType;
+    protected $adminAuthService;
+
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
+    {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->adminAuthService = app(AdminAuthService::class);
+    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -43,15 +50,43 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Check if the account is locked due to too many failed attempts
+        if ($this->adminAuthService->isAccountLocked($this->email)) {
+            // Calculate seconds remaining for lockout
+            $secondsRemaining = $this->adminAuthService->getLockoutSecondsRemaining($this->email);
+            $message = 'Account temporarily locked due to multiple failed login attempts. Please try again in ' . $secondsRemaining . ' seconds.';
+            
+            throw ValidationException::withMessages([
+                'email' => $message,
+            ]);
+        }
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+            $this->adminAuthService->logFailedAttempt($this->email);
+            
+            // Get current failed attempts count (before this attempt)
+            $failedAttempts = $this->adminAuthService->getFailedAttemptsCount($this->email);
+            $totalAttemptsAfterThis = $failedAttempts + 1;
+            
+            // Check if this attempt will cause a lockout
+            if ($totalAttemptsAfterThis >= 3) {
+                // This is the third failed attempt, account will be locked
+                $message = 'Invalid credentials. This was your third failed attempt. Your account is now locked for 5 minutes.';
+            } else {
+                // Still have attempts remaining
+                $remainingAttempts = 3 - $totalAttemptsAfterThis;
+                $message = trans('auth.failed');
+                $message .= ' You have ' . $remainingAttempts . ' attempt(s) remaining before your account is locked for 5 minutes.';
+            }
 
             throw ValidationException::withMessages([
-                $this->email => trans('auth.failed'),
+                'email' => $message,
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+        $this->adminAuthService->logSuccessfulAttempt($this->email);
     }
 
     /**

@@ -224,7 +224,12 @@
             <a href="{{ route('customer.orders') }}" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Back to My Orders
             </a>
-            <h5 class="mb-0"><i class="fas fa-receipt me-2 text-danger"></i>Order Details</h5>
+            <div>
+                <h5 class="mb-0 d-inline-block me-3"><i class="fas fa-receipt me-2 text-danger"></i>Order Details</h5>
+                <a href="{{ route('customer.orders.download-invoice', $order->id) }}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-print me-1"></i> Print Invoice
+                </a>
+            </div>
         </div>
 
         @if(session('success'))
@@ -291,6 +296,99 @@
                             <div class="info-value text-danger fw-bold">₱{{ number_format($order->details->sum('total'), 2) }}</div>
                         </div>
                     </div>
+                    
+                    <!-- Customer Name -->
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Customer Account</div>
+                            <div class="info-value">{{ $order->customer_name }}</div>
+                        </div>
+                    </div>
+                    
+                    @if($order->receiver_name)
+                    <!-- Receiver Name -->
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Receiver Name</div>
+                            <div class="info-value">{{ $order->receiver_name }}</div>
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <!-- Customer Email -->
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Customer Email</div>
+                            <div class="info-value">{{ $order->customer_email }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delivery Information -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5 class="mb-3">Delivery Information</h5>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">City</div>
+                            <div class="info-value">{{ $order->city }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Postal Code</div>
+                            <div class="info-value">{{ $order->postal_code }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Barangay</div>
+                            <div class="info-value">{{ $order->barangay }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Street Name</div>
+                            <div class="info-value">{{ $order->street_name }}</div>
+                        </div>
+                    </div>
+                    
+                    @if($order->building)
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Building</div>
+                            <div class="info-value">{{ $order->building }}</div>
+                        </div>
+                    </div>
+                    @endif
+                    
+                    @if($order->house_no)
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">House No.</div>
+                            <div class="info-value">{{ $order->house_no }}</div>
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Full Delivery Address</div>
+                            <div class="info-value">{{ $order->delivery_address }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="info-box">
+                            <div class="info-label">Contact Number</div>
+                            <div class="info-value">{{ $order->contact_phone }}</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- GCash Reference (if applicable) -->
@@ -316,6 +414,29 @@
                     </div>
                 </div>
                 @endif
+                
+                <!-- Shop Information -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5 class="mb-3">From Yannis Meat Shop</h5>
+                        <div class="info-box">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="info-label">Address</div>
+                                    <div class="info-value">Katapatn Rd, 17, Cabuyao City, 4025 Laguna</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-label">Phone</div>
+                                    <div class="info-value">+63 09082413347</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">email@example.com</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

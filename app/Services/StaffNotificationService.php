@@ -13,7 +13,7 @@ class StaffNotificationService
     /**
      * Create a pending order notification
      */
-    public function createPendingOrderNotification(Order $order): StaffNotification
+    public function createPendingOrderNotification(Order $order, ?int $userId = null): StaffNotification
     {
         // Ensure customer relationship is loaded
         if (!$order->relationLoaded('customer')) {
@@ -31,6 +31,7 @@ class StaffNotificationService
                 'order_date' => $order->order_date->format('Y-m-d H:i:s'),
             ],
             'order_id' => $order->id,
+            'user_id' => $userId,
         ]);
         
         // Clear notification cache
@@ -42,7 +43,7 @@ class StaffNotificationService
     /**
      * Create a cancelled order notification
      */
-    public function createCancelledOrderNotification(Order $order, ?User $cancelledBy = null): StaffNotification
+    public function createCancelledOrderNotification(Order $order, ?User $cancelledBy = null, ?int $userId = null): StaffNotification
     {
         // Ensure customer relationship is loaded
         if (!$order->relationLoaded('customer')) {
@@ -64,6 +65,7 @@ class StaffNotificationService
             ],
             'order_id' => $order->id,
             'cancelled_by_user_id' => $cancelledBy?->id,
+            'user_id' => $userId,
         ]);
         
         // Clear notification cache
@@ -75,7 +77,7 @@ class StaffNotificationService
     /**
      * Create a low stock notification
      */
-    public function createLowStockNotification($product): StaffNotification
+    public function createLowStockNotification($product, ?int $userId = null): StaffNotification
     {
         $notification = StaffNotification::create([
             'type' => 'low_stock',
@@ -88,6 +90,7 @@ class StaffNotificationService
                 'current_stock' => $product->quantity,
                 'unit' => $product->unit->name,
             ],
+            'user_id' => $userId,
         ]);
         
         // Clear notification cache
@@ -99,24 +102,27 @@ class StaffNotificationService
     /**
      * Get unread notifications count with caching
      */
-    public function getUnreadCount(): int
+    public function getUnreadCount(?int $userId = null): int
     {
-        $cacheKey = 'staff_unread_notifications_count_' . auth()->id();
-        return Cache::remember($cacheKey, 30, function() {
-            return StaffNotification::unread()->count();
+        $userId = $userId ?? auth()->id();
+        $cacheKey = 'staff_unread_notifications_count_' . $userId;
+        return Cache::remember($cacheKey, 30, function() use ($userId) {
+            return StaffNotification::unread()->forUser($userId)->count();
         });
     }
 
     /**
      * Get recent notifications with caching
      */
-    public function getRecentNotifications(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getRecentNotifications(int $limit = 10, ?int $userId = null): \Illuminate\Database\Eloquent\Collection
     {
-        $cacheKey = 'staff_recent_notifications_' . auth()->id() . '_' . $limit;
-        return Cache::remember($cacheKey, 30, function() use ($limit) {
+        $userId = $userId ?? auth()->id();
+        $cacheKey = 'staff_recent_notifications_' . $userId . '_' . $limit;
+        return Cache::remember($cacheKey, 30, function() use ($limit, $userId) {
             return StaffNotification::with(['order' => function($query) {
                     $query->with('customer');
                 }, 'cancelledByUser'])
+                ->forUser($userId)
                 ->latest()
                 ->limit($limit)
                 ->get();
@@ -126,14 +132,16 @@ class StaffNotificationService
     /**
      * Get unread notifications with caching
      */
-    public function getUnreadNotifications(): \Illuminate\Database\Eloquent\Collection
+    public function getUnreadNotifications(?int $userId = null): \Illuminate\Database\Eloquent\Collection
     {
-        $cacheKey = 'staff_unread_notifications_' . auth()->id();
-        return Cache::remember($cacheKey, 30, function() {
+        $userId = $userId ?? auth()->id();
+        $cacheKey = 'staff_unread_notifications_' . $userId;
+        return Cache::remember($cacheKey, 30, function() use ($userId) {
             return StaffNotification::with(['order' => function($query) {
                     $query->with('customer');
                 }, 'cancelledByUser'])
                 ->unread()
+                ->forUser($userId)
                 ->latest()
                 ->get();
         });
@@ -151,9 +159,10 @@ class StaffNotificationService
     /**
      * Mark all notifications as read
      */
-    public function markAllAsRead(): void
+    public function markAllAsRead(?int $userId = null): void
     {
-        StaffNotification::unread()->update([
+        $userId = $userId ?? auth()->id();
+        StaffNotification::unread()->forUser($userId)->update([
             'is_read' => true,
             'read_at' => now(),
         ]);
@@ -163,9 +172,9 @@ class StaffNotificationService
     /**
      * Clear notification cache
      */
-    private function clearNotificationCache(): void
+    private function clearNotificationCache(?int $userId = null): void
     {
-        $userId = auth()->id();
+        $userId = $userId ?? auth()->id();
         Cache::forget('staff_unread_notifications_count_' . $userId);
         Cache::forget('staff_recent_notifications_' . $userId . '_5');
         Cache::forget('staff_recent_notifications_' . $userId . '_10');

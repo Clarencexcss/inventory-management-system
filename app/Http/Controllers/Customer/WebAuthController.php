@@ -35,15 +35,25 @@ class WebAuthController extends Controller
     public function register(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z\s.\-\']+$/',
             'email' => 'required|string|email|max:255|unique:customers',
             'username' => 'required|string|max:255|unique:customers',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'required|string|max:20|unique:customers',
+            'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers',
             'address' => 'required|string|max:500',
+        ], [
+            'name.regex' => 'The name may only contain letters, spaces, periods, hyphens, and apostrophes.',
+            'phone.regex' => 'The phone number must start with +63 and be exactly 11 digits.',
+            'phone.unique' => 'This phone number is already registered.',
         ]);
 
-        $result = $this->authService->createCustomerAccount($request->all());
+        // Process phone number - if it starts with 09, convert to +63
+        $requestData = $request->all();
+        if (isset($requestData['phone']) && preg_match('/^09\d{9}$/', $requestData['phone'])) {
+            $requestData['phone'] = '+63' . substr($requestData['phone'], 1);
+        }
+
+        $result = $this->authService->createCustomerAccount($requestData);
 
         if ($result['success']) {
             // Log in the customer after registration using web_customer guard
@@ -88,9 +98,18 @@ class WebAuthController extends Controller
                 ->with('success', 'Welcome back!');
         }
 
-        throw ValidationException::withMessages([
-            'login' => [$result['message']],
-        ]);
+        // Pass remaining attempts or lockout information to the session
+        if (isset($result['remaining_attempts'])) {
+            return back()->withErrors(['login' => $result['message']])
+                ->with('login_attempts_remaining', $result['remaining_attempts']);
+        }
+        
+        if (isset($result['lockout_seconds'])) {
+            return back()->withErrors(['login' => $result['message']])
+                ->with('lockout_seconds', $result['lockout_seconds']);
+        }
+
+        return back()->withErrors(['login' => $result['message']]);
     }
 
     /**
@@ -110,4 +129,4 @@ class WebAuthController extends Controller
 
         return redirect('/');
     }
-} 
+}

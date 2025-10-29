@@ -110,15 +110,21 @@
                     @else
                         @foreach($topPerformers as $index => $performer)
                             <div class="d-flex align-items-center mb-3 {{ $loop->last ? '' : 'pb-3 border-bottom' }}">
-                                <span class="badge bg-success fs-4 me-3">
-                                    #{{ $index + 1 }}
-                                </span>
                                 <div class="flex-grow-1">
-                                    <strong class="d-block">{{ $performer->staff->name }}</strong>
-                                    <small class="text-muted">{{ $performer->staff->position }}</small>
+                                    @if($performer->staff)
+                                        <strong class="d-block">{{ $performer->staff->name }}</strong>
+                                        <small class="text-muted">{{ $performer->staff->position }}</small>
+                                    @else
+                                        <strong class="d-block">Unknown Staff</strong>
+                                        <small class="text-muted">Position not available</small>
+                                    @endif
                                 </div>
-                                <span class="badge bg-success fs-4">
-                                    {{ number_format($performer->avg_performance, 1) }}%
+                                @php
+                                    $score = $performer->avg_performance;
+                                    $color = $score >= 80 ? 'success' : ($score >= 60 ? 'warning' : 'danger');
+                                @endphp
+                                <span class="badge bg-{{ $color }} fs-4">
+                                    {{ number_format($score, 1) }}%
                                 </span>
                             </div>
                         @endforeach
@@ -143,8 +149,13 @@
                         @foreach($bottomPerformers as $index => $performer)
                             <div class="d-flex align-items-center mb-3 {{ $loop->last ? '' : 'pb-3 border-bottom' }}">
                                 <div class="flex-grow-1">
-                                    <strong class="d-block">{{ $performer->staff->name }}</strong>
-                                    <small class="text-muted">{{ $performer->staff->position }}</small>
+                                    @if($performer->staff)
+                                        <strong class="d-block">{{ $performer->staff->name }}</strong>
+                                        <small class="text-muted">{{ $performer->staff->position }}</small>
+                                    @else
+                                        <strong class="d-block">Unknown Staff</strong>
+                                        <small class="text-muted">Position not available</small>
+                                    @endif
                                 </div>
                                 @php
                                     $score = $performer->avg_performance;
@@ -229,11 +240,21 @@
                                     <tr>
                                         <td><strong>{{ $index + 1 }}</strong></td>
                                         <td>
-                                            <a href="{{ route('staff.show', $staffAvg->staff) }}" class="text-decoration-none">
-                                                <strong>{{ $staffAvg->staff->name }}</strong>
-                                            </a>
+                                            @if($staffAvg->staff)
+                                                <a href="{{ route('staff.show', $staffAvg->staff) }}" class="text-decoration-none">
+                                                    <strong>{{ $staffAvg->staff->name }}</strong>
+                                                </a>
+                                            @else
+                                                <strong>Unknown Staff</strong>
+                                            @endif
                                         </td>
-                                        <td>{{ $staffAvg->staff->position }}</td>
+                                        <td>
+                                            @if($staffAvg->staff)
+                                                {{ $staffAvg->staff->position }}
+                                            @else
+                                                Position not available
+                                            @endif
+                                        </td>
                                         <td>
                                             <div class="progress" style="height: 25px; min-width: 150px;">
                                                 <div class="progress-bar bg-{{ $color }}" style="width: {{ $score }}%">
@@ -247,10 +268,17 @@
                                             </span>
                                         </td>
                                         <td class="text-end">
-                                            <a href="{{ route('staff.show', $staffAvg->staff) }}" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-eye me-1"></i>
-                                                View Details
-                                            </a>
+                                            @if($staffAvg->staff)
+                                                <a href="{{ route('staff.show', $staffAvg->staff) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    View Details
+                                                </a>
+                                            @else
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    View Details
+                                                </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -268,13 +296,19 @@
 <script>
     // Staff Performance Bar Chart
     const staffCtx = document.getElementById('staffPerformanceChart').getContext('2d');
+    
+    // Filter out null staff and prepare chart data
+    const validStaffAverages = @json($staffAverages->filter(function($item) { return $item->staff !== null; }));
+    const staffNames = validStaffAverages.map(item => item.staff.name);
+    const staffPerformanceData = validStaffAverages.map(item => parseFloat(item.avg_performance));
+    
     const staffPerformanceChart = new Chart(staffCtx, {
         type: 'bar',
         data: {
-            labels: {!! json_encode($staffAverages->pluck('staff.name')) !!},
+            labels: staffNames,
             datasets: [{
                 label: 'Average Performance (%)',
-                data: {!! json_encode($staffAverages->pluck('avg_performance')) !!},
+                data: staffPerformanceData,
                 backgroundColor: function(context) {
                     const value = context.parsed.y;
                     return value >= 80 ? 'rgba(40, 167, 69, 0.8)' : 

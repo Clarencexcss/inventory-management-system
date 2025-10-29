@@ -27,16 +27,26 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        // Process phone number - if it starts with 09, convert to +63
+        $requestData = $request->all();
+        if (isset($requestData['phone']) && preg_match('/^09\d{9}$/', $requestData['phone'])) {
+            $requestData['phone'] = '+63' . substr($requestData['phone'], 1);
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z\s.\-\']+$/',
             'email' => 'required|string|email|max:255|unique:customers',
             'username' => 'required|string|max:255|unique:customers',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'required|string|max:20|unique:customers',
+            'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers',
             'address' => 'required|string|max:500',
+        ], [
+            'name.regex' => 'The name may only contain letters, spaces, periods, hyphens, and apostrophes.',
+            'phone.regex' => 'The phone number must start with +63 and be exactly 11 digits.',
+            'phone.unique' => 'This phone number is already registered.',
         ]);
 
-        $result = $this->authService->createCustomerAccount($request->all());
+        $result = $this->authService->createCustomerAccount($requestData);
 
         if ($result['success']) {
             return response()->json($result, 201);
@@ -99,24 +109,36 @@ class AuthController extends Controller
     {
         $customer = $request->user();
 
+        // Process phone number - if it starts with 09, convert to +63
+        $requestData = $request->all();
+        if (isset($requestData['phone']) && preg_match('/^09\d{9}$/', $requestData['phone'])) {
+            $requestData['phone'] = '+63' . substr($requestData['phone'], 1);
+        }
+
         $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:20|unique:customers,phone,' . $customer->id,
+            'name' => 'sometimes|string|max:255|regex:/^[a-zA-Z\s.\-\']+$/',
+            'phone' => 'sometimes|string|regex:/^\+63\d{10}$/|unique:customers,phone,' . $customer->id,
             'address' => 'sometimes|string|max:500',
             'photo' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'name.regex' => 'The name may only contain letters, spaces, periods, hyphens, and apostrophes.',
+            'phone.regex' => 'The phone number must start with +63 and be exactly 11 digits.',
         ]);
 
+        // Prepare data for update
         $data = $request->only(['name', 'phone', 'address']);
-
+        
         // Handle photo upload
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($customer->photo) {
-                Storage::disk('public')->delete($customer->photo);
+                Storage::disk('public')->delete('customers/photos/' . $customer->photo);
             }
 
-            $photoPath = $request->file('photo')->store('customers/photos', 'public');
-            $data['photo'] = $photoPath;
+            $file = $request->file('photo');
+            $filename = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('customers', $filename, 'public');
+            $data['photo'] = $filename;
         }
 
         $customer->update($data);

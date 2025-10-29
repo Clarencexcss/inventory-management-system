@@ -23,12 +23,13 @@ class StaffNotificationNavbar extends Component
     public function loadNotifications()
     {
         // Cache notification data for 30 seconds to reduce database queries
-        $cacheKey = 'staff_notifications_' . auth()->id();
-        $data = Cache::remember($cacheKey, 30, function() {
+        $userId = auth()->id();
+        $cacheKey = 'staff_notifications_' . $userId;
+        $data = Cache::remember($cacheKey, 30, function() use ($userId) {
             $service = app(StaffNotificationService::class);
             return [
-                'unreadCount' => $service->getUnreadCount(),
-                'notifications' => $service->getRecentNotifications(5)->toArray()
+                'unreadCount' => $service->getUnreadCount($userId),
+                'notifications' => $service->getRecentNotifications(5, $userId)->toArray()
             ];
         });
         
@@ -49,7 +50,8 @@ class StaffNotificationNavbar extends Component
             $service->markAsRead($notification);
             
             // Clear cache to force refresh
-            $cacheKey = 'staff_notifications_' . auth()->id();
+            $userId = auth()->id();
+            $cacheKey = 'staff_notifications_' . $userId;
             Cache::forget($cacheKey);
             
             $this->loadNotifications();
@@ -58,11 +60,12 @@ class StaffNotificationNavbar extends Component
 
     public function markAllAsRead()
     {
+        $userId = auth()->id();
         $service = app(StaffNotificationService::class);
-        $service->markAllAsRead();
+        $service->markAllAsRead($userId);
         
         // Clear cache to force refresh
-        $cacheKey = 'staff_notifications_' . auth()->id();
+        $cacheKey = 'staff_notifications_' . $userId;
         Cache::forget($cacheKey);
         
         $this->loadNotifications();
@@ -71,16 +74,18 @@ class StaffNotificationNavbar extends Component
     public function goToOrder($orderId)
     {
         // Mark the notification as read when clicked
+        $userId = auth()->id();
         $notification = StaffNotification::where('order_id', $orderId)
             ->whereIn('type', ['pending_order', 'cancelled_order'])
             ->where('is_read', false)
+            ->forUser($userId)
             ->first();
             
         if ($notification) {
             $notification->markAsRead();
             
             // Clear cache to force refresh
-            $cacheKey = 'staff_notifications_' . auth()->id();
+            $cacheKey = 'staff_notifications_' . $userId;
             Cache::forget($cacheKey);
             
             $this->loadNotifications();

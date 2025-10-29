@@ -298,12 +298,20 @@
                                     <div class="col-sm-6 col-md-6">
                                         <div class="mb-3">
                                             <label for="storage_location" class="form-label">Storage Location</label>
-                                            <input type="text" 
-                                                   name="storage_location" 
-                                                   id="storage_location" 
-                                                   class="form-control @error('storage_location') is-invalid @enderror" 
-                                                   placeholder="e.g., Freezer 1, Shelf 2"
-                                                   value="{{ old('storage_location', $product->storage_location) }}">
+                                            <select name="storage_location" id="storage_location"
+                                                    class="form-select @error('storage_location') is-invalid @enderror">
+                                                <option selected disabled>Select a storage location:</option>
+                                                <option value="Freezer 1" {{ old('storage_location', $product->storage_location) == 'Freezer 1' ? 'selected' : '' }}>Freezer 1</option>
+                                                <option value="Freezer 2" {{ old('storage_location', $product->storage_location) == 'Freezer 2' ? 'selected' : '' }}>Freezer 2</option>
+                                                <option value="Freezer 3" {{ old('storage_location', $product->storage_location) == 'Freezer 3' ? 'selected' : '' }}>Freezer 3</option>
+                                                <option value="Freezer 4" {{ old('storage_location', $product->storage_location) == 'Freezer 4' ? 'selected' : '' }}>Freezer 4</option>
+                                                <option value="Freezer 5" {{ old('storage_location', $product->storage_location) == 'Freezer 5' ? 'selected' : '' }}>Freezer 5</option>
+                                                <option value="Shelf 1" {{ old('storage_location', $product->storage_location) == 'Shelf 1' ? 'selected' : '' }}>Shelf 1</option>
+                                                <option value="Shelf 2" {{ old('storage_location', $product->storage_location) == 'Shelf 2' ? 'selected' : '' }}>Shelf 2</option>
+                                                <option value="Shelf 3" {{ old('storage_location', $product->storage_location) == 'Shelf 3' ? 'selected' : '' }}>Shelf 3</option>
+                                                <option value="Shelf 4" {{ old('storage_location', $product->storage_location) == 'Shelf 4' ? 'selected' : '' }}>Shelf 4</option>
+                                                <option value="Shelf 5" {{ old('storage_location', $product->storage_location) == 'Shelf 5' ? 'selected' : '' }}>Shelf 5</option>
+                                            </select>
                                             @error('storage_location')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror

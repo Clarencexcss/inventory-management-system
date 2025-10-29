@@ -19,7 +19,24 @@
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="page-title">{{ __('Order Details') }}</h1>
-                <x-back-button url="{{ route('orders.index') }}" text="Back to Orders" />
+                <div class="d-flex gap-2">
+                    <x-back-button url="{{ route('orders.index') }}" text="Back to Orders" />
+                    <!-- Remove button -->
+                    <form action="{{ route('orders.destroy', $order) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-icon btn-outline-danger" onclick="return confirm('Are you sure you want to remove this order?')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M4 7l16 0" />
+                                <path d="M10 11l0 6" />
+                                <path d="M14 11l0 6" />
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
             </div>
             <p class="text-muted">Invoice: <strong>{{ $order->invoice_no }}</strong> | Customer: <strong>{{ $order->customer->name }}</strong></p>
         </div>
@@ -31,10 +48,7 @@
                     @if ($order->order_status === \App\Enums\OrderStatus::PENDING)
                         <form action="{{ route('orders.update', $order) }}" method="POST">
                             @csrf
-                            @method('put')
-                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to approve this order?')">
-                                Approve Orders
-                            </button>
+                            @method('put')       
                         </form>
                         
                         <!-- Cancel Order Button (Admin Only) -->
@@ -57,7 +71,7 @@
                 <div class="row mb-4">
                     <div class="col-md-3 mb-3">
                         <label class="form-label">{{ __('Order Date') }}</label>
-                        <input type="text" class="form-control" value="{{ $order->order_date->format('d-m-Y') }}" disabled>
+                        <input type="text" class="form-control" value="{{ $order->created_at->timezone('Asia/Manila')->format('d-m-Y g:i A') }}" disabled>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">{{ __('Payment Type') }}</label>
@@ -72,21 +86,67 @@
                         </span>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">{{ __('Customer') }}</label>
+                        <label class="form-label">{{ __('Customer Account') }}</label>
                         <input type="text" class="form-control" value="{{ $order->customer->name }}" disabled>
+                    </div>
+                    @if($order->receiver_name)
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Receiver Name') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->receiver_name }}" disabled>
+                    </div>
+                    @endif
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Customer Email') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->customer_email }}" disabled>
                     </div>
                 </div>
 
                 {{-- Delivery Info --}}
                 <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <h4 class="mb-3">{{ __('Delivery Information') }}</h4>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('City') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->city }}" disabled>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Postal Code') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->postal_code }}" disabled>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Barangay') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->barangay }}" disabled>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Street Name') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->street_name }}" disabled>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('Building') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->building ?? 'N/A' }}" disabled>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">{{ __('House No.') }}</label>
+                        <input type="text" class="form-control" value="{{ $order->house_no ?? 'N/A' }}" disabled>
+                    </div>
+                    
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ __('Delivery Address') }}</label>
+                        <label class="form-label">{{ __('Full Delivery Address') }}</label>
                         <input type="text" class="form-control" value="{{ $order->delivery_address }}" disabled>
                     </div>
+                    
                     <div class="col-md-3 mb-3">
                         <label class="form-label">{{ __('Contact Number') }}</label>
                         <input type="text" class="form-control" value="{{ $order->contact_phone }}" disabled>
                     </div>
+                    
                     <div class="col-md-3 mb-3">
                         <label class="form-label">{{ __('Delivery Notes') }}</label>
                         <textarea class="form-control" rows="2" disabled>{{ $order->delivery_notes }}</textarea>
@@ -117,6 +177,28 @@
                                 <span class="text-muted">{{ __('No image uploaded') }}</span>
                             @endif
                         </div>
+                    </div>
+                </div>
+                
+                {{-- Shop Information --}}
+                <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <h4 class="mb-3">{{ __('From Yannis Meat Shop') }}</h4>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ __('Address') }}</label>
+                        <input type="text" class="form-control" value="Katapatn Rd, 17, Cabuyao City, 4025 Laguna" disabled>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ __('Phone') }}</label>
+                        <input type="text" class="form-control" value="+63 09082413347" disabled>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ __('Email') }}</label>
+                        <input type="text" class="form-control" value="email@example.com" disabled>
                     </div>
                 </div>
 
@@ -214,10 +296,10 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <strong>Customer:</strong> {{ $order->customer->name }}
+                            <strong>Customer Account:</strong> {{ $order->customer->name }}
                         </div>
                         <div class="col-md-6">
-                            <strong>Order Date:</strong> {{ $order->order_date->format('M d, Y') }}
+                            <strong>Order Date:</strong> {{ $order->created_at->timezone('Asia/Manila')->format('M d, Y g:i A') }}
                         </div>
                     </div>
                     
@@ -312,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
                      style="max-width: 100%; max-height: 80vh; object-fit: contain;">
                 <div class="mt-3">
                     <p class="text-muted mb-1"><strong>GCash Reference:</strong> {{ $order->gcash_reference ?? 'N/A' }}</p>
-                    <p class="text-muted mb-0"><strong>Order Date:</strong> {{ $order->order_date->format('M d, Y') }}</p>
+                    <p class="text-muted mb-0"><strong>Order Date:</strong> {{ $order->created_at->timezone('Asia/Manila')->format('M d, Y g:i A') }}</p>
                 </div>
             </div>
             <div class="modal-footer">

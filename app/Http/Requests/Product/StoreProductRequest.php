@@ -4,7 +4,8 @@ namespace App\Http\Requests\Product;
 
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Http\FormRequest;
-use Haruncpi\LaravelIdGenerator\IdGenerator;
+use App\Models\MeatCut;
+use App\Models\Product;
 
 class StoreProductRequest extends FormRequest
 {
@@ -47,16 +48,110 @@ class StoreProductRequest extends FormRequest
     {
         $code = $this->code;
         if (!$code) {
-            // Generate unique code if not provided
-            do {
-                $code = 'PC' . strtoupper(uniqid());
-            } while (\App\Models\Product::where('code', $code)->exists());
+            // Generate unique code in format: ANIMAL-CUT-XXX
+            $meatCut = MeatCut::find($this->meat_cut_id);
+            if ($meatCut) {
+                $code = $this->generateProductCode($meatCut);
+            } else {
+                // Fallback if meat cut not found
+                do {
+                    $code = 'PC' . strtoupper(uniqid());
+                } while (Product::where('code', $code)->exists());
+            }
         }
         
         $this->merge([
             'slug' => Str::slug($this->name, '-'),
             'code' => $code,
         ]);
+    }
+
+    /**
+     * Generate a product code in the format: ANIMAL-CUT-XXX
+     * Example: CK-WNG-001 (Chicken Wings 001)
+     */
+    private function generateProductCode(MeatCut $meatCut): string
+    {
+        // Animal type abbreviations
+        $animalAbbreviations = [
+            'beef' => 'BF',
+            'pork' => 'PK',
+            'chicken' => 'CK',
+            'lamb' => 'LB',
+            'goat' => 'GT'
+        ];
+        
+        // Get animal abbreviation or use first 2 letters capitalized
+        $animalType = strtolower($meatCut->animal_type);
+        $animalCode = $animalAbbreviations[$animalType] ?? strtoupper(substr($animalType, 0, 2));
+        
+        // Generate cut abbreviation from cut name
+        $cutCode = $this->generateCutAbbreviation($meatCut->name);
+        
+        // Find the next sequential number for this animal-cut combination
+        $sequence = $this->getNextSequenceNumber($animalCode, $cutCode);
+        
+        return sprintf('%s-%s-%03d', $animalCode, $cutCode, $sequence);
+    }
+    
+    /**
+     * Generate a cut abbreviation from the cut name
+     * Examples: "Chicken Wings" -> "WNG", "Ribeye" -> "RIB"
+     */
+    private function generateCutAbbreviation(string $cutName): string
+    {
+        // Common cut abbreviations
+        $cutAbbreviations = [
+            'breast' => 'BRS',
+            'thigh' => 'THI',
+            'wings' => 'WNG',
+            'ribeye' => 'RIB',
+            'sirloin' => 'SIR',
+            'tenderloin' => 'TEN',
+            't-bone' => 'TBN',
+            'brisket' => 'BRS',
+            'chop' => 'CHP',
+            'belly' => 'BEL',
+            'ribs' => 'RIB',
+            'shank' => 'SHK'
+        ];
+        
+        // Convert to lowercase for matching
+        $lowerCutName = strtolower($cutName);
+        
+        // Check if we have a predefined abbreviation
+        foreach ($cutAbbreviations as $cut => $abbrev) {
+            if (strpos($lowerCutName, $cut) !== false) {
+                return $abbrev;
+            }
+        }
+        
+        // Fallback: take first 3 letters of the last word
+        $words = explode(' ', $cutName);
+        $lastWord = strtolower(end($words));
+        return strtoupper(substr($lastWord, 0, 3));
+    }
+    
+    /**
+     * Get the next sequence number for a given animal-cut combination
+     */
+    private function getNextSequenceNumber(string $animalCode, string $cutCode): int
+    {
+        // Find existing products with the same animal-cut prefix
+        $existingCode = Product::where('code', 'like', "$animalCode-$cutCode-%")
+            ->orderBy('code', 'desc')
+            ->first();
+            
+        if ($existingCode) {
+            // Extract the sequence number from the last product code
+            $parts = explode('-', $existingCode->code);
+            if (count($parts) == 3 && is_numeric($parts[2])) {
+                return (int)$parts[2] + 1;
+            }
+        }
+        
+        // Start with 1 if no existing products found
+        return 1;
     }
 
     public function messages(): array
