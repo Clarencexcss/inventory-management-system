@@ -16,16 +16,21 @@
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
 
         body {
-             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
         }
 
         /* Navbar */
         .navbar {
             background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .navbar-brand {
@@ -35,34 +40,40 @@
 
         .navbar-nav .nav-link {
             color: #f1f1f1 !important;
-            font-weight: 00;
-            text-decoration: none !important; /* Removes underline */
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
         }
 
         .navbar-nav .nav-link:hover,
         .navbar-nav .nav-link.active {
             color: #ffffff !important;
-            text-decoration: none !important; /* Ensures no underline */
+            transform: translateY(-1px);
+            text-decoration: none !important;
         }
 
         /* Buttons */
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-back {
             background-color: #6c757d;
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -73,26 +84,56 @@
         .btn-back:hover {
             background-color: #5a6268;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-view {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 6px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 6px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-1px);
         }
 
         /* Cards */
         .card {
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
         }
 
         .card-header {
             background-color: var(--primary-color);
             color: #fff;
             border-bottom: none;
+            font-weight: 600;
         }
 
         /* Table */
         .table th {
             background-color: #f1f1f1;
             color: #333;
+            font-weight: 600;
         }
 
         .table-hover tbody tr:hover {
@@ -100,24 +141,26 @@
         }
 
         .status-badge {
-            font-size: 0.8rem;
-            padding: 0.35rem 0.6rem;
-            border-radius: 0.4rem;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .status-pending {
-            background-color: #ffc107;
-            color: #000;
+            background-color: #fff3cd;
+            color: #856404;
         }
 
         .status-complete {
-            background-color: #28a745;
-            color: #fff;
+            background-color: #d4edda;
+            color: #155724;
         }
 
         .status-cancelled {
-            background-color: #dc3545;
-            color: #fff;
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         .modal-header {
@@ -126,7 +169,7 @@
         }
 
         .modal-content {
-            border-radius: 0.75rem;
+            border-radius: 12px;
             overflow: hidden;
         }
 
@@ -135,12 +178,69 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .page-header h5 {
-            font-weight: 600;
-            color: #333;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        /* Order Item Display */
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .order-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-badge {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 8px;
+        }
+
+        .empty-orders {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-orders i {
+            font-size: 4rem;
+            color: #ced4da;
+            margin-bottom: 20px;
+        }
+
+        .empty-orders h5 {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+            
+            .btn-view, .btn-cancel {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+            
+            .status-badge {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
         }
     </style>
 </head>
@@ -197,7 +297,7 @@
             <button class="btn-back" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h5><i class="fas fa-shopping-cart me-2 text-danger"></i>My Orders</h5>
+            <h5><i class="fas fa-shopping-cart me-2"></i>My Orders</h5>
         </div>
 
         @if(session('success'))
@@ -239,8 +339,8 @@
                                         </td>
                                         <td>
                                             @foreach($order->details->take(2) as $detail)
-                                                <div class="d-flex align-items-center mb-1">
-                                                    <span class="badge bg-secondary me-2">{{ $detail->quantity }}</span>
+                                                <div class="order-item">
+                                                    <span class="item-badge">{{ $detail->quantity }}</span>
                                                     <span>{{ $detail->product->name ?? 'Product' }}</span>
                                                 </div>
                                             @endforeach
@@ -262,13 +362,13 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('customer.orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                <i class="fas fa-eye"></i>View
+                                            <a href="{{ route('customer.orders.show', $order->id) }}" class="btn btn-view btn-outline-primary me-1">
+                                                <i class="fas fa-eye me-1"></i>View
                                             </a>
 
                                             @if($order->order_status === \App\Enums\OrderStatus::PENDING)
-                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal{{ $order->id }}">
-                                                    <i class="fas fa-times"></i>Cancel
+                                                <button type="button" class="btn btn-cancel btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal{{ $order->id }}">
+                                                    <i class="fas fa-times me-1"></i>Cancel
                                                 </button>
 
                                                 <!-- Cancel Modal -->
@@ -276,8 +376,8 @@
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Cancel Order #{{ $order->invoice_no }}</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                <h5 class="modal-title">Cancel Order #{{ $order->id }}</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                             </div>
                                                             <form action="{{ route('customer.orders.cancel', $order->id) }}" method="POST">
                                                                 @csrf
@@ -306,10 +406,10 @@
                         </table>
                     </div>
                 @else
-                    <div class="text-center py-5">
-                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No Orders Yet</h5>
-                        <p class="text-muted">You haven't placed any orders yet.</p>
+                    <div class="empty-orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h5>No Orders Yet</h5>
+                        <p class="text-muted mb-4">You haven't placed any orders yet.</p>
                         <a href="{{ route('customer.dashboard') }}" class="btn btn-primary">
                             <i class="fas fa-home me-1"></i>Back to Dashboard
                         </a>

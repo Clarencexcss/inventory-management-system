@@ -34,7 +34,7 @@ class CustomerLoginLockoutTest extends TestCase
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertSessionHasErrors(['login' => 'Invalid credentials']);
+        $response->assertSessionHasErrors(['login' => 'Invalid password. Please check your password and try again. You have 2 attempt(s) remaining before your account is locked for 5 minutes.']);
 
         // Second failed attempt
         $response = $this->post('/customer/login', [
@@ -42,7 +42,7 @@ class CustomerLoginLockoutTest extends TestCase
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertSessionHasErrors(['login' => 'Invalid credentials']);
+        $response->assertSessionHasErrors(['login' => 'Invalid password. Please check your password and try again. You have 1 attempt(s) remaining before your account is locked for 5 minutes.']);
 
         // Third failed attempt
         $response = $this->post('/customer/login', [
@@ -50,7 +50,7 @@ class CustomerLoginLockoutTest extends TestCase
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertSessionHasErrors(['login' => 'Invalid credentials']);
+        $response->assertSessionHasErrors(['login' => 'Invalid password. This is your last attempt. Your account is now locked for 5 minutes.']);
 
         // Fourth attempt should be locked out
         $response = $this->post('/customer/login', [
@@ -120,6 +120,6 @@ class CustomerLoginLockoutTest extends TestCase
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertSessionHasErrors(['login' => 'Invalid credentials']);
+        $response->assertSessionHasErrors(['login' => 'Invalid password. Please check your password and try again. You have 2 attempt(s) remaining before your account is locked for 5 minutes.']);
     }
 }

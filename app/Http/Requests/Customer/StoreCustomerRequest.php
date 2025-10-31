@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Customer;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\UniqueEmailAcrossTables;
 
 class StoreCustomerRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class StoreCustomerRequest extends FormRequest
         return [
             'photo' => 'image|file|max:1024',
             'name' => 'required|string|max:50|regex:/^[a-zA-Z\s.\-\']+$/',
-            'email' => 'required|email|max:50|unique:customers,email',
+            'email' => ['required', 'email', 'max:50', new UniqueEmailAcrossTables],
             'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers,phone',
             'account_holder' => 'max:50',
             'account_number' => 'max:25',

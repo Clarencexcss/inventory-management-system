@@ -15,16 +15,21 @@
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
+            color: #333;
         }
 
         /* Navbar Styles */
         .navbar {
             background-color: #8B0000 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .navbar-brand {
@@ -34,45 +39,85 @@
 
         .navbar .nav-link {
             color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .navbar .nav-link:hover {
             opacity: 0.85;
+            transform: translateY(-1px);
         }
 
         .dropdown-menu {
             background-color: white;
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
         .dropdown-item {
             color: #333;
+            transition: all 0.2s ease;
         }
 
         .dropdown-item:hover {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
         }
 
         /* Buttons */
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-danger {
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            transform: translateY(-2px);
         }
 
         /* Cards */
         .card {
             border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
         }
 
         .card-header {
             background-color: var(--primary-color);
             color: white;
             border-bottom: none;
+            font-weight: 600;
         }
 
         .cart-item-image {
@@ -80,15 +125,253 @@
             height: 80px;
             object-fit: cover;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .quantity-input {
-            width: 80px;
+            width: 100px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 8px 12px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .quantity-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(139, 0, 0, 0.25);
         }
 
         .summary-card {
             position: sticky;
             top: 20px;
+            border-radius: 12px;
+        }
+
+        .cart-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .cart-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 3px;
+            font-size: 1rem;
+        }
+
+        .product-meta {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .price-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .unit-price {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .price-per-unit {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .item-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .item-total-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-input {
+            width: 70px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            padding: 6px 8px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .update-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .empty-cart {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-cart i {
+            font-size: 4rem;
+            color: #ced4da;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart h5 {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .summary-total {
+            border-top: 2px solid #eee;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .summary-total .amount {
+            color: var(--primary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-checkout {
+            background-color: #28a745;
+            border-color: #28a745;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-checkout:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .btn-continue-shopping {
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .btn-clear-cart {
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .stock-indicator {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .in-stock {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .low-stock {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .out-of-stock {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .update-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .update-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -171,88 +454,105 @@
                     <div class="card-body">
                         @if($cartItems->count() > 0)
                             @foreach($cartItems as $item)
-                                <div class="row align-items-center mb-3 pb-3 border-bottom">
-                                    <div class="col-md-2">
-                                        @if($item->options->image)
-                                            <img src="{{ Storage::url($item->options->image) }}" 
-                                                 alt="{{ $item->name ?? 'Product' }}" class="cart-item-image">
-                                        @else
-                                            <div class="cart-item-image d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-image text-muted"></i>
+                                <div class="cart-item">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 text-center">
+                                            @if($item->options->image)
+                                                <img src="{{ Storage::url($item->options->image) }}" 
+                                                     alt="{{ $item->name ?? 'Product' }}" class="cart-item-image">
+                                            @else
+                                                <div class="cart-item-image d-flex align-items-center justify-content-center bg-light">
+                                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <h6 class="product-title">{{ $item->name ?? 'Product' }}</h6>
+                                            <div class="product-meta">
+                                                <div>Code: {{ $item->options->code }}</div>
+                                                <div>Unit: {{ $item->options->unit }}</div>
                                             </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <h6 class="mb-1">{{ $item->name ?? 'Product' }}</h6>
-                                        <p class="text-muted small mb-0">
-                                            Code: {{ $item->options->code }} • Unit: {{ $item->options->unit }}
-                                        </p>
-                                        <p class="text-muted small mb-0">
-                                            Stock: {{ $item->options->stock }} available
-                                        </p>
-                                    </div>
-                                    
-                                    <div class="col-md-2">
-                                        <div class="text-center">
-                                            <div class="fw-bold">₱{{ number_format($item->price, 2) }}</div>
-                                            <small class="text-muted">
-                                                per {{ $item->options->unit ?? 'kg' }}
-                                            </small>
+                                            <div class="mt-1">
+                                                @if($item->options->stock > 5)
+                                                    <span class="stock-indicator in-stock">
+                                                        <i class="fas fa-check-circle me-1"></i>In Stock
+                                                    </span>
+                                                @elseif($item->options->stock > 0)
+                                                    <span class="stock-indicator low-stock">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>Low Stock ({{ $item->options->stock }} left)
+                                                    </span>
+                                                @else
+                                                    <span class="stock-indicator out-of-stock">
+                                                        <i class="fas fa-times-circle me-1"></i>Out of Stock
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="col-md-2">
-                                        <form action="{{ route('customer.cart.update', $item->rowId) }}" method="POST" class="d-flex align-items-center">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="number" name="quantity" value="{{ $item->qty }}" 
-                                                   min="1" max="{{ $item->options->stock }}" 
-                                                   class="form-control quantity-input me-2">
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-sync-alt"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                    
-                                    <div class="col-md-2">
-                                        <div class="text-center">
-                                            <div class="fw-bold">₱{{ number_format($item->subtotal, 2) }}</div>
+                                        
+                                        <div class="col-md-2">
+                                            <div class="price-info">
+                                                <div class="unit-price">₱{{ number_format($item->price, 2) }}</div>
+                                                <div class="price-per-unit">
+                                                    per {{ $item->options->unit ?? 'kg' }}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="col-md-1">
-                                        <form action="{{ route('customer.cart.remove', $item->rowId) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                    onclick="return confirm('Remove this item from cart?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        
+                                        <div class="col-md-2">
+                                            <div class="quantity-controls">
+                                                <form action="{{ route('customer.cart.update', $item->rowId) }}" method="POST" class="d-flex align-items-center">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="number" name="quantity" value="{{ $item->qty }}" 
+                                                           min="1" max="{{ $item->options->stock }}" 
+                                                           class="quantity-input">
+                                                    <button type="submit" class="btn update-btn">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2">
+                                            <div class="item-total-container">
+                                                <div class="item-total">₱{{ number_format($item->subtotal, 2) }}</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-1 text-center">
+                                            <form action="{{ route('customer.cart.remove', $item->rowId) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn remove-btn" 
+                                                        onclick="return confirm('Remove this item from cart?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
                             
-                            <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex justify-content-between align-items-center mt-4">
                                 <form action="{{ route('customer.cart.clear') }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger" 
+                                    <button type="submit" class="btn btn-clear-cart btn-outline-danger" 
                                             onclick="return confirm('Clear entire cart?')">
                                         <i class="fas fa-trash me-1"></i>Clear Cart
                                     </button>
                                 </form>
                                 
-                                <a href="{{ route('customer.products') }}" class="btn btn-outline-primary">
+                                <a href="{{ route('customer.products') }}" class="btn btn-continue-shopping btn-outline-primary">
                                     <i class="fas fa-arrow-left me-1"></i>Continue Shopping
                                 </a>
                             </div>
                         @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">Your Cart is Empty</h5>
-                                <p class="text-muted">Add some products to your cart to get started.</p>
+                            <div class="empty-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                                <h5>Your Cart is Empty</h5>
+                                <p class="text-muted mb-4">Add some products to your cart to get started.</p>
                                 <a href="{{ route('customer.products') }}" class="btn btn-primary">
                                     <i class="fas fa-store me-1"></i>Browse Products
                                 </a>
@@ -272,24 +572,22 @@
                     </div>
                     <div class="card-body">
                         @if($cartItems->count() > 0)
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Subtotal:</span>
+                            <div class="summary-item">
+                                <span>Subtotal ({{ $cartItems->count() }} items):</span>
                                 <span>₱{{ number_format($cartSubtotal, 2) }}</span>
                             </div>
-                            <hr>
-                            <div class="d-flex justify-content-between mb-3">
-                                <strong>Total:</strong>
-                                <strong class="text-primary">₱{{ number_format($cartSubtotal, 2) }}</strong>
+                            <div class="summary-total">
+                                <span>Total:</span>
+                                <span class="amount">₱{{ number_format($cartSubtotal, 2) }}</span>
                             </div>
                             
-                            <a href="{{ route('customer.checkout') }}" class="btn btn-primary w-100">
+                            <a href="{{ route('customer.checkout') }}" class="btn btn-checkout w-100 mt-4">
                                 <i class="fas fa-credit-card me-1"></i>Proceed to Checkout
                             </a>
                             
-                            
-                            </div>
                         @else
-                            <div class="text-center py-3">
+                            <div class="text-center py-4">
+                                <i class="fas fa-receipt fa-2x text-muted mb-3"></i>
                                 <p class="text-muted mb-0">No items in cart</p>
                             </div>
                         @endif

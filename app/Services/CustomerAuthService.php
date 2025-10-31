@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\CustomerAuthLog;
 use App\Models\LoginAttempt;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Arr;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class CustomerAuthService
 {
@@ -96,7 +96,8 @@ class CustomerAuthService
             if ($this->isAccountLocked($emailOrUsername, 'customer')) {
                 // Calculate seconds remaining for lockout
                 $secondsRemaining = $this->getLockoutSecondsRemaining($emailOrUsername, 'customer');
-                $message = 'Account temporarily locked due to multiple failed login attempts. Please try again in ' . $secondsRemaining . ' seconds.';
+                $minutesRemaining = ceil($secondsRemaining / 60);
+                $message = 'Account temporarily locked due to multiple failed login attempts. Please try again in ' . $minutesRemaining . ' minutes.';
                 
                 return [
                     'success' => false,
@@ -136,7 +137,7 @@ class CustomerAuthService
                 // Check if account should now be locked (3 or more failed attempts)
                 if ($failedAttempts >= 3) {
                     // Account is now locked
-                    $message = 'Invalid password. This was your third failed attempt. Your account is now locked for 5 minutes.';
+                    $message = 'Account temporarily locked due to multiple failed login attempts. Please try again in 5 minutes.';
                     return [
                         'success' => false,
                         'message' => $message,

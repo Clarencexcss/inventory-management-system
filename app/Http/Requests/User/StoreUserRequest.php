@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\UniqueEmailAcrossTables;
 
 class StoreUserRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class StoreUserRequest extends FormRequest
         return [
             'photo' => 'image|file|max:1024',
             'name' => 'required|max:50',
-            'email' => 'required|email|max:50|unique:users,email',
+            'email' => ['required', 'email', 'max:50', new UniqueEmailAcrossTables],
             'username' => 'required|min:4|max:25|alpha_dash:ascii|unique:users,username',
             'password' => 'required_with:password_confirmation|min:6',
             'password_confirmation' => 'same:password|min:6',

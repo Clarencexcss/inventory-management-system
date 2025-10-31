@@ -27,14 +27,7 @@ class ProfileController extends Controller
     {
         $user = $request->user()->fill($request->validated());
 
-        $rules = [
-            'name' => 'required|max:50',
-            'photo' => 'image|file|max:1024',
-            'email' => 'required|email|max:50|unique:users,email,'.$user->id,
-            'username' => 'required|min:4|max:25|alpha_dash:ascii|unique:users,username,'.$user->id
-        ];
-
-        $validatedData = $request->validate($rules);
+        $validatedData = $request->validated();
 
         if ($validatedData['email'] != $user->email)
         {

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Rules\UniqueEmailAcrossTables;
 
 class WebAuthController extends Controller
 {
@@ -36,7 +37,7 @@ class WebAuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s.\-\']+$/',
-            'email' => 'required|string|email|max:255|unique:customers',
+            'email' => ['required', 'string', 'email', 'max:255', new UniqueEmailAcrossTables],
             'username' => 'required|string|max:255|unique:customers',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers',
@@ -98,17 +99,13 @@ class WebAuthController extends Controller
                 ->with('success', 'Welcome back!');
         }
 
-        // Pass remaining attempts or lockout information to the session
-        if (isset($result['remaining_attempts'])) {
-            return back()->withErrors(['login' => $result['message']])
-                ->with('login_attempts_remaining', $result['remaining_attempts']);
-        }
-        
+        // Pass lockout information to the session
         if (isset($result['lockout_seconds'])) {
             return back()->withErrors(['login' => $result['message']])
                 ->with('lockout_seconds', $result['lockout_seconds']);
         }
 
+        // For other cases, just show the error message
         return back()->withErrors(['login' => $result['message']]);
     }
 

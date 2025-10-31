@@ -4,6 +4,7 @@ namespace App\Http\Requests\Customer;
 
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\UniqueEmailAcrossTablesForUpdate;
 
 class UpdateCustomerRequest extends FormRequest
 {
@@ -46,7 +47,7 @@ class UpdateCustomerRequest extends FormRequest
                 'nullable',
                 'email',
                 'max:50',
-                Rule::unique('customers', 'email')->ignore($customerId),
+                new UniqueEmailAcrossTablesForUpdate($customerId, 'customer')
             ],
             'phone' => [
                 'required',

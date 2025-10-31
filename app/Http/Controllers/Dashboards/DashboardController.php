@@ -33,6 +33,7 @@ class DashboardController extends Controller
             $lowStockProducts = Product::whereColumn('quantity', '<=', 'quantity_alert')
                 ->where('quantity', '>', 0)
                 ->count();
+            $outOfStockProducts = Product::where('quantity', 0)->count();
 
             // Meat-specific statistics (keeping for backward compatibility)
             $totalMeatCuts = MeatCut::count();
@@ -57,6 +58,7 @@ class DashboardController extends Controller
                 'categories',
                 'availableProducts',
                 'lowStockProducts',
+                'outOfStockProducts',
                 'totalMeatCuts',
                 'availableMeatCuts',
                 'lowStockMeatCuts',

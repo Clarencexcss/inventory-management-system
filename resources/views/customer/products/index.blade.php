@@ -16,16 +16,21 @@
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
         
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
+            color: #333;
         }
 
         /* Navbar customization */
         .navbar {
             background-color: #8B0000 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .navbar-brand {
@@ -35,31 +40,41 @@
 
         .navbar-nav .nav-link {
             color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .navbar-nav .nav-link:hover {
             color: #f8d7da !important;
+            transform: translateY(-1px);
         }
 
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .card {
             border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
         }
         
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
         }
         
         .card-header {
@@ -68,10 +83,22 @@
             border-bottom: none;
         }
 
-        .product-image {
+        .product-image-container {
             height: 200px;
-            object-fit: cover;
+            overflow: hidden;
+            position: relative;
+            background-color: #f8f9fa;
+        }
+
+        .product-image {
+            height: 100%;
             width: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .product-image {
+            transform: scale(1.05);
         }
 
         .product-card {
@@ -79,9 +106,10 @@
         }
 
         .price {
-            font-size: 1.25rem;
-            font-weight: bold;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--primary-color);
+            margin: 10px 0;
         }
 
         .stock-badge {
@@ -89,12 +117,198 @@
             top: 10px;
             right: 10px;
             z-index: 1;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .low-stock {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .out-of-stock {
+            background-color: #dc3545;
+            color: white;
         }
 
         .filter-sidebar {
             background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-sidebar h5 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
             border-radius: 8px;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(139, 0, 0, 0.25);
+        }
+
+        .btn-filter {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .btn-clear {
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .unit-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .sold-per-info {
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .unit-info-badge {
+            background-color: #fff3cd;
+            color: #856404;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid #ffeaa7;
+        }
+
+        .availability {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .in-stock {
+            color: #198754;
+        }
+
+        .low-stock-text {
+            color: #ffc107;
+        }
+
+        .out-of-stock-text {
+            color: #dc3545;
+        }
+
+        .add-to-cart-btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination {
+            margin-top: 30px;
+        }
+
+        .page-link {
+            color: var(--primary-color);
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .no-products {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .no-products i {
+            font-size: 3rem;
+            color: #ced4da;
+            margin-bottom: 20px;
+        }
+
+        .no-products h5 {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .product-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
         }
     </style>
 </head>
@@ -169,14 +383,14 @@
         <div class="row">
             <!-- Filters Sidebar -->
             <div class="col-lg-3 mb-4">
-                <div class="filter-sidebar p-3">
-                    <h5 class="mb-3">
+                <div class="filter-sidebar">
+                    <h5 class="mb-0">
                         <i class="fas fa-filter me-2"></i>Filters
                     </h5>
                     
                     <!-- Search -->
                     <form method="GET" action="{{ route('customer.products') }}">
-                        <div class="mb-3">
+                        <div class="mb-3 mt-4">
                             <label for="search" class="form-label">Search Products</label>
                             <input type="text" class="form-control" id="search" name="search" 
                                    value="{{ request('search') }}" placeholder="Search products...">
@@ -187,10 +401,11 @@
                             <label for="category" class="form-label">Category</label>
                             <select class="form-select @error('category') is-invalid @enderror" id="category" name="category">
                                 <option value="">All Categories</option>
-                                <option value="beef" {{ old('category', $category ?? '') == 'beef' ? 'selected' : '' }}>Beef</option>
-                                <option value="chicken" {{ old('category', $category ?? '') == 'chicken' ? 'selected' : '' }}>Chicken</option>
-                                <option value="pig" {{ old('category', $category ?? '') == 'pig' ? 'selected' : '' }}>Pig</option>
-                                <option value="goat" {{ old('category', $category ?? '') == 'goat' ? 'selected' : '' }}>Goat</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('category')
                                 <div class="invalid-feedback">
@@ -199,29 +414,47 @@
                             @enderror
                         </div>
 
-                        <!-- Sort -->
+                        <!-- Price Range Filter -->
                         <div class="mb-3">
-                            <label for="sort" class="form-label">Sort By</label>
-                            <select class="form-select" id="sort" name="sort">
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name</option>
-                                <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Price</option>
+                            <label for="price_range" class="form-label">Price Range</label>
+                            <select class="form-select" id="price_range" name="price_range">
+                                <option value="">All Prices</option>
+                                <option value="0-100" {{ request('price_range') == '0-100' ? 'selected' : '' }}>₱0 - ₱100</option>
+                                <option value="101-200" {{ request('price_range') == '101-200' ? 'selected' : '' }}>₱101 - ₱200</option>
+                                <option value="201-500" {{ request('price_range') == '201-500' ? 'selected' : '' }}>₱201 - ₱500</option>
+                                <option value="501+" {{ request('price_range') == '501+' ? 'selected' : '' }}>₱501 and above</option>
                             </select>
                         </div>
 
+                        <!-- Unit Filter -->
                         <div class="mb-3">
-                            <label for="direction" class="form-label">Order</label>
-                            <select class="form-select" id="direction" name="direction">
-                                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
-                                <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Descending</option>
+                            <label for="unit" class="form-label">Packaging / Unit</label>
+                            <select class="form-select" id="unit" name="unit">
+                                <option value="">All Units</option>
+                                <option value="kg" {{ request('unit') == 'kg' ? 'selected' : '' }}>Kilogram (kg)</option>
+                                <option value="piece" {{ request('unit') == 'piece' ? 'selected' : '' }}>Piece</option>
+                                <option value="package" {{ request('unit') == 'package' ? 'selected' : '' }}>Package</option>
+                                <option value="box" {{ request('unit') == 'box' ? 'selected' : '' }}>Box</option>
+                                <option value="dozen" {{ request('unit') == 'dozen' ? 'selected' : '' }}>Dozen</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">
+                        <!-- Stock Status Filter -->
+                        <div class="mb-3">
+                            <label for="stock_status" class="form-label">Availability / Stock Status</label>
+                            <select class="form-select" id="stock_status" name="stock_status">
+                                <option value="">All Stock Status</option>
+                                <option value="in_stock" {{ request('stock_status') == 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                                <option value="low_stock" {{ request('stock_status') == 'low_stock' ? 'selected' : '' }}>Low Stock</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-filter w-100">
                             <i class="fas fa-search me-1"></i>Apply Filters
                         </button>
                         
-                        @if(request('search') || request('category') || request('sort') != 'name' || request('direction') != 'asc')
-                            <a href="{{ route('customer.products') }}" class="btn btn-outline-secondary w-100 mt-2">
+                        @if(request('search') || request('category') || request('price_range') || request('unit') || request('stock_status'))
+                            <a href="{{ route('customer.products') }}" class="btn btn-outline-secondary btn-clear w-100 mt-2">
                                 <i class="fas fa-times me-1"></i>Clear Filters
                             </a>
                         @endif
@@ -231,11 +464,11 @@
 
             <!-- Products Grid -->
             <div class="col-lg-9">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>
-                        <i class="fas fa-store me-2"></i>Products
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-store me-2"></i>Our Products
                     </h2>
-                    <div class="text-muted">
+                    <div class="product-count">
                         {{ $products->total() }} products found
                     </div>
                 </div>
@@ -245,59 +478,55 @@
                         @foreach($products as $product)
                             <div class="col-md-6 col-lg-4 mb-4">
                                 <div class="card product-card">
-                                    <div class="position-relative">
+                                    <div class="product-image-container">
                                         @if($product->product_image)
                                             <img src="{{ asset('storage/products/' . $product->product_image) }}" 
                                                  alt="{{ $product->name ?? 'Product' }}" class="product-image">
                                         @else
-                                            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                            <div class="product-image d-flex align-items-center justify-content-center h-100">
                                                 <i class="fas fa-image fa-3x text-muted"></i>
                                             </div>
                                         @endif
                                         
-                                        @if($product->quantity <= 5)
-                                            <span class="badge bg-warning stock-badge">Low Stock</span>
+                                        @if($product->quantity <= 0)
+                                            <span class="badge out-of-stock stock-badge">Out of Stock</span>
+                                        @elseif($product->quantity <= 5)
+                                            <span class="badge low-stock stock-badge">Low Stock</span>
                                         @endif
                                     </div>
                                     
                                     <div class="card-body d-flex flex-column">
-                                        <h5 class="card-title">{{ $product->name ?? 'Unnamed Product' }}</h5>
-                                        <p class="card-text text-muted small">
+                                        <h5 class="product-title">{{ $product->name ?? 'Unnamed Product' }}</h5>
+                                        <p class="product-category">
                                             {{ $product->code ?? 'N/A' }} • {{ $product->category->name ?? 'Uncategorized' }}
                                         </p>
                                         
-                                        <div class="price mb-2">
+                                        <div class="price">
                                             ₱{{ number_format($product->selling_price ?? 0, 2) }}
-                                            @if($product->unit)
-                                                /{{ $product->unit->name }}
-                                            @else
-                                                /kg
-                                            @endif
                                         </div>
                                         
-                                        <div class="mb-2">
-                                            <small class="badge bg-info text-dark">
-                                                Sold per {{ $product->unit->name ?? 'unit' }}
-                                            </small>
+                                        <div class="product-meta">
+                                            <span class="unit-badge">
+                                              Sold per  {{ $product->unit->name ?? 'kg' }}
+                                            </span>
+                                            <span class="availability {{ $product->quantity > 5 ? 'in-stock' : ($product->quantity > 0 ? 'low-stock-text' : 'out-of-stock-text') }}">
+                                                <i class="fas fa-box me-1"></i>
+                                                {{ $product->quantity ?? 0 }} left
+                                            </span>
                                         </div>
                                         
-                                        <div class="text-muted small mb-3">
-                                            <i class="fas fa-box me-1"></i>
-                                            {{ $product->quantity ?? 0 }} {{ $product->unit->name ?? 'units' }} available
-                                        </div>
-                                        
-                                        <div class="mt-auto">
+                                        <div class="mt-auto pt-3">
                                             @if($product->quantity > 0)
-                                                <form action="{{ route('customer.cart.add') }}" method="POST" class="d-inline">
+                                                <form action="{{ route('customer.cart.add') }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                                                     <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                    <button type="submit" class="btn btn-primary add-to-cart-btn w-100">
                                                         <i class="fas fa-cart-plus me-1"></i>Add to Cart
                                                     </button>
                                                 </form>
                                             @else
-                                                <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                <button class="btn btn-secondary add-to-cart-btn w-100" disabled>
                                                     <i class="fas fa-times me-1"></i>Out of Stock
                                                 </button>
                                             @endif
@@ -310,13 +539,13 @@
 
                     <!-- Pagination -->
                     <div class="d-flex justify-content-center mt-4">
-                        {{ $products->appends(request()->query())->links() }}
+                        {{ $products->appends(request()->query())->links('vendor.pagination.bootstrap-5') }}
                     </div>
                 @else
-                    <div class="text-center py-5">
-                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No Products Found</h5>
-                        <p class="text-muted">Try adjusting your search criteria or browse all products.</p>
+                    <div class="no-products">
+                        <i class="fas fa-search"></i>
+                        <h5>No Products Found</h5>
+                        <p class="text-muted mb-4">Try adjusting your search criteria or browse all products.</p>
                         <a href="{{ route('customer.products') }}" class="btn btn-primary">
                             <i class="fas fa-store me-1"></i>Browse All Products
                         </a>
@@ -327,7 +556,7 @@
     </div>
 
     <!-- Scripts -->
-        <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Rules\UniqueEmailAcrossTablesForUpdate;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -29,7 +30,7 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'email',
                 'max:50',
-                Rule::unique('users', 'email')->ignore($this->user)
+                new UniqueEmailAcrossTablesForUpdate($this->user->id, 'user')
             ],
             'username' => [
                 'required',

@@ -41,10 +41,18 @@
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.2s;
+            margin-bottom: 1.5rem;
         }
         
         .card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 600;
         }
         
         .btn-primary {
@@ -66,12 +74,31 @@
             color: var(--primary-color);
             font-weight: 600;
         }
+        
+        .table th {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .badge {
+            font-weight: 500;
+        }
+        
+        .alert {
+            border-radius: 8px;
+        }
+        
+        footer {
+            background-color: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: auto;
+        }
     </style>
 
     @stack('page-styles')
     @livewireStyles
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
@@ -155,7 +182,7 @@
         </div>
     </nav>
 
-    <div class="container-fluid">
+    <div class="container-fluid flex-grow-1">
         <div class="row">
             <main class="col py-4">
                 @if(isset($showBackButton) && $showBackButton)
@@ -168,7 +195,7 @@
         </div>
     </div>
 
-    <footer class="footer mt-auto py-3 bg-light">
+    <footer class="footer py-3">
         <div class="container text-center">
             <span class="text-muted">© {{ date('Y') }} Yannis Meatshop. All rights reserved.</span>
         </div>

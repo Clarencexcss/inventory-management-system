@@ -41,28 +41,6 @@
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header">
-                    Two-Factor Authentication
-                </div>
-                <div class="card-body">
-                    <p>
-                        Add another level of security to your account by enabling two-factor authentication.
-                        We will send you a text message to verify your login attempts on unrecognized devices and browsers.
-                    </p>
-                    <form>
-                        <div class="form-check">
-                            <input class="form-check-input" id="twoFactorOn" type="radio" name="twoFactor" checked="" />
-                            <label class="form-check-label" for="twoFactorOn">On</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" id="twoFactorOff" type="radio" name="twoFactor" />
-                            <label class="form-check-label" for="twoFactorOff">Off</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
                     Delete Account
                 </div>
                 <div class="card-body">

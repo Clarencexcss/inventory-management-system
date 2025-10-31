@@ -16,16 +16,21 @@
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
+            color: #333;
         }
 
         /* Navbar */
         .navbar {
             background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .navbar-brand {
@@ -36,12 +41,14 @@
         .navbar-nav .nav-link {
             color: #f1f1f1 !important;
             font-weight: 500;
+            transition: all 0.3s ease;
             text-decoration: none !important;
         }
 
         .navbar-nav .nav-link:hover,
         .navbar-nav .nav-link.active {
             color: #ffffff !important;
+            transform: translateY(-1px);
             text-decoration: none !important;
         }
 
@@ -49,20 +56,24 @@
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-back {
             background-color: #6c757d;
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -73,30 +84,66 @@
         .btn-back:hover {
             background-color: #5a6268;
             transform: translateY(-2px);
-            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-print {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
         }
 
         /* Cards */
         .card {
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
         }
 
         .card-header {
             background-color: var(--primary-color);
             color: #fff;
             border-bottom: none;
+            font-weight: 600;
             padding: 1rem 1.5rem;
         }
 
         .info-box {
-            background-color: #f8f9fa;
+            background-color: white;
+            border: 1px solid #e9ecef;
             border-left: 4px solid var(--primary-color);
             padding: 1rem;
             margin-bottom: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .info-label {
@@ -110,6 +157,7 @@
         .info-value {
             color: #333;
             font-size: 1rem;
+            font-weight: 500;
         }
 
         /* Table */
@@ -124,32 +172,34 @@
         }
 
         .product-img {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
-            border-radius: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .status-badge {
-            font-size: 0.9rem;
+            font-size: 1rem;
             padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+            border-radius: 20px;
             font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .status-pending {
-            background-color: #ffc107;
-            color: #000;
+            background-color: #fff3cd;
+            color: #856404;
         }
 
         .status-complete {
-            background-color: #28a745;
-            color: #fff;
+            background-color: #d4edda;
+            color: #155724;
         }
 
         .status-cancelled {
-            background-color: #dc3545;
-            color: #fff;
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         .total-row {
@@ -167,8 +217,48 @@
         .proof-image {
             max-width: 100%;
             max-height: 400px;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Section Headers */
+        .section-header {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin: 25px 0 15px 0;
+        }
+
+        /* Modal */
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .product-img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .info-box {
+                padding: 0.75rem;
+            }
+            
+            .info-label {
+                font-size: 0.75rem;
+            }
+            
+            .info-value {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -225,8 +315,8 @@
                 <i class="fas fa-arrow-left"></i> Back to My Orders
             </a>
             <div>
-                <h5 class="mb-0 d-inline-block me-3"><i class="fas fa-receipt me-2 text-danger"></i>Order Details</h5>
-                <a href="{{ route('customer.orders.download-invoice', $order->id) }}" class="btn btn-primary" target="_blank">
+                <h5 class="mb-0 d-inline-block me-3"><i class="fas fa-receipt me-2"></i>Order Details</h5>
+                <a href="{{ route('customer.orders.download-invoice', $order->id) }}" class="btn btn-print btn-primary" target="_blank">
                     <i class="fas fa-print me-1"></i> Print Invoice
                 </a>
             </div>
@@ -247,7 +337,7 @@
         @endif
 
         <!-- Order Information Card -->
-        <div class="card mb-4">
+        <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">Order #{{ $order->id }} - Invoice: {{ $order->invoice_no ?? 'N/A' }}</h4>
             </div>
@@ -325,11 +415,9 @@
                 </div>
                 
                 <!-- Delivery Information -->
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <h5 class="mb-3">Delivery Information</h5>
-                    </div>
-                    
+                <h5 class="section-header">Delivery Information</h5>
+                
+                <div class="row">
                     <div class="col-md-3 mb-3">
                         <div class="info-box">
                             <div class="info-label">City</div>
@@ -405,10 +493,11 @@
 
                 <!-- Proof of Payment -->
                 @if($order->proof_of_payment)
-                <div class="row mt-3">
+                <h5 class="section-header">Proof of Payment</h5>
+                
+                <div class="row">
                     <div class="col-12">
-                        <div class="info-label mb-2">Proof of Payment</div>
-                        <div class="text-center p-3 bg-light rounded">
+                        <div class="text-center p-4 bg-light rounded">
                             <img src="{{ asset('storage/' . $order->proof_of_payment) }}" alt="Proof of Payment" class="proof-image">
                         </div>
                     </div>
@@ -416,9 +505,10 @@
                 @endif
                 
                 <!-- Shop Information -->
-                <div class="row mt-3">
+                <h5 class="section-header">From Yannis Meat Shop</h5>
+                
+                <div class="row">
                     <div class="col-12">
-                        <h5 class="mb-3">From Yannis Meat Shop</h5>
                         <div class="info-box">
                             <div class="row">
                                 <div class="col-md-4">
@@ -431,7 +521,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="info-label">Email</div>
-                                    <div class="info-value">email@example.com</div>
+                                    <div class="info-value">yannismeatshop@gmail.com</div>
                                 </div>
                             </div>
                         </div>
@@ -464,7 +554,9 @@
                                     @if($detail->product && $detail->product->product_image)
                                         <img src="{{ asset('storage/products/' . $detail->product->product_image) }}" alt="{{ $detail->product->name }}" class="product-img">
                                     @else
-                                        <img src="{{ asset('assets/img/products/default.webp') }}" alt="Product" class="product-img">
+                                        <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
                                     @endif
                                 </td>
                                 <td>
@@ -495,8 +587,8 @@
 
                 <!-- Cancel Order Button (Only for Pending Orders) -->
                 @if($order->order_status === \App\Enums\OrderStatus::PENDING)
-                <div class="text-end mt-3">
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-cancel btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
                         <i class="fas fa-times me-1"></i>Cancel This Order
                     </button>
                 </div>
@@ -505,7 +597,7 @@
                 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header" style="background-color: var(--primary-color); color: white;">
+                            <div class="modal-header">
                                 <h5 class="modal-title">Cancel Order #{{ $order->id }}</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>

@@ -1,12 +1,67 @@
 @extends('layouts.butcher')
 
+@push('page-styles')
+<style>
+    .stat-card {
+        border-left: 4px solid var(--primary-color);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 1.5rem;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .stat-card.success {
+        border-left-color: #28a745;
+    }
+    .stat-card.warning {
+        border-left-color: #ffc107;
+    }
+    .stat-card.danger {
+        border-left-color: #dc3545;
+    }
+    .stat-card.info {
+        border-left-color: #17a2b8;
+    }
+    .stat-card.dark {
+        border-left-color: #343a40;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+    
+    .notification-card {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .notification-card.border-info { border-left-color: #17a2b8; }
+    .notification-card.border-danger { border-left-color: #dc3545; }
+    .notification-card.border-success { border-left-color: #28a745; }
+    .notification-card.border-warning { border-left-color: #ffc107; }
+    
+    .page-title {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col">
             <h1 class="page-title">
                 <i class="fas fa-chart-line me-2"></i>Dashboard Overview
             </h1>
+            <p class="text-muted">Welcome back! Here's what's happening with your business today.</p>
         </div>
     </div>
 
@@ -14,76 +69,87 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-danger text-white">
+                <div class="card-header bg-white border-bottom">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-box-open me-2"></i>Inventory Overview
+                        <i class="fas fa-box-open me-2 text-primary"></i>Inventory Overview
                     </h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-sm-6 col-lg-3 mb-4">
-                            <div class="card bg-light">
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="card stat-card">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <span class="bg-danger text-white p-3 rounded">
-                                                <i class="fas fa-box fa-2x"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $products }}</h3>
-                                            <div class="text-muted">Total Products</div>
+                                        <span class="bg-primary text-white avatar me-3">
+                                            <i class="fas fa-box"></i>
+                                        </span>
+                                        <div>
+                                            <div class="h3 mb-0">{{ $products }}</div>
+                                            <div class="text-muted small">Total Products</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-lg-3 mb-4">
-                            <div class="card bg-light">
+                        
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="card stat-card success">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <span class="bg-success text-white p-3 rounded">
-                                                <i class="fas fa-check-circle fa-2x"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $availableProducts }}</h3>
-                                            <div class="text-muted">Available Products</div>
+                                        <span class="bg-success text-white avatar me-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </span>
+                                        <div>
+                                            <div class="h3 mb-0 text-success">{{ $availableProducts }}</div>
+                                            <div class="text-muted small">Available</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-lg-3 mb-4">
-                            <div class="card bg-light">
+                        
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="card stat-card warning">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <span class="bg-warning text-white p-3 rounded">
-                                                <i class="fas fa-exclamation-triangle fa-2x"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $lowStockProducts }}</h3>
-                                            <div class="text-muted">Low Products</div>
+                                        <span class="bg-warning text-white avatar me-3">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                        <div>
+                                            <div class="h3 mb-0 text-warning">{{ $lowStockProducts }}</div>
+                                            <div class="text-muted small">Low Stock</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-lg-3 mb-4">
-                            <div class="card bg-light">
+                        
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="card stat-card danger">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <span class="bg-info text-white p-3 rounded">
-                                                <i class="fas fa-shopping-cart fa-2x"></i>
-                                            </span>
+                                        <span class="bg-danger text-white avatar me-3">
+                                            <i class="fas fa-times-circle"></i>
+                                        </span>
+                                        <div>
+                                            <div class="h3 mb-0 text-danger">{{ $outOfStockProducts }}</div>
+                                            <div class="text-muted small">Out of Stock</div>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h3 class="mb-0">{{ $todayOrders }}</h3>
-                                            <div class="text-muted">Today's Orders</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-2 col-md-4 col-sm-6">
+                            <div class="card stat-card info">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <span class="bg-info text-white avatar me-3">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </span>
+                                        <div>
+                                            <div class="h3 mb-0 text-info">{{ $todayOrders }}</div>
+                                            <div class="text-muted small">Today's Orders</div>
                                         </div>
                                     </div>
                                 </div>
@@ -100,9 +166,9 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-white border-bottom">
                     <h3 class="card-title mb-0">
-                        <i class="fas fa-bell me-2"></i>Recent Notifications
+                        <i class="fas fa-bell me-2 text-primary"></i>Recent Notifications
                         @if(isset($unreadNotifications) && $unreadNotifications > 0)
                             <span class="badge bg-warning ms-2">{{ $unreadNotifications }} unread</span>
                         @endif
@@ -111,8 +177,8 @@
                 <div class="card-body">
                     <div class="row">
                         @foreach($notifications->take(4) as $notification)
-                        <div class="col-sm-6 col-lg-3 mb-3">
-                            <div class="card border-start border-3 
+                        <div class="col-md-6 mb-3">
+                            <div class="notification-card 
                                 @if($notification->type === 'pending_order') border-info
                                 @elseif($notification->type === 'cancelled_order') border-danger
                                 @elseif($notification->type === 'order_completed') border-success
@@ -120,32 +186,30 @@
                                 @else border-secondary
                                 @endif
                             ">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="flex-shrink-0 me-2">
-                                            @if($notification->type === 'pending_order')
-                                                <i class="fas fa-clock text-info"></i>
-                                            @elseif($notification->type === 'cancelled_order')
-                                                <i class="fas fa-times-circle text-danger"></i>
-                                            @elseif($notification->type === 'order_completed')
-                                                <i class="fas fa-check-circle text-success"></i>
-                                            @elseif($notification->type === 'low_stock')
-                                                <i class="fas fa-exclamation-triangle text-warning"></i>
-                                            @else
-                                                <i class="fas fa-info-circle text-secondary"></i>
-                                            @endif
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1 small {{ $notification->read_at ? 'text-muted' : 'fw-bold' }}">
-                                                {{ $notification->title }}
-                                            </h6>
-                                            <p class="mb-1 small text-muted">
-                                                {{ Str::limit($notification->message, 50) }}
-                                            </p>
-                                            <small class="text-muted">
-                                                {{ $notification->created_at->diffForHumans() }}
-                                            </small>
-                                        </div>
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0 me-3 mt-1">
+                                        @if($notification->type === 'pending_order')
+                                            <i class="fas fa-clock text-info"></i>
+                                        @elseif($notification->type === 'cancelled_order')
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        @elseif($notification->type === 'order_completed')
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        @elseif($notification->type === 'low_stock')
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        @else
+                                            <i class="fas fa-info-circle text-secondary"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 {{ $notification->read_at ? 'text-muted' : 'fw-bold' }}">
+                                            {{ $notification->title }}
+                                        </h6>
+                                        <p class="mb-1 small text-muted">
+                                            {{ Str::limit($notification->message, 80) }}
+                                        </p>
+                                        <small class="text-muted">
+                                            {{ $notification->created_at->diffForHumans() }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -167,9 +231,9 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie me-2"></i>Meat by Animal Type
+                <div class="card-header bg-white border-bottom">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>Meat by Animal Type
                     </h3>
                 </div>
                 <div class="card-body">
@@ -184,8 +248,15 @@
                             <tbody>
                                 @foreach($meatByAnimalType as $type => $count)
                                 <tr>
-                                    <td>{{ ucfirst($type) }}</td>
-                                    <td>{{ $count }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark me-2">
+                                            {{ strtoupper(substr($type, 0, 2)) }}
+                                        </span>
+                                        {{ ucfirst($type) }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ $count }}</span>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -196,23 +267,39 @@
         </div>
         <div class="col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-tasks me-2"></i>Orders Overview
+                <div class="card-header bg-white border-bottom">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2 text-primary"></i>Orders Overview
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>Today's Orders</div>
-                        <div class="badge bg-info">{{ $todayOrders }}</div>
+                    <div class="d-flex justify-content-between mb-3 align-items-center">
+                        <div>
+                            <i class="fas fa-calendar-day text-info me-2"></i>
+                            Today's Orders
+                        </div>
+                        <div class="badge bg-info fs-6">{{ $todayOrders }}</div>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>Completed Orders</div>
-                        <div class="badge bg-success">{{ $completedOrders }}</div>
+                    <div class="d-flex justify-content-between mb-3 align-items-center">
+                        <div>
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Completed Orders
+                        </div>
+                        <div class="badge bg-success fs-6">{{ $completedOrders }}</div>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>Total Orders</div>
-                        <div class="badge bg-primary">{{ $orders }}</div>
+                    <div class="d-flex justify-content-between mb-3 align-items-center">
+                        <div>
+                            <i class="fas fa-shopping-cart text-primary me-2"></i>
+                            Total Orders
+                        </div>
+                        <div class="badge bg-primary fs-6">{{ $orders }}</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            Pending Orders
+                        </div>
+                        <div class="badge bg-warning fs-6">{{ $pendingOrders }}</div>
                     </div>
                 </div>
             </div>
@@ -220,14 +307,3 @@
     </div>
 </div>
 @endsection
-
-@push('page-styles')
-<style>
-    .card-header {
-        border-bottom: none;
-    }
-    .bg-danger {
-        background-color: var(--primary-color) !important;
-    }
-</style>
-@endpush

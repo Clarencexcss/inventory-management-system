@@ -7,6 +7,7 @@ use App\Models\LoginAttempt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AdminAuthService
 {
@@ -18,20 +19,13 @@ class AdminAuthService
      */
     public function isAccountLocked(string $email): bool
     {
-        try {
-            $failedAttempts = LoginAttempt::where('email', $email)
-                ->where('user_type', 'admin')
-                ->where('successful', false)
-                ->where('attempted_at', '>=', now()->subMinutes(5))
-                ->count();
+        $failedAttempts = LoginAttempt::where('email', $email)
+            ->where('user_type', 'admin')
+            ->where('successful', false)
+            ->where('attempted_at', '>=', now()->subMinutes(5))
+            ->count();
 
-            return $failedAttempts >= 3;
-        } catch (\Exception $e) {
-            Log::error('Failed to check account lock status', [
-                'error' => $e->getMessage(),
-            ]);
-            return false; // Don't lock accounts if there's an error
-        }
+        return $failedAttempts >= 3;
     }
 
     /**
@@ -51,7 +45,7 @@ class AdminAuthService
                 'successful' => false,
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to log login attempt', [
+            Log::error('Failed to log admin login attempt', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -74,7 +68,29 @@ class AdminAuthService
                 'successful' => true,
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to log login attempt', [
+            Log::error('Failed to log admin login attempt', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Clear failed login attempts after successful login
+     * 
+     * @param string $email
+     * @return void
+     */
+    public function clearFailedAttempts(string $email): void
+    {
+        try {
+            // Delete failed attempts older than 5 minutes
+            LoginAttempt::where('email', $email)
+                ->where('user_type', 'admin')
+                ->where('successful', false)
+                ->where('attempted_at', '<', now()->subMinutes(5))
+                ->delete();
+        } catch (\Exception $e) {
+            Log::error('Failed to clear admin failed login attempts', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -95,7 +111,7 @@ class AdminAuthService
                 ->where('attempted_at', '>=', now()->subMinutes(5))
                 ->count();
         } catch (\Exception $e) {
-            Log::error('Failed to get failed attempts count', [
+            Log::error('Failed to get admin failed attempts count', [
                 'error' => $e->getMessage(),
             ]);
             return 0;
@@ -129,10 +145,53 @@ class AdminAuthService
 
             return $secondsRemaining;
         } catch (\Exception $e) {
-            Log::error('Failed to get lockout seconds remaining', [
+            Log::error('Failed to get admin lockout seconds remaining', [
                 'error' => $e->getMessage(),
             ]);
             return 0;
+        }
+    }
+    
+    /**
+     * Get the appropriate warning message based on failed attempts
+     * 
+     * @param string $email
+     * @param int $totalFailedAttempts Total failed attempts including the current one
+     * @return array
+     */
+    public function getWarningMessage(string $email, int $totalFailedAttempts = null): array
+    {
+        // If totalFailedAttempts is not provided, get it from the database
+        if ($totalFailedAttempts === null) {
+            $totalFailedAttempts = $this->getFailedAttemptsCount($email);
+        }
+        
+        // The messages are based on the total number of failed attempts
+        switch ($totalFailedAttempts) {
+            case 1:
+                return [
+                    'message' => '⚠️ You have 2 attempts remaining before your account is locked for 5 minutes.',
+                    'type' => 'warning',
+                    'remaining_attempts' => 2
+                ];
+            case 2:
+                return [
+                    'message' => '⚠️ You have 1 attempt remaining before your account is locked for 5 minutes.',
+                    'type' => 'warning',
+                    'remaining_attempts' => 1
+                ];
+            case 3:
+                return [
+                    'message' => '⚠️ This is your last attempt. If you fail again, your account will be locked for 5 minutes.',
+                    'type' => 'warning',
+                    'remaining_attempts' => 0
+                ];
+            default:
+                return [
+                    'message' => '',
+                    'type' => '',
+                    'remaining_attempts' => max(0, 3 - $totalFailedAttempts)
+                ];
         }
     }
 }

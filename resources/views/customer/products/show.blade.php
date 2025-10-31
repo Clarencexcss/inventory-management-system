@@ -19,11 +19,14 @@
             --primary-color: #8B0000;
             --secondary-color: #4A0404;
             --accent-color: #FF4136;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
+            color: #333;
         }
         
         .navbar-brand {
@@ -34,22 +37,36 @@
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .card {
             border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+            overflow: hidden;
         }
         
         .card-header {
             background-color: var(--primary-color);
             color: white;
             border-bottom: none;
+            font-weight: 600;
+        }
+
+        .product-image-container {
+            position: relative;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .product-image {
@@ -59,20 +76,175 @@
         }
 
         .price {
-            font-size: 2rem;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 700;
             color: var(--primary-color);
+            margin: 15px 0;
         }
 
         .stock-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             z-index: 1;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .low-stock {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .out-of-stock {
+            background-color: #dc3545;
+            color: white;
         }
 
         .quantity-input {
-            width: 100px;
+            width: 100%;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .quantity-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(139, 0, 0, 0.25);
+        }
+
+        .add-to-cart-btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .product-info-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .product-info-value {
+            color: #212529;
+            font-size: 1.1rem;
+        }
+
+        .related-product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .related-product-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #212529;
+            margin-bottom: 3px;
+        }
+
+        .related-product-price {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .view-details-btn {
+            border-radius: 6px;
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            font-weight: 500;
+        }
+
+        .breadcrumb {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .product-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .meta-item {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .unit-info {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 500;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .alert-info {
+            border-radius: 8px;
+            border: none;
+            background-color: #d1ecf1;
+        }
+
+        .alert-warning {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .related-products-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar styling */
+        .related-products-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .related-products-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .related-products-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -159,18 +331,20 @@
                         <div class="row">
                             <!-- Product Image -->
                             <div class="col-md-6 mb-4">
-                                <div class="position-relative">
+                                <div class="product-image-container position-relative">
                                     @if($product->product_image)
                                         <img src="{{ asset('storage/products/' . $product->product_image) }}" 
                                              alt="{{ $product->name ?? 'Product' }}" class="product-image w-100">
                                     @else
-                                        <div class="product-image d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
+                                        <div class="product-image d-flex align-items-center justify-content-center" style="height: 300px;">
                                             <i class="fas fa-image fa-4x text-muted"></i>
                                         </div>
                                     @endif
                                     
-                                    @if($product->quantity <= 5)
-                                        <span class="badge bg-warning stock-badge">Low Stock</span>
+                                    @if($product->quantity <= 0)
+                                        <span class="badge out-of-stock stock-badge">Out of Stock</span>
+                                    @elseif($product->quantity <= 5)
+                                        <span class="badge low-stock stock-badge">Low Stock</span>
                                     @endif
                                 </div>
                             </div>
@@ -179,19 +353,14 @@
                             <div class="col-md-6">
                                 <h2 class="mb-3">{{ $product->name ?? 'Unnamed Product' }}</h2>
                                 
-                                <div class="price mb-2">
+                                <div class="price">
                                     ₱{{ number_format($product->selling_price ?? 0, 2) }}
-                                    @if($product->unit)
-                                        /{{ $product->unit->name }}
-                                    @else
-                                        /kg
-                                    @endif
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <div class="alert alert-info py-2 px-3 mb-0">
-                                        <small class="fw-bold">
-                                            <i class="fas fa-tag me-1"></i>
+                                <div class="alert alert-info py-2 px-3 mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-balance-scale me-2"></i>
+                                        <span class="fw-bold">
                                             @if($product->unit && strtolower($product->unit->name) === 'kg')
                                                 Sold per kilogram
                                             @elseif($product->unit && strtolower($product->unit->name) === 'piece')
@@ -205,28 +374,32 @@
                                             @else
                                                 Sold per {{ $product->unit->name ?? 'unit' }}
                                             @endif
-                                        </small>
+                                        </span>
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <p class="text-muted mb-1">
-                                        <strong>Product Code:</strong> {{ $product->code }}
-                                    </p>
-                                    <p class="text-muted mb-1">
-                                        <strong>Category:</strong> {{ $product->category->name ?? 'Uncategorized' }}
-                                    </p>
-                                    <p class="text-muted mb-1">
-                                        <strong>Unit:</strong> {{ $product->unit->name ?? 'kg' }}
-                                    </p>
-                                    <p class="text-muted mb-3">
-                                        <strong>Stock:</strong> {{ $product->quantity }} available
-                                    </p>
+                                <div class="product-meta">
+                                    <div class="meta-item">
+                                        <div class="meta-label">Product Code</div>
+                                        <div class="meta-value">{{ $product->code ?? 'N/A' }}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Category</div>
+                                        <div class="meta-value">{{ $product->category->name ?? 'Uncategorized' }}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Unit</div>
+                                        <div class="meta-value">{{ $product->unit->name ?? 'kg' }}</div>
+                                    </div>
+                                    <div class="meta-item">
+                                        <div class="meta-label">Stock</div>
+                                        <div class="meta-value">{{ $product->quantity ?? 0 }}</div>
+                                    </div>
                                 </div>
                                 
                                 @if($product->notes)
-                                    <div class="mb-3">
-                                        <h6>Description:</h6>
+                                    <div class="mb-4">
+                                        <h5 class="section-title">Description</h5>
                                         <p class="text-muted">{{ $product->notes }}</p>
                                     </div>
                                 @endif
@@ -236,14 +409,14 @@
                                         @csrf
                                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                                         <div class="row align-items-end">
-                                            <div class="col-md-4">
-                                                <label for="quantity" class="form-label">Quantity (kg)</label>
-                                                <input type="number" class="form-control quantity-input" 
+                                            <div class="col-md-6 mb-3">
+                                                <label for="quantity" class="form-label product-info-label">Quantity</label>
+                                                <input type="number" class="quantity-input" 
                                                        id="quantity" name="quantity" value="1" 
                                                        min="1" max="{{ $product->quantity }}">
                                             </div>
-                                            <div class="col-md-8">
-                                                <button type="submit" class="btn btn-primary w-100">
+                                            <div class="col-md-6 mb-3">
+                                                <button type="submit" class="btn btn-primary add-to-cart-btn w-100">
                                                     <i class="fas fa-cart-plus me-1"></i>Add to Cart
                                                 </button>
                                             </div>
@@ -269,24 +442,24 @@
                             <i class="fas fa-thumbs-up me-2"></i>Related Products
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body related-products-container">
                         @if($relatedProducts->count() > 0)
                             @foreach($relatedProducts as $relatedProduct)
-                                <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
                                     <div class="flex-shrink-0 me-3">
                                         @if($relatedProduct->product_image)
                                             <img src="{{ asset('storage/products/' . $relatedProduct->product_image) }}" 
                                                  alt="{{ $relatedProduct->name ?? 'Related Product' }}" 
-                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                                 class="related-product-image">
                                         @else
-                                            <div style="width: 60px; height: 60px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                            <div class="related-product-image d-flex align-items-center justify-content-center bg-light">
                                                 <i class="fas fa-image text-muted"></i>
                                             </div>
                                         @endif
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-1">{{ $relatedProduct->name ?? 'Related Product' }}</h6>
-                                        <p class="text-muted mb-1 small">
+                                        <h6 class="related-product-title mb-1">{{ $relatedProduct->name ?? 'Related Product' }}</h6>
+                                        <p class="related-product-price mb-2">
                                             ₱{{ number_format($relatedProduct->selling_price ?? 0, 2) }}
                                             @if($relatedProduct->unit)
                                                 /{{ $relatedProduct->unit->name }}
@@ -295,14 +468,14 @@
                                             @endif
                                         </p>
                                         <a href="{{ route('customer.products.show', $relatedProduct) }}" 
-                                           class="btn btn-sm btn-outline-primary">
+                                           class="btn btn-sm btn-outline-primary view-details-btn">
                                             View Details
                                         </a>
                                     </div>
                                 </div>
                             @endforeach
                         @else
-                            <p class="text-muted text-center">No related products found.</p>
+                            <p class="text-muted text-center py-4">No related products found.</p>
                         @endif
                     </div>
                 </div>
@@ -315,4 +488,4 @@
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
 </body>
-</html> 
+</html>

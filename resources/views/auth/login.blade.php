@@ -12,7 +12,7 @@
             <div class="alert alert-danger">
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li>{!! nl2br(e($error)) !!}</li>
                     @endforeach
                 </ul>
             </div>
@@ -70,11 +70,11 @@
     </p>
 </div>
 
-{{-- JavaScript for displaying detailed error messages --}}
 <script>
     // This script helps display more detailed error messages if needed
     document.addEventListener('DOMContentLoaded', function() {
         // Any additional client-side logic can be added here
     });
 </script>
+
 @endsection

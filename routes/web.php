@@ -91,9 +91,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:web_customer'])-
 // Customer Protected Routes - AUTHENTICATED + VERIFIED ONLY
 // Uses 'customer.web.auth' middleware - requires authentication AND email verification
 Route::middleware(['customer.web.auth'])->group(function () {
-    Route::get('/customer/dashboard', function () {
-        return view('customer.dashboard');
-    })->name('customer.dashboard');
+    Route::get('/customer/dashboard', [App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('customer.dashboard');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('customer.orders');
     Route::get('/my-orders/{order}', [\App\Http\Controllers\Customer\OrderController::class, 'showOrder'])->name('customer.orders.show');
     Route::post('/my-orders/{order}/cancel', [\App\Http\Controllers\Customer\OrderController::class, 'cancel'])->name('customer.orders.cancel');

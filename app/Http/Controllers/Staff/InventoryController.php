@@ -17,7 +17,24 @@ class InventoryController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('staff.inventory.index', compact('inventoryMovements'));
+        // Get counts for dashboard cards
+        $outOfStockCount = Product::where('quantity', 0)->count();
+        $lowStockProducts = Product::where('quantity', '<=', DB::raw('minimum_stock_level'))->count();
+        $pendingDeliveries = InventoryMovement::where('type', 'in')
+            ->where('reference_type', 'purchase')
+            ->whereNull('received_at')
+            ->count();
+        $expiredProducts = Product::where('expiration_date', '<', now())
+            ->orWhere('status', 'damaged')
+            ->count();
+
+        return view('staff.inventory.index', compact(
+            'inventoryMovements', 
+            'outOfStockCount', 
+            'lowStockProducts', 
+            'pendingDeliveries', 
+            'expiredProducts'
+        ));
     }
 
     public function create()

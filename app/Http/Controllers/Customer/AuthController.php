@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use App\Rules\UniqueEmailAcrossTables;
 
 class AuthController extends Controller
 {
@@ -35,7 +36,7 @@ class AuthController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255|regex:/^[a-zA-Z\s.\-\']+$/',
-            'email' => 'required|string|email|max:255|unique:customers',
+            'email' => ['required', 'string', 'email', 'max:255', new UniqueEmailAcrossTables],
             'username' => 'required|string|max:255|unique:customers',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string|regex:/^\+63\d{10}$/|unique:customers',

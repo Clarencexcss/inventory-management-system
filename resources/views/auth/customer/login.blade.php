@@ -23,14 +23,6 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         
-        {{-- Login attempt notification --}}
-        @if (session('login_attempts_remaining'))
-            <div class="alert alert-warning">
-                <strong>Warning:</strong> You have {{ session('login_attempts_remaining') }} login attempt(s) remaining. 
-                After 3 failed attempts, your account will be locked for 5 minutes.
-            </div>
-        @endif
-        
         {{-- Lockout notification with countdown --}}
         @if (session('lockout_seconds'))
             <div class="alert alert-danger" id="lockout-notification">
